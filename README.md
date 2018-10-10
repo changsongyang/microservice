@@ -5,7 +5,7 @@
 
 
 #### 整体项目介绍
-common-parent &nbsp;&nbsp;&nbsp;&nbsp; 是所有模块的父pom，用以维护所有模块即第三方依赖包的版本等内容  </br>
+common-parent &nbsp;&nbsp;&nbsp;&nbsp; 是所有模块的父pom，用以维护所有模块及第三方依赖包的版本等内容  </br>
 common-static &nbsp;&nbsp;&nbsp;&nbsp; 是公用的静态基础模块，用以定义一些静态的内容，如：Enum、Constant、Exception、POJO、Annotation 等  <br/>
 common-util &nbsp;&nbsp;&nbsp;&nbsp; 是公用的工具类，提供常用工具类和组件，如：StringUtil、JsonUtil，或者封装curator、redis组件等  <br/>
 common-rocketmq &nbsp;&nbsp;&nbsp;&nbsp; 是使用RocketMQ来发送、消费消息的模块，在RocketMQ原生API上加了一层封装，方便业务开发使用  <br/>
