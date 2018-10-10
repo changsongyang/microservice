@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.study.demo.provider.entity.User">
+	<sql id="table"> tbl_user </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="org.study.demo.provider.entity.User">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="VERSION" property="version" jdbcType="BIGINT"/>
+		<result column="USER_NO" property="userNo" jdbcType="CHAR"/>
+		<result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+		<result column="REAL_NAME" property="realName" jdbcType="VARCHAR"/>
+		<result column="GENDER" property="gender" jdbcType="TINYINT"/>
+		<result column="AGE" property="age" jdbcType="SMALLINT"/>
+		<result column="ANNUAL_INCOME" property="annualIncome" jdbcType="DECIMAL"/>
+		<result column="IS_PROGRAMMER" property="isProgrammer" jdbcType="TINYINT"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		CREATE_TIME,
+		VERSION,
+		USER_NO,
+		USER_NAME,
+		REAL_NAME,
+		GENDER,
+		AGE,
+		ANNUAL_INCOME,
+		IS_PROGRAMMER
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="org.study.demo.provider.entity.User">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	USER_NO,
+        	USER_NAME,
+        	REAL_NAME,
+        	GENDER,
+        	AGE,
+        	ANNUAL_INCOME,
+        	IS_PROGRAMMER
+        ) VALUES (
+			#{createTime,jdbcType=TIMESTAMP},
+			0,
+			#{userNo,jdbcType=CHAR},
+			#{userName,jdbcType=VARCHAR},
+			#{realName,jdbcType=VARCHAR},
+			#{gender,jdbcType=TINYINT},
+			#{age,jdbcType=SMALLINT},
+			#{annualIncome,jdbcType=DECIMAL},
+			#{isProgrammer,jdbcType=TINYINT}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+        	CREATE_TIME,
+        	VERSION,
+        	USER_NO,
+        	USER_NAME,
+        	REAL_NAME,
+        	GENDER,
+        	AGE,
+        	ANNUAL_INCOME,
+        	IS_PROGRAMMER
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{item.createTime,jdbcType=TIMESTAMP},
+			0,
+			#{item.userNo,jdbcType=CHAR},
+			#{item.userName,jdbcType=VARCHAR},
+			#{item.realName,jdbcType=VARCHAR},
+			#{item.gender,jdbcType=TINYINT},
+			#{item.age,jdbcType=SMALLINT},
+			#{item.annualIncome,jdbcType=DECIMAL},
+			#{item.isProgrammer,jdbcType=TINYINT}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="org.study.demo.provider.entity.User">
+        UPDATE <include refid="table" />
+		<set>
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			USER_NO = #{userNo,jdbcType=CHAR},
+			USER_NAME = #{userName,jdbcType=VARCHAR},
+			REAL_NAME = #{realName,jdbcType=VARCHAR},
+			GENDER = #{gender,jdbcType=TINYINT},
+			AGE = #{age,jdbcType=SMALLINT},
+			ANNUAL_INCOME = #{annualIncome,jdbcType=DECIMAL},
+			IS_PROGRAMMER = #{isProgrammer,jdbcType=TINYINT}
+		</set>
+        WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="org.study.demo.provider.entity.User">
+		UPDATE <include refid="table" />
+		<set>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			<if test="userNo != null">
+				USER_NO = #{userNo,jdbcType=CHAR},
+			</if>
+			<if test="userName != null">
+				USER_NAME = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="realName != null">
+				REAL_NAME = #{realName,jdbcType=VARCHAR},
+			</if>
+			<if test="gender != null">
+				GENDER = #{gender,jdbcType=TINYINT},
+			</if>
+			<if test="age != null">
+				AGE = #{age,jdbcType=SMALLINT},
+			</if>
+			<if test="annualIncome != null">
+				ANNUAL_INCOME = #{annualIncome,jdbcType=DECIMAL},
+			</if>
+			<if test="isProgrammer != null">
+				IS_PROGRAMMER = #{isProgrammer,jdbcType=TINYINT}
+			</if>
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个id查询 -->
+    <select id="listByPkList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+    <select id="getByPk" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE ID = #{id,jdbcType=BIGINT}  
+	</select>
+
+	<!-- 按id主键删除 -->
+	<delete id="deleteByPk">
+        DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+	<!-- 按多个id主键删除 -->
+	<delete id="deleteByPkList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE ID IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="idList != null and idList.size() > 0">
+			AND ID IN <foreach collection="idList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="version != null ">
+			AND VERSION = #{version,jdbcType=BIGINT}
+		</if>
+		<if test="userNo != null and userNo !='' ">
+			AND USER_NO = #{userNo,jdbcType=CHAR}
+		</if>
+		<if test="userName != null and userName !='' ">
+			AND USER_NAME = #{userName,jdbcType=VARCHAR}
+		</if>
+		<if test="realName != null and realName !='' ">
+			AND REAL_NAME = #{realName,jdbcType=VARCHAR}
+		</if>
+		<if test="gender != null ">
+			AND GENDER = #{gender,jdbcType=TINYINT}
+		</if>
+		<if test="age != null ">
+			AND AGE = #{age,jdbcType=SMALLINT}
+		</if>
+		<if test="annualIncome != null ">
+			AND ANNUAL_INCOME = #{annualIncome,jdbcType=DECIMAL}
+		</if>
+		<if test="isProgrammer != null ">
+			AND IS_PROGRAMMER = #{isProgrammer,jdbcType=TINYINT}
+		</if>
+	</sql>
+</mapper>
+

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.study.demo.provider.entity.UserExt">
+	<sql id="table"> tbl_user_ext </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="org.study.demo.provider.entity.UserExt">
+		<result column="USER_NO" property="userNo" jdbcType="CHAR"/>
+		<result column="VERSION" property="version" jdbcType="BIGINT"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="ADDRESS" property="address" jdbcType="VARCHAR"/>
+		<result column="HEIGHT" property="height" jdbcType="SMALLINT"/>
+		<result column="WEIGHT" property="weight" jdbcType="DECIMAL"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		USER_NO,
+		VERSION,
+		CREATE_TIME,
+		ADDRESS,
+		HEIGHT,
+		WEIGHT
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="userNo" parameterType="org.study.demo.provider.entity.UserExt">
+		INSERT INTO <include refid="table" /> (
+			USER_NO,
+        	VERSION,
+        	CREATE_TIME,
+        	ADDRESS,
+        	HEIGHT,
+        	WEIGHT
+        ) VALUES (
+			#{userNo,jdbcType=CHAR},
+			0,
+			#{createTime,jdbcType=TIMESTAMP},
+			#{address,jdbcType=VARCHAR},
+			#{height,jdbcType=SMALLINT},
+			#{weight,jdbcType=DECIMAL}
+        )
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="userNo" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+			USER_NO,
+        	VERSION,
+        	CREATE_TIME,
+        	ADDRESS,
+        	HEIGHT,
+        	WEIGHT
+        ) VALUES 
+			<foreach collection="list" item="item" separator=",">
+			(
+			#{userNo,jdbcType=CHAR},
+			0,
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.address,jdbcType=VARCHAR},
+			#{item.height,jdbcType=SMALLINT},
+			#{item.weight,jdbcType=DECIMAL}
+			)
+			</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="update" parameterType="org.study.demo.provider.entity.UserExt">
+        UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			ADDRESS = #{address,jdbcType=VARCHAR},
+			HEIGHT = #{height,jdbcType=SMALLINT},
+			WEIGHT = #{weight,jdbcType=DECIMAL}
+		</set>
+        WHERE USER_NO = #{userNo,jdbcType=CHAR} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+
+	<!-- 只更新不为null的属性 -->
+	<update id="updateIfNotNull" parameterType="org.study.demo.provider.entity.UserExt">
+		UPDATE <include refid="table" />
+		<set>
+			VERSION = #{version,jdbcType=BIGINT} + 1,
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="address != null">
+				ADDRESS = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="height != null">
+				HEIGHT = #{height,jdbcType=SMALLINT},
+			</if>
+			<if test="weight != null">
+				WEIGHT = #{weight,jdbcType=DECIMAL}
+			</if>
+		</set>
+		WHERE USER_NO = #{userNo,jdbcType=CHAR} and VERSION = #{version,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<choose>
+			<when test="sortColumns != null and sortColumns !='' ">
+				<![CDATA[ ORDER BY ${sortColumns} ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ID DESC ]]>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 根据多条件组合查询，计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(USER_NO) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 按查询条件删除 -->
+	<delete id="deleteBy">
+        DELETE FROM <include refid="table" /> 
+		<where>
+			<include refid="condition_sql" />
+		</where>
+    </delete>
+
+	<!-- 根据多个主键查询 -->
+    <select id="listByPkList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE USER_NO IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=CHAR}</foreach>
+	</select>
+
+	<!-- 根据主键查询 -->
+    <select id="getByPk" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" /> 
+		WHERE USER_NO = #{userNo,jdbcType=CHAR}  
+	</select>
+
+	<!-- 按主键删除 -->
+	<delete id="deleteByPk">
+        DELETE FROM <include refid="table" /> WHERE USER_NO = #{userNo,jdbcType=CHAR}
+    </delete>
+
+	<!-- 按多个主键删除 -->
+	<delete id="deleteByPkList" parameterType="list">
+		DELETE FROM <include refid="table" />
+		WHERE USER_NO IN 
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=CHAR}</foreach>
+	</delete>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+
+	<sql id="condition_sql">
+		<if test="userNo != null and userNo !='' ">
+			AND USER_NO = #{userNo,jdbcType=CHAR}
+		</if>
+		<if test="userNoList != null and userNoList.size() > 0">
+			AND USER_NO IN <foreach collection="userNoList" item="item" index="index" open="(" separator="," close=")">#{item,jdbcType=CHAR}</foreach>
+		</if>
+		<if test="version != null ">
+			AND VERSION = #{version,jdbcType=BIGINT}
+		</if>
+		<if test="createTime != null ">
+			AND CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+		</if>
+		<if test="address != null and address !='' ">
+			AND ADDRESS = #{address,jdbcType=VARCHAR}
+		</if>
+		<if test="height != null ">
+			AND HEIGHT = #{height,jdbcType=SMALLINT}
+		</if>
+		<if test="weight != null ">
+			AND WEIGHT = #{weight,jdbcType=DECIMAL}
+		</if>
+	</sql>
+</mapper>
+
