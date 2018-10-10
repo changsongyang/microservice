@@ -1,7 +1,7 @@
 # microservice 微服务学习项目
 
 #### 项目介绍
-微服务学习模块，目前包括 SpringBoot 2.4、Dubbo 2.6.2、Mybatis、RocketMQ 4.3.1、Redis、Quartz 2.2.1 整合的一套微服务架构，使用Redisson作为redis的客户端，简化redis的使用，使用curator作为zookeeper作为的客户端，使用其分布式锁，后续继续完善考虑加入全链路跟踪、Nacos配置中心、ElasticSearch等内容。  <br/>
+微服务学习模块，目前包括 SpringBoot 2.4、Dubbo 2.6.2、Mybatis、RocketMQ 4.3.1、Redis、Quartz 2.2.1 整合的一套微服务架构，使用Redisson作为redis的客户端，简化redis的使用，使用curator作为zookeeper的客户端，使用其分布式锁，后续继续完善考虑加入全链路跟踪、Nacos配置中心、ElasticSearch等内容。  <br/>
 
 
 #### 整体项目介绍
