@@ -8,9 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.study.common.mq.message.CMessage;
 import org.study.common.mq.util.MessageUtil;
+import org.study.common.statics.exceptions.BizException;
 
 /**
- * @description 本地事务处理器，子类需要通过重写doLocalTransaction来执行本地事务、通过重写checkTransaction来检查本地事务
+ * @description 本地事务处理器，子类需要通过重写executeLocalTransaction来执行本地事务、通过重写checkLocalTransaction来检查本地事务
  * @author chenyf
  */
 public abstract class LocalTransactionProcessor implements TransactionListener {
@@ -39,8 +40,13 @@ public abstract class LocalTransactionProcessor implements TransactionListener {
                 return LocalTransactionState.ROLLBACK_MESSAGE;
             }
         }catch (Throwable ex){
-            logger.error("[RMQ_EXECUTE_TRANS_EXCEPTION] KEY={} MsgEvent={}", cMessage.getKey(), cMessage.getMsgEvent(), ex);
-            return LocalTransactionState.UNKNOW;
+            if(ex instanceof BizException){//业务异常，认为是主动抛出的异常，将直接回滚消息
+                logger.error("[RMQ_EXECUTE_TRANS_BIZEXCEPTION] KEY={} MsgEvent={}", cMessage.getKey(), cMessage.getMsgEvent(), ex);
+                return LocalTransactionState.ROLLBACK_MESSAGE;
+            }else{
+                logger.error("[RMQ_EXECUTE_TRANS_EXCEPTION] KEY={} MsgEvent={}", cMessage.getKey(), cMessage.getMsgEvent(), ex);
+                return LocalTransactionState.UNKNOW;
+            }
         }
     }
 
@@ -76,7 +82,8 @@ public abstract class LocalTransactionProcessor implements TransactionListener {
      * 执行本地事务
      * 注意：
      *      1、事务成功时返回TRUE，事务失败时返回FALSE，事务状态未知时返回NULL
-     *      2、LocalTransactionProcessor对象是可复用的，在executeLocalTransaction方法内部可根据msgEvent来判断是哪种消息，进而知道应该查询哪个地方的本地事务
+     *      2、如果本方法抛出了BizException，会认为本地事务执行失败，将直接回滚消息
+     *      3、LocalTransactionProcessor对象是可复用的，在executeLocalTransaction方法内部可根据msgEvent来判断是哪种消息，进而知道应该查询哪个地方的本地事务
      *
      * @param msg
      * @param <T>
