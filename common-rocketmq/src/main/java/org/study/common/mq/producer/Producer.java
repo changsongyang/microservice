@@ -111,16 +111,14 @@ public class Producer {
 
         Throwable ex = null;
         SendResult sendResult = null;
-        long costMills = 0;
+        long start = System.currentTimeMillis();
         try {
-            long start = System.currentTimeMillis();
             sendResult = this.producer.send(message);
-            costMills = System.currentTimeMillis() - start;
         } catch (Throwable e) {
             ex = e;
         } finally {
             try{
-                afterSendProcessor.executeAfterSend(msg, sendResult, ex, costMills);
+                afterSendProcessor.executeAfterSend(msg, sendResult, ex, System.currentTimeMillis()-start);
             }catch(Throwable e){
                 logger.error("single_executeAfterSend_Exception", e);
             }
@@ -155,16 +153,14 @@ public class Producer {
 
         Throwable ex = null;
         SendResult sendResult = null;
-        long costMills = 0;
+        long start = System.currentTimeMillis();
         try {
-            long start = System.currentTimeMillis();
             sendResult = this.producer.send(messageList);
-            costMills = System.currentTimeMillis() - start;
         } catch (Throwable e) {
             ex = e;
         } finally {
             try{
-                afterSendProcessor.executeAfterSend(topic, msgList, sendResult, ex, costMills);
+                afterSendProcessor.executeAfterSend(topic, msgList, sendResult, ex, System.currentTimeMillis() - start);
             }catch(Throwable e){
                 logger.error("batch_executeAfterSend_Exception", e);
             }
@@ -195,16 +191,14 @@ public class Producer {
 
         Throwable ex = null;
         SendResult sendResult = null;
-        long costMills = 0;
+        long start = System.currentTimeMillis();
         try {
-            long start = System.currentTimeMillis();
             sendResult = this.producer.send(message, orderlyMessageQueueSelector, msg.getMsgFlag());
-            costMills = System.currentTimeMillis() - start;
         } catch (Throwable e) {
             ex = e;
         } finally {
             try{
-                afterSendProcessor.executeAfterSend(msg, sendResult, ex, costMills);
+                afterSendProcessor.executeAfterSend(msg, sendResult, ex, System.currentTimeMillis() - start);
             }catch(Throwable e){
                 logger.error("orderly_executeAfterSend_Exception", e);
             }
@@ -244,17 +238,14 @@ public class Producer {
 
         Throwable ex = null;
         SendResult sendResult = null;
-        long costMills = 0;
+        long start = System.currentTimeMillis();
         try {
-
-            long start = System.currentTimeMillis();
             sendResult = this.producer.sendMessageInTransaction(message, msg.getMsgFlag());
-            costMills = System.currentTimeMillis() - start;
         } catch (Throwable e) {
             ex = e;
         } finally {
             try{
-                afterSendProcessor.executeAfterSend(msg, sendResult, ex, costMills);
+                afterSendProcessor.executeAfterSend(msg, sendResult, ex, System.currentTimeMillis() - start);
             }catch(Throwable e){
                 logger.error("transaction_executeAfterSend_Exception", e);
             }

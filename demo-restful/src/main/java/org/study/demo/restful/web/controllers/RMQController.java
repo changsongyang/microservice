@@ -27,7 +27,6 @@ public class RMQController {
         message.setBody(msgBody);
         message.setMsgEvent(MsgEvent.SINGLE_MSG_TEST);
         producer.send(message);
-
         return RestResult.bizSuccess(100, "发送单笔消息成功");
     }
 
@@ -67,5 +66,33 @@ public class RMQController {
         producer.sendTransaction(message);
 
         return RestResult.bizSuccess(100, "发送事务消息成功");
+    }
+
+    @RequestMapping(value = "sendMuch", method = RequestMethod.POST)
+    public RestResult sendMuch(String msgKey, String msgBody){
+        PMessage message = new PMessage();
+        message.setTopic("singleMsgTopic");
+        message.setTags("muchTag");
+        message.setKey(msgKey);
+        message.setBody(msgBody);
+        message.setMsgEvent(MsgEvent.SINGLE_MSG_TEST);
+
+        int maxThread = 50, maxNum = 1000;
+        for(int i=0; i<=maxThread; i++){
+            final int v = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for(int j=0; j <= maxNum; j++) {
+                        message.setKey(msgKey+"_"+v+"_"+j);
+                        message.setBody(msgBody+"_i="+v+"_j="+j);
+                        producer.send(message);
+                    }
+
+                }
+            }).start();
+        }
+
+        return RestResult.bizSuccess(100, "发送多消息成功");
     }
 }

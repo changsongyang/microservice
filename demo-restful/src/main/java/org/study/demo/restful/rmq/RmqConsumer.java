@@ -1,6 +1,5 @@
 package org.study.demo.restful.rmq;
 
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,16 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.study.common.mq.consumer.Consumer;
 import org.study.common.mq.message.CMessage;
 import org.study.common.statics.constants.MsgEvent;
-import org.study.common.statics.constants.MsgTopicAndTags;
 import org.study.common.util.component.ZKClient;
 import org.study.common.util.utils.JsonUtil;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class RmqConsumer extends Consumer {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     ZKClient zkClient;
+    private AtomicLong batchCount = new AtomicLong(0);
 
     @Override
     public <T> boolean handleMessage(CMessage<T> cMessage) throws Exception{
@@ -51,6 +51,9 @@ public class RmqConsumer extends Consumer {
                 result = false;
                 logger.error("unexpected msgEvent:{}", cMessage.getMsgEvent());
                 break;
+        }
+        if(cMessage.getMsgEvent() == MsgEvent.BATCH_MSG_TEST){
+            logger.info("========> 批量消息条数："+batchCount.incrementAndGet());
         }
         return result;
     }

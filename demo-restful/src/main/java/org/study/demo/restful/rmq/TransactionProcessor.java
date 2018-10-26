@@ -18,7 +18,7 @@ public class TransactionProcessor extends LocalTransactionProcessor {
                 logger.info("到了执行本地事务_1：{}", JsonUtil.toString(cMessage));
                 break;
             case MsgEvent.TRANS_MSG_TEST_2:
-                result = true;
+                result = false;
                 logger.info("到了执行本地事务_2：{}", JsonUtil.toString(cMessage));
                 break;
             default:
