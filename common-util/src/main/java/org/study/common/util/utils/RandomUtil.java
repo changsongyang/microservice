@@ -13,10 +13,4 @@ public class RandomUtil {
         Random rand = new Random();
         return rand.nextInt((max - min) + 1) + min;
     }
-
-    public static void main(String[] args){
-        for(int i=0; i<100; i++){
-            System.out.println("i=" + i + " random=" + getInt(-100, 100));
-        }
-    }
 }
