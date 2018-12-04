@@ -1,6 +1,6 @@
 package org.study.common.util.utils;
 
-import java.util.UUID;
+import java.util.Random;
 
 /**
  * @Description:
@@ -9,11 +9,14 @@ import java.util.UUID;
  */
 public class RandomUtil {
 
-    public static String getUUIDStr(){
-        return UUID.randomUUID().toString();
+    private static int getInt(int min, int max){
+        Random rand = new Random();
+        return rand.nextInt((max - min) + 1) + min;
     }
 
-    public static String getMD5UUIDStr(){
-        return MD5Util.getMD5Str(UUID.randomUUID().toString());
+    public static void main(String[] args){
+        for(int i=0; i<100; i++){
+            System.out.println("i=" + i + " random=" + getInt(-100, 100));
+        }
     }
 }
