@@ -11,7 +11,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.study</groupId>
-    <artifactId>demo-nacos</artifactId>
+    <artifactId>demo-nacos-config</artifactId>
+    <description>使用nacos作为配置中心的示例模块</description>
 
     <dependencies>
         <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
