@@ -34,7 +34,7 @@ public class RedisClient {
     }
 
     /**
-     * 单例模式
+     * 单机模式
      * @param address   地址：如 127.0.0.1:6768
      * @param password
      * @return

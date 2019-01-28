@@ -25,7 +25,7 @@
 
         <!-- 中间件：MQ、Cache、Zookeeper等 -->
         <activemq-spring.version>5.15.6</activemq-spring.version>
-        <rocketmq.version>4.3.1</rocketmq.version>
+        <rocketmq.version>4.4.0</rocketmq.version>
         <redisson.version>3.6.5</redisson.version>
         <quartz.version>2.2.3</quartz.version>
         <curator.version>4.0.1</curator.version>
@@ -36,6 +36,10 @@
 
         <!-- 其他starter -->
         <jasypt-starter.version>2.0.0</jasypt-starter.version>
+        <nacos-config-spring-boot.version>0.2.1</nacos-config-spring-boot.version>
+        <spring-cloud-nacos-config-starter.version>0.2.1.RELEASE</spring-cloud-nacos-config-starter.version>
+
+        <rocketmq-spring-boot.version>2.0.1</rocketmq-spring-boot.version>
 
         <!-- 基础工具相关 -->
         <servlet-api.version>4.0.0</servlet-api.version>
@@ -274,20 +278,9 @@
 
     <!-- 依赖项目的声明和管理 -->
     <dependencyManagement>
-        <!-- 声明需要被引用的第三方项目 START -->
         <dependencies>
-            <!-- spring cloud -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Edgware.SR2</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- 在这里引入 spring boot，不能像直接继承spring-boot-parent那样可以在每个子模块中直接使用一些依赖，而是也需要在子模块的的pom
-            文件中显示的引入那些依赖jar包，但是可以不用管理版本号，这些会由spring-boot统一管理，这样的做法不仅能够统一管理版本，并且自己可以
-            非常清晰准确的根据需要来引入自己需要的jar包，同时还可享受spring boot带来的一系列便捷特性 -->
+            <!-- ################################# 基础依赖配置 #################################### -->
+            <!-- spring boot：自定义parent pom时使用spring boot的方式 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -295,6 +288,27 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- spring cloud alibaba -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>0.2.1.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- spring cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Finchley.SR1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- ################################# 基础依赖配置 #################################### -->
+
+
+
+            <!-- 声明需要被引用的第三方项目 START -->
 
             <!-- spring boot相关 END -->
             <dependency><!-- Spring Boot的核心启动器，包含了自动配置、日志和YAML -->
@@ -308,6 +322,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
             <dependency><!-- spring boot test -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -506,16 +521,17 @@
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring-boot.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <!-- 需要全局引入的依赖jar START -->
     <dependencies>
-        <dependency><!-- Spring Boot的核心启动器，包含了自动配置、日志和YAML -->
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
         <dependency> <!-- 引入log4j2依赖，代表使用log4j2 -->
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
