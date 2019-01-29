@@ -28,14 +28,10 @@
             <artifactId>dubbo</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-        </dependency>
-        <!-- dubbo END -->
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
+        <!-- dubbo END -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

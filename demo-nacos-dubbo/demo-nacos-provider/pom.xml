@@ -38,17 +38,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-        </dependency>
-        <!-- dubbo END -->
-
         <!-- 把nacos作为Dubbo的注册中心所需要的依赖 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
+        <!-- dubbo END -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
