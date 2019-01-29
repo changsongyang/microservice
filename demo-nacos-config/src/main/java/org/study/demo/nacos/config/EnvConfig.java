@@ -7,11 +7,11 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 @RefreshScope//加上此注解，当配置有更新的时候会自动更新当前类的实例对象
 @SpringBootConfiguration
 public class EnvConfig {
-    @Value(value = "${useLocalCache:false}")
+    @Value(value = "${useLocalCache:false}")//有默认值
     private boolean useLocalCache;
-    @Value(value = "${localKey:cacheKey}")
+    @Value(value = "${localKey}")
     private String localKey;
-    @Value(value = "${localValue:10}")
+    @Value(value = "${localValue}")
     private Integer localValue;
 
 
