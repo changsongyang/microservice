@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.study.demo.rocketmq.consts.Const;
-import org.study.demo.rocketmq.vo.OrderVo;
+import org.study.demo.rocketmq.vo.bizVo.OrderVo;
 
 @RocketMQTransactionListener(txProducerGroup = Const.TX_PRODUCER_GROUP)
 public class RMQTransactionListener implements RocketMQLocalTransactionListener {

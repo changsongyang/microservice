@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.demo.rocketmq.component.Sender;
 import org.study.demo.rocketmq.consts.Const;
-import org.study.demo.rocketmq.vo.ItemVo;
-import org.study.demo.rocketmq.vo.OrderVo;
+import org.study.demo.rocketmq.vo.bizVo.ItemVo;
+import org.study.demo.rocketmq.vo.bizVo.OrderVo;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,12 +25,15 @@ public class DemoController {
         String tags = "oneTag";
 
         OrderVo vo = new OrderVo();
+        vo.setTopic(topic);
+        vo.setTags(tags);
+        vo.setMsgType(10001);
+        vo.setTrxNo(msgKey);
+        vo.setMsgKey(msgKey);
+
         vo.setAmount(BigDecimal.valueOf(20.36));
         vo.setIsFinish(true);
-        vo.setTrxNo(msgKey);
-        vo.setMsgType(10001);
-
-        sender.sendOne(topic, tags, msgKey, vo);
+        sender.sendOne(vo);
         return true;
     }
 
@@ -42,13 +45,17 @@ public class DemoController {
         List<OrderVo> voList = new ArrayList<>();
         for(int i=1; i<=3; i++){
             OrderVo vo = new OrderVo();
+            vo.setTopic(topic);
+            vo.setTags(tags + "_" + i);
+            vo.setMsgType(10002);
+            vo.setTrxNo(msgKey + i);
+            vo.setMsgKey(msgKey);
+
             vo.setAmount(BigDecimal.valueOf(10.01 * i).setScale(2, BigDecimal.ROUND_DOWN));
             vo.setIsFinish(true);
-            vo.setTrxNo(msgKey);
-            vo.setMsgType(10002);
             voList.add(vo);
         }
-        sender.sendBatch(topic, tags, msgKey, voList);
+        sender.sendBatch(topic, voList);
         return true;
     }
 
@@ -58,12 +65,15 @@ public class DemoController {
         String tags = "transTag";
 
         OrderVo vo = new OrderVo();
+        vo.setTopic(topic);
+        vo.setTags(tags);
+        vo.setMsgType(20001);
+        vo.setTrxNo(msgKey);
+        vo.setMsgKey(msgKey);
+
         vo.setAmount(BigDecimal.valueOf(368.52));
         vo.setIsFinish(true);
-        vo.setTrxNo(msgKey);
-        vo.setMsgType(20001);
-
-        sender.sendTrans(Const.TX_PRODUCER_GROUP, topic, tags, msgKey, vo);
+        sender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         return true;
     }
 
@@ -73,10 +83,13 @@ public class DemoController {
         String tags = "transTagItem";
 
         OrderVo vo = new OrderVo();
+        vo.setTopic(topic);
+        vo.setTags(tags);
+        vo.setMsgType(20002);
+        vo.setTrxNo(msgKey);
+        vo.setMsgKey(msgKey);
         vo.setAmount(BigDecimal.valueOf(3852.32));
         vo.setIsFinish(true);
-        vo.setTrxNo(msgKey);
-        vo.setMsgType(20002);
 
         List<ItemVo> itemVos = new ArrayList<>();
         for(int i=1; i<=5; i++){
@@ -87,8 +100,7 @@ public class DemoController {
         }
         vo.setItemVoList(itemVos);
 
-        sender.sendTrans(Const.TX_PRODUCER_GROUP, topic, tags, msgKey, vo);
+        sender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         return true;
     }
-
 }

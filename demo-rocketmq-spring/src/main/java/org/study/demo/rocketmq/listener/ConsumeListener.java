@@ -6,7 +6,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.study.demo.rocketmq.vo.OrderVo;
+import org.study.demo.rocketmq.vo.bizVo.OrderVo;
 
 @Component
 public class ConsumeListener {
@@ -21,7 +21,7 @@ public class ConsumeListener {
     }
 
     @Component
-    @RocketMQMessageListener(topic = "my-topic", selectorExpression = "batchTag", consumerGroup = "my-topic_batchTag")
+    @RocketMQMessageListener(topic = "my-topic", consumerGroup = "my-topic_batchTag")
     public class batchTagConsumer implements RocketMQListener<OrderVo> {
         public void onMessage(OrderVo message) {
             logger.info("OrderVo = {}", JSON.toJSONString(message));

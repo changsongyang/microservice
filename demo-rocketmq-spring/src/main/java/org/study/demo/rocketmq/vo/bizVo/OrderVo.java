@@ -1,4 +1,6 @@
-package org.study.demo.rocketmq.vo;
+package org.study.demo.rocketmq.vo.bizVo;
+
+import org.study.demo.rocketmq.vo.MessageVo;
 
 import java.math.BigDecimal;
 import java.util.List;
