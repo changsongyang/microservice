@@ -33,6 +33,7 @@
         <!-- dubbo 相关 -->
         <dubbo-starter.version>0.2.0</dubbo-starter.version>
         <dubbo.version>2.6.2</dubbo.version>
+        <dubbo-registry-nacos.version>0.0.1</dubbo-registry-nacos.version>
 
         <!-- 其他starter -->
         <jasypt-starter.version>2.0.0</jasypt-starter.version>
@@ -365,6 +366,11 @@
                         <artifactId>netty</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dubbo-registry-nacos</artifactId>
+                <version>${dubbo-registry-nacos.version}</version>
             </dependency>
             <!-- curator：是zookeeper的一种客户端 -->
             <dependency>
