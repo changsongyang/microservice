@@ -1,6 +1,5 @@
-package org.study.demo.shutdown.hook.provider.hook;
+package org.study.common.util.component;
 
-import com.alibaba.dubbo.common.utils.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +8,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.annotation.PostConstruct;
 
-public class AppShutdownHook {
-    private Logger logger = LoggerFactory.getLogger(AppShutdownHook.class);
+public class ShutdownHook {
+    private Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
+    private long dubboShutdownTimeOutMills = 10000;//dubbo框架关闭的超时时间
     @Autowired
     private ConfigurableApplicationContext configurableApplicationContext;
 
-    public AppShutdownHook() {
+    public ShutdownHook() {
     }
 
     @PostConstruct
@@ -26,7 +26,7 @@ public class AppShutdownHook {
         Thread shutdownHook = new Thread() {
             public void run() {
                 try {
-                    long timeOut = ConfigUtils.getServerShutdownTimeout();
+                    long timeOut = dubboShutdownTimeOutMills;
                     logger.info("Waiting for Dubbo shutdown with {} seconds", ((int)(timeOut/1000)));
                     Thread.sleep(timeOut);
                 } catch (Throwable e) {
@@ -42,7 +42,7 @@ public class AppShutdownHook {
                 }
 
                 try {
-                    SpringApplication.exit(AppShutdownHook.this.configurableApplicationContext);
+                    SpringApplication.exit(ShutdownHook.this.configurableApplicationContext);
                     logger.info("SpringApplication Exited, Application shutdown");
                 } finally {
                     removeShutdownHook(this);
@@ -60,5 +60,13 @@ public class AppShutdownHook {
             Runtime.getRuntime().removeShutdownHook(thread);
         }catch (IllegalStateException e){
         }
+    }
+
+    public long getDubboShutdownTimeOutMills() {
+        return dubboShutdownTimeOutMills;
+    }
+
+    public void setDubboShutdownTimeOutMills(long dubboShutdownTimeOutMills) {
+        this.dubboShutdownTimeOutMills = dubboShutdownTimeOutMills;
     }
 }
