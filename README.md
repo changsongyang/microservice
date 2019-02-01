@@ -19,3 +19,5 @@ demo-nacos-config &nbsp;&nbsp;&nbsp;&nbsp; 用以演示使用 springCloud config
 demo-nacos-dubbo &nbsp;&nbsp;&nbsp;&nbsp; 用以演示使用 nacos + dubbo 作为配置中心和服务注册中心的样例  <br/>
 demo-rocketmq-spring &nbsp;&nbsp;&nbsp;&nbsp; 用以演示使用 nacos + rocketmq-spring 作为来生产消息、消费消息的样例  <br/>
 demo-shutdown-hook &nbsp;&nbsp;&nbsp;&nbsp; 主要用以演示自定义shutdown hook的样例，使用自定义shutdown hook主要是为了解决在应用重启时datasource、rocketmqTemplate等已经关闭，但是外部请求还在进来，从而导致数据不一致或者数据库有更新但是没有发送消息的情况，解决方案就是先把dubbo提供者从注册中心注销，再关闭spring的ApplicationContext，同时，此样例也随demo一同演示了nacos+druid+mybatis+rocketmq联合使用的情况 <br/>
+demo-hot-deploy &nbsp;&nbsp;&nbsp;&nbsp; 用以演示使用 nacos 来进行dataSource热更新、RocketMQ热更新 的样例  <br/>
+
