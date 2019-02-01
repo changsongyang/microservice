@@ -28,8 +28,6 @@ public class DemoController {
     @Autowired
     CommonProperties propertiesConfig;
     @Autowired
-    DataSource dataSource;
-    @Autowired
     DataSourceProperties dataSourceProperties;
 
     /**
@@ -59,9 +57,7 @@ public class DemoController {
             try{
                 userDao.update(user);
                 String cfgUrl = dataSourceProperties.getUrl().substring(30, 35);
-                String datUrl = "";
-//                String datUrl = ((DruidDataSource) dataSource).getUrl().substring(28, 33);
-                log.info("========>[END] the {} time update success cfgUrl={} datUrl={}", i, cfgUrl, datUrl);
+                log.info("========>[END] the {} time update success cfgUrl={}", i, cfgUrl);
             }catch (Throwable e){
                 log.error("========>[EXCEPTION] the {} time update Exception", i, e);
             }
