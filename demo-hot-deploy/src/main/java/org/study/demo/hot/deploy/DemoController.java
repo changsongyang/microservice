@@ -13,7 +13,6 @@ import org.study.demo.hot.deploy.config.DataSourceProperties;
 import org.study.demo.hot.deploy.dao.User;
 import org.study.demo.hot.deploy.dao.UserDao;
 
-import javax.sql.DataSource;
 import java.util.Random;
 
 @RestController
