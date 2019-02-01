@@ -1,17 +1,16 @@
 package org.study.demo.nacos.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@RefreshScope//加上此注解，当配置有更新的时候会自动更新当前类的实例对象
+/**
+ * 有加 @ConfigurationProperties 注解的配置文件，不用再加 @RefreshScope 注解，因为SpringBoot已经支持自动更新被@ConfigurationProperties注解的类
+ */
 @SpringBootConfiguration
+@ConfigurationProperties
 public class EnvConfig {
-    @Value(value = "${useLocalCache:false}")//有默认值
     private boolean useLocalCache;
-    @Value(value = "${localKey}")
     private String localKey;
-    @Value(value = "${localValue}")
     private Integer localValue;
 
 
