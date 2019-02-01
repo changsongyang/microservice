@@ -2,16 +2,15 @@ package org.study.demo.shutdown.hook.provider.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.study.common.util.component.RmqSender;
 import org.study.demo.shutdown.hook.provider.dao.User;
 import org.study.demo.shutdown.hook.provider.dao.UserDao;
 import org.study.demo.shutdown.hook.provider.facade.ShutdownHookFacade;
-import org.study.demo.shutdown.hook.provider.rmq.Sender;
 import org.study.demo.shutdown.hook.provider.vo.HelloVo;
 import org.study.demo.shutdown.hook.provider.vo.OrderVo;
 
 import java.math.BigDecimal;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -19,7 +18,7 @@ public class ShutdownHookFacadeImpl implements ShutdownHookFacade {
     @Autowired
     UserDao userDao;
     @Autowired
-    Sender sender;
+    RmqSender rmqSender;
     AtomicLong dbUpdateCount = new AtomicLong(0);
     AtomicLong mqSendCount = new AtomicLong(0);
 
@@ -57,7 +56,7 @@ public class ShutdownHookFacadeImpl implements ShutdownHookFacade {
             vo.setMsgKey(msgKey);
             vo.setAmount(BigDecimal.valueOf(20.36));
             vo.setIsFinish(true);
-            sender.sendOne(vo);
+            rmqSender.sendOne(vo);
             mqSendCount.getAndIncrement();
         }catch(Throwable e){
             isException = true;

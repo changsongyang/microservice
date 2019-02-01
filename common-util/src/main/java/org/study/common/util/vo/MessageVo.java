@@ -1,4 +1,4 @@
-package org.study.demo.shutdown.hook.provider.rmq;
+package org.study.common.util.vo;
 
 public class MessageVo {
     /**

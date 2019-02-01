@@ -1,4 +1,4 @@
-package org.study.demo.rocketmq.component;
+package org.study.common.util.component;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.rocketmq.client.producer.SendResult;
@@ -12,15 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Component;
-import org.study.demo.rocketmq.vo.MessageVo;
+import org.study.common.util.vo.MessageVo;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class Sender {
+public class RmqSender {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -87,7 +84,7 @@ public class Sender {
     }
 
 
-    protected String getDestination(String topic , String tags){
+    private String getDestination(String topic , String tags){
         return topic + ":" + tags;
     }
 }

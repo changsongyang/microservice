@@ -76,6 +76,14 @@
         </dependency>
         <!-- 邮件发送 -->
 
+        <!-- RocketMQ START -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- RocketMQ END -->
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

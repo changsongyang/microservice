@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.demo.rocketmq.component.Sender;
+import org.study.common.util.component.RmqSender;
 import org.study.demo.rocketmq.consts.Const;
 import org.study.demo.rocketmq.vo.bizVo.ItemVo;
 import org.study.demo.rocketmq.vo.bizVo.OrderVo;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("demo")
 public class DemoController {
     @Autowired
-    Sender sender;
+    RmqSender rmqSender;
 
     @ResponseBody
     @RequestMapping(value = "/sendOne")
@@ -33,7 +33,7 @@ public class DemoController {
 
         vo.setAmount(BigDecimal.valueOf(20.36));
         vo.setIsFinish(true);
-        sender.sendOne(vo);
+        rmqSender.sendOne(vo);
         return true;
     }
 
@@ -55,7 +55,7 @@ public class DemoController {
             vo.setIsFinish(true);
             voList.add(vo);
         }
-        sender.sendBatch(topic, voList);
+        rmqSender.sendBatch(topic, voList);
         return true;
     }
 
@@ -73,7 +73,7 @@ public class DemoController {
 
         vo.setAmount(BigDecimal.valueOf(368.52));
         vo.setIsFinish(true);
-        sender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
+        rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         return true;
     }
 
@@ -100,7 +100,7 @@ public class DemoController {
         }
         vo.setItemVoList(itemVos);
 
-        sender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
+        rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         return true;
     }
 }
