@@ -19,6 +19,6 @@ public class StringUtil{
     }
 
     public static String getMD5UUIDStr(){
-        return MD5Util.getMD5Str(UUID.randomUUID().toString());
+        return MD5Util.getMD5Hex(UUID.randomUUID().toString());
     }
 }

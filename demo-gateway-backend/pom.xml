@@ -2,27 +2,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>common-parent</artifactId>
         <groupId>org.study</groupId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../common-parent/pom.xml</relativePath>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.study</groupId>
-    <artifactId>demo-nacos-config</artifactId>
-    <description>使用nacos作为配置中心的示例模块</description>
+    <artifactId>demo-gateway-backend</artifactId>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
-        <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${projectVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency> <!-- 需要使用nacos作为注册中心时引入 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
     </dependencies>
 </project>

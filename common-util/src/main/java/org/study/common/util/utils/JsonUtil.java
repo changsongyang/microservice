@@ -6,10 +6,8 @@
  */
 package org.study.common.util.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.*;
 
 import java.io.IOException;
@@ -20,6 +18,11 @@ import java.util.Date;
 import java.util.List;
 
 public final class JsonUtil {
+	static SerializeConfig snakeCaseConfig = new SerializeConfig();
+	static {
+		snakeCaseConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+	}
+
 	/**
 	 * 将一个对像转成一个json字符串
 	 */
@@ -68,6 +71,23 @@ public final class JsonUtil {
 		config.put(Long.class, new LongSerializer());
 		config.put(Date.class, new SimpleDateFormatSerializer("yyyy-MM-dd HH:mm:ss"));
 		return JSON.toJSONString(obj, config, SerializerFeature.WriteMapNullValue);
+	}
+
+	/**
+	 * 把字段的属性命名方式从驼峰转成下划线(只对POJO起效，对Map的key不起效)
+	 * @param obj
+	 * @return
+	 */
+	public static String toStringUnderline(Object obj){
+		return JSON.toJSONString(obj, snakeCaseConfig, SerializerFeature.SortField, SerializerFeature.WriteMapNullValue);
+	}
+
+	public static <T> T toBeanOrderly(byte[] bytes, Class<T> clazz) {
+		return JSON.parseObject(bytes, clazz, Feature.OrderedField);
+	}
+
+	public static <T> T toBeanOrderly(String text, Class<T> clazz) {
+		return JSON.parseObject(text, clazz, Feature.OrderedField);
 	}
 
 	/**

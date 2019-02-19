@@ -14,6 +14,9 @@ import org.study.common.util.component.ShutdownHook;
 
 import javax.sql.DataSource;
 
+/**
+ * 要想使用热更新的Bean不能直接在application.properties文件中配置，而是要单独在这里配置，并且要加上 @RefreshScope 注解
+ */
 @SpringBootConfiguration
 public class AppConfig {
     @Bean

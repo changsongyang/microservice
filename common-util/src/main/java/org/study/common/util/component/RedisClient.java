@@ -1,6 +1,7 @@
 package org.study.common.util.component;
 
 import org.redisson.Redisson;
+import org.redisson.RedissonRedLock;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.study.common.statics.exceptions.BizException;

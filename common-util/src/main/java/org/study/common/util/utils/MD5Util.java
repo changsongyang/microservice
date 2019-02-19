@@ -2,6 +2,7 @@ package org.study.common.util.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.study.common.statics.exceptions.BizException;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -15,37 +16,28 @@ import java.security.NoSuchAlgorithmException;
 public class MD5Util {
     private static Logger logger = LoggerFactory.getLogger(MD5Util.class);
 
+    public static String getMD5Hex(String str) {
+        return HEXUtil.encode(getMD5(str), true);
+    }
+
     /**
      *
      * @param str
      * @return
      */
-    public static String getMD5Str(String str) {
-        MessageDigest messageDigest = null;
-
+    public static byte[] getMD5(String str) {
+        MessageDigest messageDigest;
         try {
             messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            if (!StringUtil.isEmpty(str)) {
+            if (StringUtil.isNotEmpty(str)) {
                 messageDigest.update(str.getBytes("UTF-8"));
             }
         } catch (NoSuchAlgorithmException e) {
-            logger.error("getMD5Str异常", e);
+            throw new BizException("生成MD5信息时异常", e);
         } catch (UnsupportedEncodingException e) {
-            logger.error("getMD5Str异常", e);
+            throw new BizException("生成MD5信息时异常", e);
         }
-
-        byte[] byteArray = messageDigest.digest();
-
-        StringBuffer md5StrBuff = new StringBuffer();
-
-        for (int i = 0; i < byteArray.length; i++) {
-            if (Integer.toHexString(0xFF & byteArray[i]).length() == 1){
-                md5StrBuff.append("0").append(Integer.toHexString(0xFF & byteArray[i]));
-            } else {
-                md5StrBuff.append(Integer.toHexString(0xFF & byteArray[i]));
-            }
-        }
-        return md5StrBuff.toString().toUpperCase();
+        return messageDigest.digest();
     }
 }
