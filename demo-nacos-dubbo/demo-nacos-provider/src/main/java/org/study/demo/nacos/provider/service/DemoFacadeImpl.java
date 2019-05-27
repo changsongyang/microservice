@@ -1,8 +1,8 @@
 package org.study.demo.nacos.provider.service;
 
-import com.alibaba.dubbo.config.annotation.Service;
-import org.study.demo.nacos.provider.facade.DemoFacade;
-import org.study.demo.nacos.provider.vo.HelloVo;
+import org.apache.dubbo.config.annotation.Service;
+import org.study.demo.nacos.api.facade.DemoFacade;
+import org.study.demo.nacos.api.vo.HelloVo;
 
 import java.util.Random;
 

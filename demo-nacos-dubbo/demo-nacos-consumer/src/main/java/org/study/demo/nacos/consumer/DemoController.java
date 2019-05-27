@@ -1,12 +1,12 @@
 package org.study.demo.nacos.consumer;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.demo.nacos.provider.facade.DemoFacade;
-import org.study.demo.nacos.provider.vo.HelloVo;
+import org.study.demo.nacos.api.facade.DemoFacade;
+import org.study.demo.nacos.api.vo.HelloVo;
 
 import java.util.Random;
 

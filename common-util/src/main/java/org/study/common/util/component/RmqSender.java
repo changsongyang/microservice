@@ -8,7 +8,6 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.rocketmq.spring.support.RocketMQUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
@@ -18,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RmqSender {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
+    Logger log = LoggerFactory.getLogger(this.getClass());
     private RocketMQTemplate rocketMQTemplate;
+
+    public RmqSender(RocketMQTemplate rocketMQTemplate){
+        this.rocketMQTemplate = rocketMQTemplate;
+    }
 
     /**
      * 发送单个消息

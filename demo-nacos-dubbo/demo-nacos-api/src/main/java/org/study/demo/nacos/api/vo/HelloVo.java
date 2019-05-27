@@ -1,4 +1,4 @@
-package org.study.demo.nacos.provider.vo;
+package org.study.demo.nacos.api.vo;
 
 import java.io.Serializable;
 

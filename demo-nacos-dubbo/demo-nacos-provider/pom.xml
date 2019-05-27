@@ -24,6 +24,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>demo-nacos-api</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+
         <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
@@ -31,16 +37,15 @@
 
         <!-- dubbo START -->
         <dependency>
-            <groupId>com.alibaba.boot</groupId>
+            <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
-        <!-- 把nacos作为Dubbo的注册中心所需要的依赖 -->
         <dependency>
-            <groupId>com.alibaba</groupId>
+            <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
         <!-- dubbo END -->

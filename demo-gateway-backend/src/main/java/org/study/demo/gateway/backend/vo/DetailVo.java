@@ -2,12 +2,10 @@ package org.study.demo.gateway.backend.vo;
 
 import java.io.Serializable;
 
-public class CountryVo implements Serializable {
+public class DetailVo implements Serializable {
     private String cnName;
     private String enName;
     private Integer num;
-    private String reqText;
-    private String repText;
 
     public String getCnName() {
         return cnName;
@@ -31,21 +29,5 @@ public class CountryVo implements Serializable {
 
     public void setNum(Integer num) {
         this.num = num;
-    }
-
-    public String getReqText() {
-        return reqText;
-    }
-
-    public void setReqText(String reqText) {
-        this.reqText = reqText;
-    }
-
-    public String getRepText() {
-        return repText;
-    }
-
-    public void setRepText(String repText) {
-        this.repText = repText;
     }
 }
