@@ -30,10 +30,20 @@
             <version>${projectVersion}</version>
         </dependency>
 
-        <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
+        <!-- nacos START -->
+        <dependency><!-- 把nacos作为配置中心时需要引入的依赖 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-registry-nacos</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+        </dependency>
+        <!-- nacos END -->
 
         <!-- dubbo START -->
         <dependency>
@@ -43,10 +53,6 @@
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
         <!-- dubbo END -->
     </dependencies>

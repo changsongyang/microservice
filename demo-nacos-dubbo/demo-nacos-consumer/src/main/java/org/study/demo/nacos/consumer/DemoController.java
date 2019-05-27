@@ -16,13 +16,12 @@ public class DemoController {
     @Reference
     DemoFacade demoFacade;
 
-    @ResponseBody
     @RequestMapping(value = "/sayHello", method = RequestMethod.GET)
     public String sayHello(String content) {
-        return demoFacade.syaHello(content);
+        String value = demoFacade.syaHello(content);
+        return "{\"returnValue\":\"" + value + "\"}";
     }
 
-    @ResponseBody
     @RequestMapping(value = "/sayHello2", method = RequestMethod.GET)
     public HelloVo sayHello2(String content) {
         HelloVo helloVo = new HelloVo();
