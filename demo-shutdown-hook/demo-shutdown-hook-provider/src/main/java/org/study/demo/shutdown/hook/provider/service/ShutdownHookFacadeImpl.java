@@ -2,7 +2,7 @@ package org.study.demo.shutdown.hook.provider.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.common.util.component.RmqSender;
+import org.study.common.util.component.RocketMQSender;
 import org.study.demo.shutdown.hook.provider.dao.User;
 import org.study.demo.shutdown.hook.provider.dao.UserDao;
 import org.study.demo.shutdown.hook.provider.facade.ShutdownHookFacade;
@@ -18,7 +18,7 @@ public class ShutdownHookFacadeImpl implements ShutdownHookFacade {
     @Autowired
     UserDao userDao;
     @Autowired
-    RmqSender rmqSender;
+    RocketMQSender rmqSender;
     AtomicLong dbUpdateCount = new AtomicLong(0);
     AtomicLong mqSendCount = new AtomicLong(0);
 

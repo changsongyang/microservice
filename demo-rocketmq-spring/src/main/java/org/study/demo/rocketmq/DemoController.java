@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.common.util.component.RmqSender;
+import org.study.common.util.component.RocketMQSender;
 import org.study.demo.rocketmq.consts.Const;
 import org.study.demo.rocketmq.vo.bizVo.ItemVo;
 import org.study.demo.rocketmq.vo.bizVo.OrderVo;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("demo")
 public class DemoController {
     @Autowired
-    RmqSender rmqSender;
+    RocketMQSender rmqSender;
 
     @ResponseBody
     @RequestMapping(value = "/sendOne")

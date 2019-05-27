@@ -16,11 +16,11 @@ import org.study.common.util.vo.MessageVo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RmqSender {
+public class RocketMQSender {
     Logger log = LoggerFactory.getLogger(this.getClass());
     private RocketMQTemplate rocketMQTemplate;
 
-    public RmqSender(RocketMQTemplate rocketMQTemplate){
+    public RocketMQSender(RocketMQTemplate rocketMQTemplate){
         this.rocketMQTemplate = rocketMQTemplate;
     }
 

@@ -38,7 +38,7 @@
         <jasypt-starter.version>2.0.0</jasypt-starter.version>
         <spring-cloud-nacos-config-starter.version>0.2.1.RELEASE</spring-cloud-nacos-config-starter.version>
 
-        <rocketmq-spring-boot.version>2.0.2</rocketmq-spring-boot.version>
+        <rocketmq-spring-boot.version>2.0.4-SNAPSHOT</rocketmq-spring-boot.version>
 
         <!-- 基础工具相关 -->
         <servlet-api.version>4.0.0</servlet-api.version>

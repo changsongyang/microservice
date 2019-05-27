@@ -9,7 +9,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
-import org.study.common.util.component.RmqSender;
+import org.study.common.util.component.RocketMQSender;
 import org.study.common.util.component.ShutdownHook;
 
 import javax.sql.DataSource;
@@ -78,7 +78,7 @@ public class AppConfig {
 
     @RefreshScope
     @Bean
-    public RmqSender rmqSender(){
-        return new RmqSender();
+    public RocketMQSender rmqSender(){
+        return new RocketMQSender();
     }
 }

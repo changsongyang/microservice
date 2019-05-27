@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.common.util.component.RmqSender;
+import org.study.common.util.component.RocketMQSender;
 import org.study.common.util.vo.MessageVo;
 import org.study.demo.hot.deploy.config.CommonProperties;
 import org.study.demo.hot.deploy.config.DataSourceProperties;
@@ -23,7 +23,7 @@ public class DemoController {
     @Autowired
     UserDao userDao;
     @Autowired
-    RmqSender rmqSender;
+    RocketMQSender rmqSender;
     @Autowired
     CommonProperties propertiesConfig;
     @Autowired
