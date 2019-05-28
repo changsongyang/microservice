@@ -78,7 +78,7 @@ public class AppConfig {
 
     @RefreshScope
     @Bean
-    public RocketMQSender rmqSender(){
-        return new RocketMQSender();
+    public RocketMQSender rmqSender(RocketMQTemplate rocketMQTemplate){
+        return new RocketMQSender(rocketMQTemplate);
     }
 }

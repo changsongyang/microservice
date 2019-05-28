@@ -21,7 +21,6 @@ public class DemoController {
     @Autowired
     EnvConfig envConfig;
 
-    @ResponseBody
     @RequestMapping(value = "/shutdownTest", method = RequestMethod.GET)
     public void shutdownTest(boolean isReset) {
         long now = System.currentTimeMillis();
@@ -42,7 +41,6 @@ public class DemoController {
         System.out.println("===========>[END] callTimes="+i+",costSecond=" + costSec);
     }
 
-    @ResponseBody
     @RequestMapping(value = "/sayHello2", method = RequestMethod.GET)
     public HelloVo sayHello2(String content) {
         HelloVo helloVo = new HelloVo();

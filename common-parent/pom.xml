@@ -13,43 +13,40 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
 
-        <!-- spring相关 -->
+        <!-- springBoot体系 -->
         <spring-boot.version>2.1.3.RELEASE</spring-boot.version>
         <spring-cloud.version>Greenwich</spring-cloud.version>
         <spring-cloud-alibaba.version>0.9.0.RELEASE</spring-cloud-alibaba.version>
 
         <!-- db相关 -->
-        <mybatis-starter.version>1.3.2</mybatis-starter.version>
-        <pagehelper-starter.version>1.2.7</pagehelper-starter.version>
-        <druid-starter.version>1.1.10</druid-starter.version>
+        <pagehelper-starter.version>1.2.10</pagehelper-starter.version>
+        <mybatis-starter.version>2.0.1</mybatis-starter.version>
+        <druid-starter.version>1.1.17</druid-starter.version>
         <mysql-connector.version>8.0.12</mysql-connector.version>
 
         <!-- 中间件：MQ、Cache、Zookeeper等 -->
-        <activemq-spring.version>5.15.6</activemq-spring.version>
-        <rocketmq.version>4.4.0</rocketmq.version>
-        <redisson.version>3.6.5</redisson.version>
-        <quartz.version>2.2.3</quartz.version>
-        <curator.version>4.0.1</curator.version>
+        <activemq-spring.version>5.15.9</activemq-spring.version>
+        <rocketmq-spring-boot.version>2.0.4-SNAPSHOT</rocketmq-spring-boot.version>
+        <redisson.version>3.10.7</redisson.version>
+        <quartz.version>2.3.1</quartz.version>
+        <curator.version>4.2.0</curator.version>
 
         <!-- dubbo 相关 -->
         <dubbo.version>2.7.1</dubbo.version>
 
         <!-- 其他starter -->
-        <jasypt-starter.version>2.0.0</jasypt-starter.version>
-        <spring-cloud-nacos-config-starter.version>0.2.1.RELEASE</spring-cloud-nacos-config-starter.version>
-
-        <rocketmq-spring-boot.version>2.0.4-SNAPSHOT</rocketmq-spring-boot.version>
+        <jasypt-starter.version>2.1.1</jasypt-starter.version>
 
         <!-- 基础工具相关 -->
-        <servlet-api.version>4.0.0</servlet-api.version>
-        <aspectjweaver.version>1.7.0</aspectjweaver.version>
-        <commons-io.version>1.3.2</commons-io.version>
-        <commons-codec.version>1.10</commons-codec.version>
-        <commons-lang3.version>3.7</commons-lang3.version>
-        <commons-beanutils.version>1.9.2</commons-beanutils.version>
-        <fastjson.version>1.2.38</fastjson.version>
-        <java-jwt.version>2.1.0</java-jwt.version>
-        <joda-time.version>2.9.9</joda-time.version>
+        <servlet-api.version>4.0.1</servlet-api.version>
+        <aspectjweaver.version>1.9.4</aspectjweaver.version>
+        <commons-io.version>2.6</commons-io.version>
+        <commons-codec.version>1.12</commons-codec.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <fastjson.version>1.2.58</fastjson.version>
+        <java-jwt.version>3.8.1</java-jwt.version>
+        <joda-time.version>2.10.2</joda-time.version>
 
         <appName>${project.artifactId}</appName>
         <mavenBuildTime>${maven.build.timestamp}</mavenBuildTime>
@@ -278,7 +275,7 @@
     <!-- 依赖项目的声明和管理 -->
     <dependencyManagement>
         <dependencies>
-            <!-- ################################# 基础依赖配置 #################################### -->
+            <!-- ################################# 基础依赖配置 START #################################### -->
             <!-- spring boot：自定义parent pom时使用spring boot的方式 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -295,10 +292,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- ################################# 基础依赖配置 #################################### -->
 
-
-            <!-- 声明需要被引用的第三方项目 START -->
             <dependency><!-- Spring Boot的核心启动器，包含了自动配置、日志和YAML -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
@@ -310,8 +304,12 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!-- ################################# 基础依赖配置 END #################################### -->
 
-            <dependency><!-- spring boot test -->
+
+
+            <!-- ################################# 第三方组件 START ################################# -->
+            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
@@ -321,12 +319,10 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-devtools</artifactId>
                 <version>${spring-boot.version}</version>
-                <!-- optional = true,依赖不会传递，该项目依赖devtools；之后依赖myboot项目的项目如果想要使用devtools，需要重新引入 -->
                 <optional>true</optional>
             </dependency>
-            <!-- spring boot相关 END -->
 
-            <!-- Aapche Dubbo  -->
+            <!-- Dubbo  -->
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-spring-boot-starter</artifactId>
@@ -343,7 +339,7 @@
                 <version>${dubbo.version}</version>
             </dependency>
 
-            <!-- curator：是zookeeper的一种客户端 -->
+            <!-- curator -->
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
@@ -355,12 +351,7 @@
                 <version>${curator.version}</version>
             </dependency>
 
-            <!-- mybatis START -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector.version}</version>
-            </dependency>
+            <!-- mybatis -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
@@ -382,33 +373,13 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- mybatis END -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
 
-            <!-- elasticsearch START -->
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>transport</artifactId>
-                <version>${elasticsearch.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>x-pack-transport</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-            <!-- elasticsearch END -->
-
-            <!-- quartz START -->
+            <!-- quartz -->
             <dependency>
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
@@ -420,12 +391,36 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- quartz END -->
 
+            <!-- Redisson -->
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
+            <!-- ActiveMQ -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-activemq</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring-boot.version}</version>
+            </dependency>
+            <!-- ################################# 第三方组件 END ################################# -->
+
+
+
+            <!-- ################################# 第三方工具包 START ################################# -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt-starter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -448,6 +443,16 @@
                 <version>${commons-beanutils.version}</version>
             </dependency>
             <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
@@ -458,52 +463,7 @@
                 <artifactId>java-jwt</artifactId>
                 <version>${java-jwt.version}</version>
             </dependency>
-            <!-- 声明需要被引用的第三方项目 END -->
-
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson</artifactId>
-                <version>${redisson.version}</version>
-            </dependency>
-
-            <!-- ActiveMQ Support Start -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-activemq</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
-            <!-- ActiveMQ Support END -->
-
-            <dependency>
-                <groupId>org.apache.rocketmq</groupId>
-                <artifactId>rocketmq-client</artifactId>
-                <version>${rocketmq.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.ulisesbocchio</groupId>
-                <artifactId>jasypt-spring-boot-starter</artifactId>
-                <version>${jasypt-starter.version}</version>
-            </dependency>
-
-            <!-- curator  -->
-            <dependency>
-                <groupId>org.apache.curator</groupId>
-                <artifactId>curator-framework</artifactId>
-                <version>${curator.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.rocketmq</groupId>
-                <artifactId>rocketmq-spring-boot-starter</artifactId>
-                <version>${rocketmq-spring-boot.version}</version>
-            </dependency>
+            <!-- ################################# 第三方工具包 END ################################# -->
         </dependencies>
     </dependencyManagement>
 
