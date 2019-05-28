@@ -1,4 +1,4 @@
-package org.study.common.util.vo;
+package org.study.common.statics.vo;
 
 public class MessageVo {
     /**

@@ -11,9 +11,4 @@ public class AppConfig {
     public ShutdownHook shutdownHook(){
         return new ShutdownHook();
     }
-
-    @Bean
-    public RocketMQSender rmqSender(){
-        return new RocketMQSender();
-    }
 }

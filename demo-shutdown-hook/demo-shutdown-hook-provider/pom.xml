@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.study</groupId>
-    <artifactId>demo-shudown-hook-provider</artifactId>
+    <artifactId>demo-shutdown-hook-provider</artifactId>
 
     <build>
         <finalName>${appName}</finalName>
@@ -28,9 +28,8 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-
-        <dependency> <!-- 把nacos作为Dubbo的注册中心所需要的依赖 -->
-            <groupId>com.alibaba</groupId>
+        <dependency><!-- 使用nacos作为dubbo的注册中心 -->
+            <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
 
@@ -44,7 +43,12 @@
         <dependency>
             <groupId>org.study</groupId>
             <artifactId>common-service</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${projectVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>demo-shutdown-hook-api</artifactId>
+            <version>${projectVersion}</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,13 +1,13 @@
 package org.study.demo.shutdown.hook.provider.service;
 
-import com.alibaba.dubbo.config.annotation.Service;
+import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.study.common.util.component.RocketMQSender;
+import org.study.demo.shutdown.hook.api.facade.ShutdownHookFacade;
+import org.study.demo.shutdown.hook.api.vo.HelloVo;
+import org.study.demo.shutdown.hook.api.vo.OrderVo;
 import org.study.demo.shutdown.hook.provider.dao.User;
 import org.study.demo.shutdown.hook.provider.dao.UserDao;
-import org.study.demo.shutdown.hook.provider.facade.ShutdownHookFacade;
-import org.study.demo.shutdown.hook.provider.vo.HelloVo;
-import org.study.demo.shutdown.hook.provider.vo.OrderVo;
 
 import java.math.BigDecimal;
 import java.util.Random;

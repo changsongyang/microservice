@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
-import org.study.common.util.vo.MessageVo;
+import org.study.common.statics.vo.MessageVo;
 
 import java.util.ArrayList;
 import java.util.List;

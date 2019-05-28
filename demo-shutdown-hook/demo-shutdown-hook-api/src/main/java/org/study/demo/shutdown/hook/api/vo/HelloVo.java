@@ -1,4 +1,4 @@
-package org.study.demo.shutdown.hook.provider.vo;
+package org.study.demo.shutdown.hook.api.vo;
 
 import java.io.Serializable;
 

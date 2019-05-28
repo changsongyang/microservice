@@ -1,14 +1,14 @@
 package org.study.demo.shutdown.hook.consumer;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.study.demo.shutdown.hook.api.facade.ShutdownHookFacade;
+import org.study.demo.shutdown.hook.api.vo.HelloVo;
 import org.study.demo.shutdown.hook.consumer.config.EnvConfig;
-import org.study.demo.shutdown.hook.provider.facade.ShutdownHookFacade;
-import org.study.demo.shutdown.hook.provider.vo.HelloVo;
 
 import java.util.Random;
 

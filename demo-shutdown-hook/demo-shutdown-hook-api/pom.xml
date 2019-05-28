@@ -3,19 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>common-parent</artifactId>
+        <artifactId>demo-shutdown-hook</artifactId>
         <groupId>org.study</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../common-parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.study</groupId>
-    <artifactId>demo-shutdown-hook</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>demo-shutdown-hook-provider</module>
-        <module>demo-shutdown-hook-consumer</module>
-        <module>demo-shutdown-hook-api</module>
-    </modules>
+    <artifactId>demo-shutdown-hook-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>common-statics</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+    </dependencies>
 </project>

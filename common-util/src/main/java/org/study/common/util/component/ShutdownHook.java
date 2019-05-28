@@ -1,24 +1,23 @@
 package org.study.common.util.component;
 
+import org.apache.rocketmq.spring.support.DefaultRocketMQListenerContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 import javax.annotation.PostConstruct;
+import java.util.Map;
 
 public class ShutdownHook {
     private Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private long dubboShutdownTimeOutMills = 10000;//dubbo框架关闭的超时时间
     @Autowired
-    private ConfigurableApplicationContext configurableApplicationContext;
+    private GenericApplicationContext genericApplicationContext;
 
     public ShutdownHook() {
-    }
-
-    @PostConstruct
-    public void init() {
         registerShutdownHook();
     }
 
@@ -26,24 +25,14 @@ public class ShutdownHook {
         Thread shutdownHook = new Thread() {
             public void run() {
                 try {
-                    long timeOut = dubboShutdownTimeOutMills;
-                    logger.info("Waiting for Dubbo shutdown with {} seconds", ((int)(timeOut/1000)));
-                    Thread.sleep(timeOut);
-                } catch (Throwable e) {
-                    logger.error("Exception Happen While Dubbo shutting down", e);
-                }
+                    //step 1：关闭RocketMQ的消费者
+                    destroyRocketMQConsumer();
 
-                try {
-                    //增加额外的3秒休眠 是为了让Dubbo更彻底的不接收外部请求
-                    Thread.sleep(3000);
-                    logger.info("Dubbo is closed, start to exit SpringApplication");
-                } catch (Throwable e) {
-                    logger.error(e.getMessage(), e);
-                }
+                    //step 2：把Dubbo提供者从注册中心注销
+                    unregisterDubboProvider();
 
-                try {
-                    SpringApplication.exit(ShutdownHook.this.configurableApplicationContext);
-                    logger.info("SpringApplication Exited, Application shutdown");
+                    //step 3：关闭Spring容器
+                    SpringApplication.exit(ShutdownHook.this.genericApplicationContext);
                 } finally {
                     removeShutdownHook(this);
                 }
@@ -52,6 +41,33 @@ public class ShutdownHook {
 
         logger.info("Register shutdownHook to JVM, threadId: {} threadName: {}", shutdownHook.getId(), shutdownHook.getName());
         Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
+    private void destroyRocketMQConsumer(){
+        try {
+            Map<String, DefaultRocketMQListenerContainer> consumerContainer = genericApplicationContext.getBeansOfType(DefaultRocketMQListenerContainer.class);
+            if(consumerContainer == null || consumerContainer.isEmpty()){
+                return;
+            }
+
+            for(Map.Entry<String, DefaultRocketMQListenerContainer> entry : consumerContainer.entrySet()){
+                try{
+                    entry.getValue().destroy();
+                }catch(Throwable e){
+                    logger.error("beanName = {} shutdown Exception", entry.getKey(), e);
+                }
+            }
+        } catch (Throwable e) {
+            logger.error("Exception Happen While RocketMQConsumer shutting down", e);
+        }
+    }
+
+    private void unregisterDubboProvider(){
+        try {
+
+        } catch (Throwable e) {
+            logger.error("Exception Happen While DubboProvider unregister", e);
+        }
     }
 
     private void removeShutdownHook(Thread thread){

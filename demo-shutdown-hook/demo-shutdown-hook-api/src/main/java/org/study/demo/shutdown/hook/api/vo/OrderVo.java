@@ -1,6 +1,6 @@
-package org.study.demo.shutdown.hook.provider.vo;
+package org.study.demo.shutdown.hook.api.vo;
 
-import org.study.common.util.vo.MessageVo;
+import org.study.common.statics.vo.MessageVo;
 
 import java.math.BigDecimal;
 import java.util.List;
