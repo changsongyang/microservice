@@ -30,7 +30,6 @@ public class DemoController {
         vo.setTags(tags);
         vo.setMsgType(10001);
         vo.setTrxNo(msgKey);
-        vo.setMsgKey(msgKey);
 
         vo.setAmount(BigDecimal.valueOf(20.36));
         vo.setIsFinish(true);
@@ -50,7 +49,6 @@ public class DemoController {
             vo.setTags(tags+"_"+i);
             vo.setMsgType(10002);
             vo.setTrxNo(msgKey + i);
-            vo.setMsgKey(msgKey);
 
             vo.setAmount(BigDecimal.valueOf(10.01 * i).setScale(2, BigDecimal.ROUND_DOWN));
             vo.setIsFinish(true);
@@ -72,7 +70,6 @@ public class DemoController {
         vo.setTags(tags);
         vo.setMsgType(ranVal == 1 ? 20001 : 20002);
         vo.setTrxNo(msgKey);
-        vo.setMsgKey(msgKey);
 
         vo.setAmount(BigDecimal.valueOf(368.52));
         vo.setIsFinish(true);
@@ -92,7 +89,6 @@ public class DemoController {
         vo.setTags(tags);
         vo.setMsgType(ranVal == 1 ? 20001 : 20002);
         vo.setTrxNo(msgKey);
-        vo.setMsgKey(msgKey);
         vo.setAmount(BigDecimal.valueOf(3852.32));
         vo.setIsFinish(true);
 

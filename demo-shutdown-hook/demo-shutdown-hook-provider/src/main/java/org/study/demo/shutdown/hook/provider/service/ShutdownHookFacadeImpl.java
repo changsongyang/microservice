@@ -53,7 +53,6 @@ public class ShutdownHookFacadeImpl implements ShutdownHookFacade {
             vo.setTags(tags);
             vo.setMsgType(10001);
             vo.setTrxNo(msgKey);
-            vo.setMsgKey(msgKey);
             vo.setAmount(BigDecimal.valueOf(20.36));
             vo.setIsFinish(true);
             rmqSender.sendOne(vo);

@@ -17,14 +17,9 @@ public class MessageVo {
     private long msgType;
 
     /**
-     * 交易流水号
+     * 交易流水号/业务流水号
      */
     private String trxNo;
-
-    /**
-     * 消息的业务编码
-     */
-    private String msgKey;
 
 
     public String getTopic() {
@@ -57,13 +52,5 @@ public class MessageVo {
 
     public void setMsgType(long msgType) {
         this.msgType = msgType;
-    }
-
-    public String getMsgKey() {
-        return msgKey;
-    }
-
-    public void setMsgKey(String msgKey) {
-        this.msgKey = msgKey;
     }
 }

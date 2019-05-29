@@ -30,7 +30,7 @@ public class RocketMQSender {
      * @return
      */
     public boolean sendOne(MessageVo msg) {
-        Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getMsgKey()).build();
+        Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getTrxNo()).build();
 
         rocketMQTemplate.syncSend(getDestination(msg.getTopic(), msg.getTags()), message);
         return true;
@@ -38,6 +38,7 @@ public class RocketMQSender {
 
     /**
      * 发送批量消息，适合同一个业务事件有多个业务系统需要做不同业务处理的时候使用
+     * 注意：4.5.1版本下Broker端使用DledgerCommitLog模式时还不支持批量消息，会报 [CODE: 13 MESSAGE_ILLEGAL] 的异常，在常规的Master-Slave下可以
      * @param topic
      * @param msgList
      * @return
@@ -51,7 +52,7 @@ public class RocketMQSender {
                 msg.setTopic(topic);//批量消息只能是相同topic下的
 
                 Message message = MessageBuilder.withPayload(msg)
-                        .setHeader(MessageConst.PROPERTY_KEYS, msg.getMsgKey())
+                        .setHeader(MessageConst.PROPERTY_KEYS, msg.getTrxNo())
                         .build();
 
                 String destination = getDestination(msg.getTopic(), msg.getTags());
@@ -78,7 +79,7 @@ public class RocketMQSender {
      * @return
      */
     public boolean sendTrans(String txProducerGroup, MessageVo msg) {
-        Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getMsgKey()).build();
+        Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getTrxNo()).build();
 
         rocketMQTemplate.sendMessageInTransaction(txProducerGroup, getDestination(msg.getTopic(), msg.getTags()), message, null);
         return true;
