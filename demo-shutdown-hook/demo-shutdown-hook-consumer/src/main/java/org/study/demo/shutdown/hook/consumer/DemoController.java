@@ -33,7 +33,7 @@ public class DemoController {
                 isReset = false;
             }catch(Throwable e){
                 isException = true;
-                e.printStackTrace();
+                System.out.println("Exception = " + e.getMessage());
             }
             System.out.println("===========>[DONE] callTimes="+i+",isException="+isException);
         }

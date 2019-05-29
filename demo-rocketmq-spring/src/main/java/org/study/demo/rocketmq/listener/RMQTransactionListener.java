@@ -21,11 +21,13 @@ public class RMQTransactionListener implements RocketMQLocalTransactionListener 
 
         if(vo.getMsgType() == 20001){
             logger.info("20001 OrderVo = {} ", JSON.toJSONString(vo));
+            return RocketMQLocalTransactionState.COMMIT;
         }else if(vo.getMsgType() == 20002){
             logger.info("20002 execute with item OrderVo = {} ", JSON.toJSONString(vo));
+            return RocketMQLocalTransactionState.UNKNOWN;
+        }else{
+            return RocketMQLocalTransactionState.UNKNOWN;
         }
-
-        return RocketMQLocalTransactionState.UNKNOWN;
     }
 
     @Override

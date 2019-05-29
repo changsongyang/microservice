@@ -21,7 +21,7 @@ public class ConsumeListener {
     }
 
     @Component
-    @RocketMQMessageListener(topic = "my-topic", consumerGroup = "my-topic_batchTag")
+    @RocketMQMessageListener(topic = "my-topic", selectorExpression = "batchTag", consumerGroup = "my-topic_batchTag")
     public class batchTagConsumer implements RocketMQListener<OrderVo> {
         public void onMessage(OrderVo message) {
             logger.info("OrderVo = {}", JSON.toJSONString(message));

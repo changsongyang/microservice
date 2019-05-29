@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.common.util.component.RocketMQSender;
+import org.study.common.util.utils.RandomUtil;
 import org.study.demo.rocketmq.consts.Const;
 import org.study.demo.rocketmq.vo.bizVo.ItemVo;
 import org.study.demo.rocketmq.vo.bizVo.OrderVo;
@@ -46,7 +47,7 @@ public class DemoController {
         for(int i=1; i<=3; i++){
             OrderVo vo = new OrderVo();
             vo.setTopic(topic);
-            vo.setTags(tags + "_" + i);
+            vo.setTags(tags+"_"+i);
             vo.setMsgType(10002);
             vo.setTrxNo(msgKey + i);
             vo.setMsgKey(msgKey);
@@ -64,10 +65,12 @@ public class DemoController {
     public boolean sendTrans(String topic, String msgKey) {
         String tags = "transTag";
 
+        int ranVal = RandomUtil.getInt(2);
+
         OrderVo vo = new OrderVo();
         vo.setTopic(topic);
         vo.setTags(tags);
-        vo.setMsgType(20001);
+        vo.setMsgType(ranVal == 1 ? 20001 : 20002);
         vo.setTrxNo(msgKey);
         vo.setMsgKey(msgKey);
 
@@ -82,10 +85,12 @@ public class DemoController {
     public boolean sendTransItem(String topic, String msgKey) {
         String tags = "transTagItem";
 
+        int ranVal = RandomUtil.getInt(2);
+
         OrderVo vo = new OrderVo();
         vo.setTopic(topic);
         vo.setTags(tags);
-        vo.setMsgType(20002);
+        vo.setMsgType(ranVal == 1 ? 20001 : 20002);
         vo.setTrxNo(msgKey);
         vo.setMsgKey(msgKey);
         vo.setAmount(BigDecimal.valueOf(3852.32));
