@@ -13,6 +13,17 @@
     <groupId>org.study</groupId>
     <artifactId>demo-rocketmq-spring</artifactId>
 
+    <build>
+        <finalName>${appName}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.study</groupId>
@@ -23,6 +34,17 @@
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
         </dependency>
+
+        <!-- ActiveMQ START -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.messaginghub</groupId>
+            <artifactId>pooled-jms</artifactId>
+        </dependency>
+        <!-- ActiveMQ END -->
 
         <dependency> <!-- 把nacos作为配置中心时需要引入的依赖 -->
             <groupId>org.springframework.cloud</groupId>
