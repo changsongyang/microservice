@@ -2,6 +2,9 @@ package org.study.common.statics.pojos;
 
 import java.util.*;
 
+/**
+ * 使用elasticsearch查询的请求参数
+ */
 public class EsQuery {
 
     private String index;
@@ -31,87 +34,180 @@ public class EsQuery {
         return new EsQuery();
     }
 
+    /**
+     * 需要返回的查询字段，默认是所有字段
+     * @param fields
+     * @return
+     */
     public EsQuery select(String... fields){
         this.selectFields = fields;
         return this;
     }
 
+    /**
+     * 查询数据源
+     * @param index
+     * @param type
+     * @return
+     */
     public EsQuery from(String index, String type){
         this.index = index;
         this.type = type;
         return this;
     }
 
+    /**
+     * 等于(精确匹配)
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery eq(String field, Object value){
         initObjectIfNeed(this.eqMap);
         this.eqMap.put(field, value);
         return this;
     }
 
+    /**
+     * 大于
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery gt(String field, Object value){
         initObjectIfNeed(this.gtMap);
         return this;
     }
 
+    /**
+     * 大于等于
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery gte(String field, Object value){
         initObjectIfNeed(this.gteMap);
         return this;
     }
 
+    /**
+     * 小于
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery lt(String field, Object value){
         initObjectIfNeed(this.ltMap);
         return this;
     }
 
+    /**
+     * 小于等于
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery lte(String field, Object value){
         initObjectIfNeed(this.lteMap);
         return this;
     }
 
+    /**
+     * 等同于sql的between
+     * @param field
+     * @param start
+     * @param end
+     * @return
+     */
     public EsQuery between(String field, Object start, Object end){
         gte(field, start);
         lte(field, end);
         return this;
     }
 
+    /**
+     * 等同于sql的in查询
+     * @param field
+     * @param values
+     * @return
+     */
     public EsQuery in(String field, Collection values){
         initArrayIfNeed(this.inMap);
         this.inMap.put(field, values.toArray());
         return this;
     }
 
+    /**
+     * 模糊匹配(全文检索)
+     * @param field
+     * @param value
+     * @return
+     */
     public EsQuery like(String field, Object value){
         initObjectIfNeed(this.likeMap);
         this.likeMap.put(field, value);
         return this;
     }
 
+    /**
+     * 计算总和
+     * @param field
+     * @return
+     */
     public EsQuery sum(String field){
         this.sum = field;
         return this;
     }
 
+    /**
+     * 计算总数
+     * @param field
+     * @return
+     */
     public EsQuery count(String field){
         this.count = field;
         return this;
     }
 
+    /**
+     * 分组
+     * @param fields
+     * @return
+     */
     public EsQuery groupBy(String fields){
         this.groupBy = fields;
         return this;
     }
 
+    /**
+     * 排序
+     * @param fields
+     * @return
+     */
     public EsQuery orderBy(String fields){
         this.orderBy = fields;
         return this;
     }
 
+    /**
+     * 分页查询
+     * @param pageCurrent
+     * @param pageSize
+     * @return
+     */
     public EsQuery page(Integer pageCurrent, Integer pageSize){
         this.pageCurrent = pageCurrent;
         this.pageSize = pageSize;
         return this;
     }
 
+    /**
+     * scroll查询
+     * @param scrollId
+     * @param expireSec
+     * @param pageSize
+     * @return
+     */
     public EsQuery scroll(String scrollId, long expireSec, int pageSize){
         this.scrollId = scrollId;
         this.scrollExpireSec = expireSec;
@@ -119,7 +215,12 @@ public class EsQuery {
         return this;
     }
 
-    public EsQuery entity(Class clz){
+    /**
+     * 查询返回的实体类
+     * @param clz
+     * @return
+     */
+    public EsQuery result(Class clz){
         this.returnClassName = clz.getName();
         return this;
     }
