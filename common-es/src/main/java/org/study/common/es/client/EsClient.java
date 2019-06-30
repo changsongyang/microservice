@@ -45,7 +45,11 @@ public class EsClient {
 
         SearchResponse response = executeQuery(esQuery);
         if(response.getHits().getTotalHits().value > 0){
-            return JsonUtil.toBean(response.getHits().getHits()[0].getSourceAsString(), clz);
+            if(isString(clz)){
+                return (T) response.getHits().getHits()[0].getSourceAsString();
+            }else{
+                return JsonUtil.toBean(response.getHits().getHits()[0].getSourceAsString(), clz);
+            }
         }else{
             return null;
         }
@@ -98,10 +102,15 @@ public class EsClient {
      */
     public  <T> List<T> getEntityList(SearchResponse response, Class<T> clz){
         List<T> entityList = new ArrayList<>();
+        boolean isString = isString(clz);
         if(response.getHits().getTotalHits().value > 0){
             SearchHit[] hits = response.getHits().getHits();
             for(int i=0; i<hits.length; i++){
-                entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
+                if(isString){
+                    entityList.add((T)hits[i].getSourceAsString());
+                }else{
+                    entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
+                }
             }
         }
         return entityList;
@@ -241,6 +250,10 @@ public class EsClient {
 
     private boolean isNotBlank(Map map){
         return map != null && ! map.isEmpty();
+    }
+
+    private boolean isString(Class clz){
+        return String.class.isAssignableFrom(clz);
     }
 
 
