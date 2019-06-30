@@ -209,6 +209,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery scroll(String scrollId, long expireSec, int pageSize){
+        this.isScroll = true;
         this.scrollId = scrollId;
         this.scrollExpireSec = expireSec;
         this.pageSize = pageSize;
