@@ -209,7 +209,7 @@ public class EsClient {
             }
         }
 
-        return null;
+        return queryBuilder;
     }
 
     /**
