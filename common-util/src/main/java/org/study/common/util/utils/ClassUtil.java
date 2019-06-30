@@ -16,7 +16,7 @@ import java.lang.reflect.Type;
 public class ClassUtil {
     private static ClassLoader classLoader;
     static {
-        classLoader = Launcher.getLauncher().getClassLoader();//得到AppClassLoader
+        classLoader = Thread.currentThread().getContextClassLoader();
     }
 
     /**

@@ -23,6 +23,11 @@ public class PageResult<T> extends BaseResult<T> {
      */
     private Long totalRecord;
 
+    /**
+     * elasticsearch遍历扫描时的scrollId
+     */
+    private String scrollId;
+
     public Integer getPageCurrent() {
         return pageCurrent;
     }
@@ -45,6 +50,14 @@ public class PageResult<T> extends BaseResult<T> {
 
     public void setTotalRecord(Long totalRecord) {
         this.totalRecord = totalRecord;
+    }
+
+    public String getScrollId() {
+        return scrollId;
+    }
+
+    public void setScrollId(String scrollId) {
+        this.scrollId = scrollId;
     }
 
     public static <T> PageResult<T> newInstance(PageParam pageParam, T data){

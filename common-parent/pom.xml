@@ -37,6 +37,8 @@
         <!-- 其他starter -->
         <jasypt-starter.version>2.1.1</jasypt-starter.version>
 
+        <es-version>7.0.1</es-version>
+
         <!-- 基础工具相关 -->
         <servlet-api.version>4.0.1</servlet-api.version>
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
@@ -404,6 +406,17 @@
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
                 <version>${rocketmq-spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${es-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${es-version}</version>
             </dependency>
             <!-- ################################# 第三方组件 END ################################# -->
 
