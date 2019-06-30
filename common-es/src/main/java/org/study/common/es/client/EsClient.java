@@ -197,6 +197,8 @@ public class EsClient {
                         query.lte(valueLte);
                     }
                 }
+
+                queryBuilder.filter(query);
             }
         }
 
