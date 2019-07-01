@@ -1,16 +1,17 @@
-package org.study.common.statics.pojos;
+package org.study.common.es.query;
 
-import java.util.*;
+import org.study.common.statics.exceptions.BizException;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 使用elasticsearch查询的请求参数
  */
 public class EsQuery {
-
     private String index;
     private String type;
-    private String sum;
-    private String count;
     private String groupBy;
     private String orderBy;
     private String returnClassName;
@@ -18,8 +19,8 @@ public class EsQuery {
     private boolean isScroll;
     private String scrollId;
     private long scrollExpireSec;
-    private Integer pageCurrent;
-    private Integer pageSize;
+    private int pageCurrent = 1;
+    private int pageSize = 10;
 
     private String[] selectFields;
     private Map<String, Object> eqMap;
@@ -29,6 +30,7 @@ public class EsQuery {
     private Map<String, Object> lteMap;
     private Map<String, Object> likeMap;
     private Map<String, Object[]> inMap;
+    private Map<String, StatisField> statisFieldMap;
 
     public static EsQuery build(){
         return new EsQuery();
@@ -47,7 +49,16 @@ public class EsQuery {
     /**
      * 查询数据源
      * @param index
-     * @param type
+     * @return
+     */
+    public EsQuery from(String index){
+        this.index = index;
+        return this;
+    }
+
+    /**
+     * 查询数据源
+     * @param index
      * @return
      */
     public EsQuery from(String index, String type){
@@ -63,7 +74,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery eq(String field, Object value){
-        initObjectIfNeed(this.eqMap);
+        initMapIfNeed(MapType.EQ_MAP);
         this.eqMap.put(field, value);
         return this;
     }
@@ -75,7 +86,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery gt(String field, Object value){
-        initObjectIfNeed(this.gtMap);
+        initMapIfNeed(MapType.GT_MAP);
         return this;
     }
 
@@ -86,7 +97,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery gte(String field, Object value){
-        initObjectIfNeed(this.gteMap);
+        initMapIfNeed(MapType.GTE_MAP);
         return this;
     }
 
@@ -97,7 +108,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery lt(String field, Object value){
-        initObjectIfNeed(this.ltMap);
+        initMapIfNeed(MapType.LT_MAP);
         return this;
     }
 
@@ -108,7 +119,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery lte(String field, Object value){
-        initObjectIfNeed(this.lteMap);
+        initMapIfNeed(MapType.LTE_MAP);
         return this;
     }
 
@@ -132,7 +143,7 @@ public class EsQuery {
      * @return
      */
     public EsQuery in(String field, Collection values){
-        initArrayIfNeed(this.inMap);
+        initMapIfNeed(MapType.IN_MAP);
         this.inMap.put(field, values.toArray());
         return this;
     }
@@ -144,18 +155,8 @@ public class EsQuery {
      * @return
      */
     public EsQuery like(String field, Object value){
-        initObjectIfNeed(this.likeMap);
+        initMapIfNeed(MapType.LIKE_MAP);
         this.likeMap.put(field, value);
-        return this;
-    }
-
-    /**
-     * 计算总和
-     * @param field
-     * @return
-     */
-    public EsQuery sum(String field){
-        this.sum = field;
         return this;
     }
 
@@ -165,7 +166,52 @@ public class EsQuery {
      * @return
      */
     public EsQuery count(String field){
-        this.count = field;
+        initStatisIfNeed(field);
+        this.statisFieldMap.get(field).setCount(true);
+        return this;
+    }
+
+    /**
+     * 计算总和
+     * @param field
+     * @return
+     */
+    public EsQuery sum(String field){
+        initStatisIfNeed(field);
+        this.statisFieldMap.get(field).setSum(true);
+        return this;
+    }
+
+    /**
+     * 计算最大值
+     * @param field
+     * @return
+     */
+    public EsQuery max(String field){
+        initStatisIfNeed(field);
+        this.statisFieldMap.get(field).setMax(true);
+        return this;
+    }
+
+    /**
+     * 计算最小值
+     * @param field
+     * @return
+     */
+    public EsQuery min(String field){
+        initStatisIfNeed(field);
+        this.statisFieldMap.get(field).setMin(true);
+        return this;
+    }
+
+    /**
+     * 计算平均值
+     * @param field
+     * @return
+     */
+    public EsQuery avg(String field){
+        initStatisIfNeed(field);
+        this.statisFieldMap.get(field).setAvg(true);
         return this;
     }
 
@@ -197,6 +243,16 @@ public class EsQuery {
      */
     public EsQuery page(Integer pageCurrent, Integer pageSize){
         this.pageCurrent = pageCurrent;
+        this.pageSize = pageSize;
+        return this;
+    }
+
+    /**
+     * 不分页查询，也需要指定条数
+     * @param pageSize
+     * @return
+     */
+    public EsQuery size(Integer pageSize){
         this.pageSize = pageSize;
         return this;
     }
@@ -247,20 +303,12 @@ public class EsQuery {
         this.type = type;
     }
 
-    public String getSum() {
-        return sum;
+    public Map<String, StatisField> getStatisFieldMap() {
+        return statisFieldMap;
     }
 
-    public void setSum(String sum) {
-        this.sum = sum;
-    }
-
-    public String getCount() {
-        return count;
-    }
-
-    public void setCount(String count) {
-        this.count = count;
+    public void setStatisFieldMap(Map<String, StatisField> statisFieldMap) {
+        this.statisFieldMap = statisFieldMap;
     }
 
     public String getGroupBy() {
@@ -311,19 +359,19 @@ public class EsQuery {
         this.scrollExpireSec = scrollExpireSec;
     }
 
-    public Integer getPageCurrent() {
+    public int getPageCurrent() {
         return pageCurrent;
     }
 
-    public void setPageCurrent(Integer pageCurrent) {
+    public void setPageCurrent(int pageCurrent) {
         this.pageCurrent = pageCurrent;
     }
 
-    public Integer getPageSize() {
+    public int getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(Integer pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
@@ -391,23 +439,168 @@ public class EsQuery {
         this.likeMap = likeMap;
     }
 
-    private void initObjectIfNeed(Map<String, Object> map){
-        if(map == null){
+    private void initMapIfNeed(int type){
+        boolean isEmpty = true;
+        switch (type){
+            case MapType.EQ_MAP:
+                isEmpty = eqMap == null;
+                break;
+            case MapType.GT_MAP:
+                isEmpty = gtMap == null;
+                break;
+            case MapType.GTE_MAP:
+                isEmpty = gteMap == null;
+                break;
+            case MapType.LT_MAP:
+                isEmpty = ltMap == null;
+                break;
+            case MapType.LTE_MAP:
+                isEmpty = lteMap == null;
+                break;
+            case MapType.IN_MAP:
+                isEmpty = inMap == null;
+                break;
+            case MapType.LIKE_MAP:
+                isEmpty = likeMap == null;
+                break;
+            case MapType.STATIS_MAP:
+                isEmpty = statisFieldMap == null;
+                break;
+        }
+
+        if(!isEmpty){
+            return;
+        }
+
+        synchronized (this){
+            switch (type){
+                case MapType.EQ_MAP:
+                    if(eqMap == null){
+                        eqMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.GT_MAP:
+                    if(gtMap == null){
+                        gtMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.GTE_MAP:
+                    if(gteMap == null){
+                        gteMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.LT_MAP:
+                    if(ltMap == null){
+                        ltMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.LTE_MAP:
+                    if(lteMap == null){
+                        lteMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.IN_MAP:
+                    if(inMap == null){
+                        inMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.LIKE_MAP:
+                    if(likeMap == null){
+                        likeMap = new HashMap<>();
+                    }
+                    break;
+                case MapType.STATIS_MAP:
+                    if(statisFieldMap == null){
+                        statisFieldMap = new HashMap<>();
+                    }
+                    break;
+                default:
+                    throw new BizException("未支持的类型type="+type);
+            }
+        }
+    }
+
+    private void initStatisIfNeed(String field){
+        initMapIfNeed(MapType.STATIS_MAP);
+
+        if(! statisFieldMap.containsKey(field)){
             synchronized (this){
-                if(map == null){
-                    map = new HashMap<String, Object>();
+                if(! statisFieldMap.containsKey(field)){
+                    statisFieldMap.put(field, new StatisField(field));
                 }
             }
         }
     }
 
-    private void initArrayIfNeed(Map<String, Object[]> map){
-        if(map == null){
-            synchronized (this){
-                if(map == null){
-                    map = new HashMap<String, Object[]>();
-                }
-            }
+    public class StatisField {
+        private String field;
+        private boolean count = false;
+        private boolean sum = false;
+        private boolean max = false;
+        private boolean min = false;
+        private boolean avg = false;
+
+        public StatisField(String field){
+            this.field = field;
         }
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
+
+        public boolean getCount() {
+            return count;
+        }
+
+        public void setCount(boolean count) {
+            this.count = count;
+        }
+
+        public boolean getSum() {
+            return sum;
+        }
+
+        public void setSum(boolean sum) {
+            this.sum = sum;
+        }
+
+        public boolean getMax() {
+            return max;
+        }
+
+        public void setMax(boolean max) {
+            this.max = max;
+        }
+
+        public boolean getMin() {
+            return min;
+        }
+
+        public void setMin(boolean min) {
+            this.min = min;
+        }
+
+        public boolean getAvg() {
+            return avg;
+        }
+
+        public void setAvg(boolean avg) {
+            this.avg = avg;
+        }
+    }
+
+    class MapType {
+        final static int EQ_MAP = 1;
+        final static int GT_MAP = 2;
+        final static int GTE_MAP = 3;
+        final static int LT_MAP = 4;
+        final static int LTE_MAP = 5;
+        final static int LIKE_MAP = 6;
+        final static int IN_MAP = 7;
+        final static int STATIS_MAP = 8;
     }
 }
