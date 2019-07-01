@@ -30,13 +30,21 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * elasticsearch客户端，提供一些常规的查询方法，如果需要复杂的查询，可通过 #getRestEsClient() 方法取得ES的原生客户端来处理
+ * elasticsearch客户端，提供一些常规的方法，如果需要复杂的查询，可通过 #getRestEsClient() 方法取得ES的原生客户端来处理
  */
 public class EsClient {
     private RestHighLevelClient restEsClient;
 
     public EsClient(RestHighLevelClient restEsClient){
         this.restEsClient = restEsClient;
+    }
+
+    /**
+     * 获取es原生客户端，用以处理比较复杂的需求
+     * @return
+     */
+    public RestHighLevelClient getRestEsClient() {
+        return restEsClient;
     }
 
     /**
@@ -439,9 +447,5 @@ public class EsClient {
 
     private String splitFieldName(String field){
         return field.split("\\|")[0];
-    }
-
-    public RestHighLevelClient getRestEsClient() {
-        return restEsClient;
     }
 }
