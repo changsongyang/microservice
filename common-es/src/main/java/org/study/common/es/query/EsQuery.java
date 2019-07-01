@@ -273,7 +273,7 @@ public class EsQuery {
     }
 
     /**
-     * 查询返回的实体类
+     * 查询返回的实体类，如果不调用此方法设置实体类，默认会返回String
      * @param clz
      * @return
      */
@@ -463,7 +463,7 @@ public class EsQuery {
             case MapType.LIKE_MAP:
                 isEmpty = likeMap == null;
                 break;
-            case MapType.STATIS_MAP:
+            case MapType.STATISTIC_MAP:
                 isEmpty = statisFieldMap == null;
                 break;
         }
@@ -509,7 +509,7 @@ public class EsQuery {
                         likeMap = new HashMap<>();
                     }
                     break;
-                case MapType.STATIS_MAP:
+                case MapType.STATISTIC_MAP:
                     if(statisFieldMap == null){
                         statisFieldMap = new HashMap<>();
                     }
@@ -521,7 +521,7 @@ public class EsQuery {
     }
 
     private void initStatisIfNeed(String field){
-        initMapIfNeed(MapType.STATIS_MAP);
+        initMapIfNeed(MapType.STATISTIC_MAP);
 
         if(! statisFieldMap.containsKey(field)){
             synchronized (this){
@@ -601,6 +601,6 @@ public class EsQuery {
         final static int LTE_MAP = 5;
         final static int LIKE_MAP = 6;
         final static int IN_MAP = 7;
-        final static int STATIS_MAP = 8;
+        final static int STATISTIC_MAP = 8;
     }
 }
