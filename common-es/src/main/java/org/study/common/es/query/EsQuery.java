@@ -2,6 +2,7 @@ package org.study.common.es.query;
 
 import org.study.common.statics.exceptions.BizException;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,9 @@ import java.util.Map;
 /**
  * 使用elasticsearch查询的请求参数
  */
-public class EsQuery {
+public class EsQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String index;
     private String type;
     private String groupBy;

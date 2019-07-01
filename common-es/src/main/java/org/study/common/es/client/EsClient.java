@@ -96,7 +96,7 @@ public class EsClient {
     }
 
     /**
-     * 统计，可统计多个字段，每个字段都可有：count、sum、min、max、avg 等统计方式
+     * 统计，可统计多个字段的多个维度，每个字段都可有：count、sum、min、max、avg 等维度统计
      * @param esQuery
      * @return
      */
@@ -123,7 +123,7 @@ public class EsClient {
     }
 
     /**
-     * 统计，只能统计1个字段
+     * 统计，只统计单个字段的不同维度
      * @see #multiStatistic(EsQuery)
      * @param esQuery
      * @return

@@ -1,8 +1,11 @@
 package org.study.common.es.query;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Statistic {
+public class Statistic implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long count;
     private BigDecimal min;
     private BigDecimal max;
