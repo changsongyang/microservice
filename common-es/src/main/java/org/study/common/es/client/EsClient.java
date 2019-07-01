@@ -236,6 +236,7 @@ public class EsClient {
         //精确匹配
         if(isNotBlank(esQuery.getEqMap())){
             for(Map.Entry<String, Object> entry : esQuery.getEqMap().entrySet()){
+                nullCheck(entry.getKey(), entry.getValue());
                 queryBuilder.filter(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
             }
         }
@@ -243,6 +244,7 @@ public class EsClient {
         //范围列表查询(in 查询)
         if(isNotBlank(esQuery.getInMap())){
             for(Map.Entry<String, Object[]> entry : esQuery.getInMap().entrySet()){
+                nullCheck(entry.getKey(), entry.getValue());
                 queryBuilder.filter(QueryBuilders.termsQuery(entry.getKey(), entry.getValue()));
             }
         }
@@ -296,6 +298,7 @@ public class EsClient {
         //全文搜索
         if(isNotBlank(esQuery.getLikeMap())){
             for(Map.Entry<String, Object> entry : esQuery.getLikeMap().entrySet()){
+                nullCheck(entry.getKey(), entry.getValue());
                 queryBuilder.filter(QueryBuilders.matchQuery(entry.getKey(), entry.getValue()));
             }
         }
@@ -306,6 +309,10 @@ public class EsClient {
     private void appendAggregation(SearchSourceBuilder sourceBuilder, EsQuery esQuery){
         for(Map.Entry<String, EsQuery.StatisField> entry : esQuery.getStatisFieldMap().entrySet()){
             String fieldName = entry.getKey();
+            if(StringUtil.isEmpty(fieldName)){
+                throw new BizException("参数非法，统计时存在为空的参数名");
+            }
+
             EsQuery.StatisField field = entry.getValue();
             boolean isNoneMatch = true;
 
@@ -382,7 +389,7 @@ public class EsClient {
         }else if(esQuery.getPageSize() <= 0 || esQuery.getPageCurrent() <= 0){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "pageCurrent和pageSize都需大于0");
         }else if(statisFieldMust && (esQuery.getStatisFieldMap() == null || esQuery.getStatisFieldMap().isEmpty())){
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "StatisFieldMap不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "statisFieldMap不能为空");
         }
     }
 
@@ -399,6 +406,22 @@ public class EsClient {
             metrics.setSum(BigDecimal.valueOf( ((ParsedSum)agg).getValue() ));
         }else if(AvgAggregationBuilder.NAME.equals(type)){
             metrics.setAvg(BigDecimal.valueOf( ((ParsedAvg)agg).getValue() ));
+        }
+    }
+
+    private void nullCheck(String key, Object value){
+         if(key == null || key.trim().length() <= 0){
+             throw new BizException("非法参数，存在为空的参数名");
+        }else if(value == null){
+            throw new BizException(key + "不能为null值");
+        }
+    }
+
+    private void nullCheck(String key, Object[] values){
+        if(key == null || key.trim().length() <= 0){
+            throw new BizException("非法参数，存在为空的参数名");
+        }else if(values == null || values.length <= 0){
+            throw new BizException(key + "不能为null值");
         }
     }
 
