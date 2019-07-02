@@ -1,6 +1,8 @@
 package org.study.common.statics.vo;
 
-public class MessageVo {
+import java.io.Serializable;
+
+public class MessageVo implements Serializable {
     /**
      * 主题
      */

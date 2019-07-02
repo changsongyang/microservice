@@ -1,8 +1,6 @@
 package org.study.demo.hot.deploy.dao;
 
-import org.study.common.statics.pojos.BaseEntity;
-
-public class User extends BaseEntity {
+public class User implements java.io.Serializable {
     private Long id;
     private Long version;
     private String username;

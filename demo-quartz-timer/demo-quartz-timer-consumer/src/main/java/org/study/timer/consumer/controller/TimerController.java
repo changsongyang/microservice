@@ -23,9 +23,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("timer")
 public class TimerController {
-    @Reference
+    @Reference(check = false)
     QuartzService quartzService;
-    @Reference
+    @Reference(check = false)
     QuartzAdminService quartzAdminService;
 
     @RequestMapping(value = "addSimpleTimer", method = RequestMethod.POST)
@@ -36,7 +36,7 @@ public class TimerController {
         String jobGroup = "simpleTimerGroup";
         String jobName = "simpleTimerJob";
         ScheduleJob scheduleJob = ScheduleJob.newSimpleTask(
-                jobGroup, jobName, MsgTopicAndTags.TOPIC_USER_BIZ, MsgTopicAndTags.TAG_TIMER_SIMPLE);
+                jobGroup, jobName, MsgTopicAndTags.TOPIC_QUARTZ_TIMER, MsgTopicAndTags.TAG_TIMER_SIMPLE);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setIntervals(intervalSecond);
         scheduleJob.setIntervalUnit(TimeUnitEnum.SECOND.getValue());
@@ -62,7 +62,7 @@ public class TimerController {
         String jobGroup = "cronTimerGroup";
         String jobName = "cronTimerJob";
         ScheduleJob scheduleJob = ScheduleJob.newCronTask(
-                jobGroup, jobName, MsgTopicAndTags.TOPIC_USER_BIZ, MsgTopicAndTags.TAG_TIMER_CRON);
+                jobGroup, jobName, MsgTopicAndTags.TOPIC_QUARTZ_TIMER, MsgTopicAndTags.TAG_TIMER_CRON);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setCronExpression(cron);
         scheduleJob.setJobDescription(jobDescription);

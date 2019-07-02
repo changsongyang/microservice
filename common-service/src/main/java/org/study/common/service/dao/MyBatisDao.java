@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.study.common.statics.exceptions.BizException;
-import org.study.common.statics.pojos.BaseEntity;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.util.utils.ClassUtil;

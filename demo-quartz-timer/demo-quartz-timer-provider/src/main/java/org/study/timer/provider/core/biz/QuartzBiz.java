@@ -9,6 +9,7 @@ import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.statics.vo.MessageVo;
+import org.study.common.util.utils.DateUtil;
 import org.study.common.util.utils.StringUtil;
 import org.study.starter.component.RocketMQSender;
 import org.study.timer.provider.core.dao.ScheduleJobDao;
@@ -233,7 +234,7 @@ public class QuartzBiz {
         msg.setTopic(scheduleJob.getTopic());
         msg.setTags(scheduleJob.getTags());
         msg.setMsgType(0);
-        msg.setTrxNo(scheduleJob.getJobGroup() + scheduleJob.getJobName() + System.currentTimeMillis());
+        msg.setTrxNo(scheduleJob.getJobGroup() + "_" + scheduleJob.getJobName() + "_" + DateUtil.formatDateTime(new Date()));
         msg.setJsonParam(scheduleJob.getParamJson()==null?"":scheduleJob.getParamJson());
         //发送消息通知
         rocketMQSender.sendOne(msg);

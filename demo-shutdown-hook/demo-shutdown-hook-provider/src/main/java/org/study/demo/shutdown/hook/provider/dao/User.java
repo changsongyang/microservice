@@ -1,8 +1,6 @@
 package org.study.demo.shutdown.hook.provider.dao;
 
-import org.study.common.statics.pojos.BaseEntity;
-
-public class User extends BaseEntity {
+public class User implements java.io.Serializable {
     private Long id;
     private Long version;
     private String username;

@@ -28,13 +28,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- nacos START -->
-        <dependency><!-- 把nacos作为配置中心时需要引入的依赖 -->
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-        </dependency>
-        <!-- nacos END -->
-
         <!-- dubbo START -->
         <dependency>
             <groupId>org.apache.dubbo</groupId>
@@ -50,5 +43,22 @@
             <type>pom</type>
         </dependency>
         <!-- dubbo END -->
+
+        <!-- nacos START -->
+        <dependency><!-- 把nacos作为配置中心时需要引入的依赖 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!-- nacos END -->
+
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>study-spring-boot-starter</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 </project>
