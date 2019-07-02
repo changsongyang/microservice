@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.study.timer.api.entity.InstanceStage">
+	<sql id="table"> qrtz_instance_state </sql>
+
+	<!-- 用于返回的bean对象 -->
+	<resultMap id="BaseResultMap" type="org.study.timer.api.entity.InstanceStage">
+		<result column="ID" property="id" jdbcType="BIGINT"/>
+		<result column="INSTANCE_ID" property="instanceId" jdbcType="VARCHAR"/>
+		<result column="STATUS" property="status" jdbcType="TINYINT"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="Base_Column_List">
+		ID,
+		INSTANCE_ID,
+		STATUS,
+		REMARK,
+		CREATE_TIME,
+		UPDATE_TIME
+	</sql>
+
+	<!-- 插入记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="org.study.timer.api.entity.InstanceStage">
+		INSERT INTO <include refid="table" /> (
+		INSTANCE_ID,
+		STATUS,
+		REMARK,
+		CREATE_TIME,
+		UPDATE_TIME
+		) VALUES (
+		#{instanceId,jdbcType=VARCHAR},
+		#{status,jdbcType=TINYINT},
+		#{remark,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+
+	<!-- 批量插入记录 -->
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="list">
+		INSERT INTO <include refid="table" /> (
+		INSTANCE_ID,
+		STATUS,
+		REMARK,
+		CREATE_TIME,
+		UPDATE_TIME
+		) VALUES
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item.instanceId,jdbcType=VARCHAR},
+			#{item.status,jdbcType=TINYINT},
+			#{item.remark,jdbcType=VARCHAR},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateTime,jdbcType=TIMESTAMP}
+		</foreach>
+	</insert>
+
+	<!--更新-->
+	<update id="update" parameterType="org.study.timer.api.entity.InstanceStage">
+		UPDATE <include refid="table" />
+		<set>
+			INSTANCE_ID = #{instanceId,jdbcType=VARCHAR},
+			STATUS = #{status,jdbcType=TINYINT},
+			REMARK = #{remark,jdbcType=VARCHAR},
+			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+		</set>
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</update>
+
+	<!-- 多条件组合查询 -->
+	<select id="listBy" parameterType="java.util.Map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!-- 计算总记录数 -->
+	<select id="countBy" parameterType="java.util.Map" resultType="long">
+		SELECT count(ID) FROM
+		<include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+
+	<!--按查询条件删除-->
+	<delete id="deleteBy">
+		DELETE FROM <include refid="table" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</delete>
+
+	<!-- 根据多个id查询 -->
+	<select id="listByIdList" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- 根据id查询 -->
+	<select id="getById" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID = #{id,jdbcType=BIGINT}
+	</select>
+
+	<!--按id主键删除-->
+	<delete id="deleteById">
+		DELETE FROM <include refid="table" /> WHERE ID = #{id,jdbcType=BIGINT}
+	</delete>
+
+	<!--按多个id主键删除-->
+	<select id="deleteByIdList" parameterType="list">
+		SELECT <include refid="Base_Column_List" />
+		FROM <include refid="table" />
+		WHERE ID IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=BIGINT}</foreach>
+	</select>
+
+	<!-- ↑↑↑↑↑↑ 如果有新增字段、删除字段、修改字段 以上内容可用模板生成新内容后直接替换 ↑↑↑↑↑↑ -->
+	<!-- ↓↓↓↓↓↓ 以下内容是根据需求手动添加或修改的，请勿使用模板内容直接覆盖 ↓↓↓↓↓↓ -->
+	<sql id="condition_sql">
+		<if test="id != null ">
+			AND ID = #{id,jdbcType=BIGINT}
+		</if>
+		<if test="instanceId != null ">
+			AND INSTANCE_ID = #{instanceId,jdbcType=VARCHAR}
+		</if>
+		<if test="status != null ">
+			AND STATUS = #{status,jdbcType=TINYINT}
+		</if>
+		<if test="remark != null ">
+			AND REMARK = #{remark,jdbcType=VARCHAR}
+		</if>
+	</sql>
+</mapper>
+

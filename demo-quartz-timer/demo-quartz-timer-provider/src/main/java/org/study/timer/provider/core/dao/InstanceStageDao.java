@@ -4,7 +4,7 @@ import org.springframework.stereotype.Repository;
 import org.study.common.service.dao.MyBatisDao;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.util.utils.StringUtil;
-import org.study.timer.provider.entity.InstanceStage;
+import org.study.timer.api.entity.InstanceStage;
 
 import java.util.HashMap;
 import java.util.Map;

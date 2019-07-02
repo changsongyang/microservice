@@ -2,7 +2,7 @@ package org.study.timer.provider.core.dao;
 
 import org.springframework.stereotype.Repository;
 import org.study.common.service.dao.MyBatisDao;
-import org.study.timer.provider.entity.ScheduleJob;
+import org.study.timer.api.entity.ScheduleJob;
 
 import java.util.HashMap;
 import java.util.Map;

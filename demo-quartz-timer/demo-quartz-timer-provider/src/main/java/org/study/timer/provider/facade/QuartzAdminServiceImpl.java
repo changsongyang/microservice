@@ -3,7 +3,7 @@ package org.study.timer.provider.facade;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.study.timer.provider.core.biz.InstanceStageBiz;
-import org.study.timer.provider.service.QuartzAdminService;
+import org.study.timer.api.service.QuartzAdminService;
 
 @Service(cluster = "broadcast")//需要设置dubbo的协议为'广播模式'
 public class QuartzAdminServiceImpl implements QuartzAdminService {

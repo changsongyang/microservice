@@ -1,4 +1,4 @@
-package org.study.timer.provider.util;
+package org.study.timer.api.util;
 
 /**
  * @author chenyf on 2016/10/6.

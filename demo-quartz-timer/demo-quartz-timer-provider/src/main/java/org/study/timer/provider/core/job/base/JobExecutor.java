@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.study.timer.provider.core.biz.InstanceStageBiz;
 import org.study.timer.provider.core.biz.QuartzBiz;
-import org.study.timer.provider.entity.ScheduleJob;
+import org.study.timer.api.entity.ScheduleJob;
 
 /**
  * Quartz的任务执行类：

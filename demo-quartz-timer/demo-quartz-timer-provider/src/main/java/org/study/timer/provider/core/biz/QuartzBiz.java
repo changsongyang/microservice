@@ -7,11 +7,12 @@ import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.ServiceResult;
+import org.study.common.statics.vo.MessageVo;
 import org.study.common.util.utils.StringUtil;
 import org.study.starter.component.RocketMQSender;
 import org.study.timer.provider.core.dao.ScheduleJobDao;
 import org.study.timer.provider.core.job.base.JobManager;
-import org.study.timer.provider.entity.ScheduleJob;
+import org.study.timer.api.entity.ScheduleJob;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -93,8 +94,11 @@ public class QuartzBiz {
                     scheduleJobTemp.setCronExpression(scheduleJob.getCronExpression());
                 }
             }
-            if(StringUtil.isNotEmpty(scheduleJob.getDestination())){
-                scheduleJobTemp.setDestination(scheduleJob.getDestination());
+            if(StringUtil.isNotEmpty(scheduleJob.getTopic())){
+                scheduleJobTemp.setTopic(scheduleJob.getTopic());
+            }
+            if(StringUtil.isNotEmpty(scheduleJob.getTags())){
+                scheduleJobTemp.setTags(scheduleJob.getTags());
             }
             if(StringUtil.isNotEmpty(scheduleJob.getEndTime())){
                 scheduleJobTemp.setEndTime(scheduleJob.getEndTime());
@@ -218,8 +222,14 @@ public class QuartzBiz {
      * @return
      */
     public boolean notifyExecuteScheduleJob(ScheduleJob scheduleJob){
+        MessageVo msg = new MessageVo();
+        msg.setTopic(scheduleJob.getTopic());
+        msg.setTags(scheduleJob.getTags());
+        msg.setMsgType(0);
+        msg.setTrxNo(scheduleJob.getJobGroup() + scheduleJob.getJobName() + System.currentTimeMillis());
+        msg.setJsonParam(scheduleJob.getParamJson()==null?"":scheduleJob.getParamJson());
         //发送消息通知
-        rocketMQSender.sendOne(scheduleJob.getDestination(), scheduleJob.getParamJson()==null?"":scheduleJob.getParamJson());
+        rocketMQSender.sendOne(msg);
         return true;
     }
 

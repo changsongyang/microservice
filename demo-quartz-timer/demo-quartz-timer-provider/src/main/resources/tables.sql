@@ -170,7 +170,7 @@ CREATE INDEX IDX_QRTZ_FT_JG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_GROUP);
 CREATE INDEX IDX_QRTZ_FT_T_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
 
-#上面那些表都是Quartz自带的, 下面这张表自建的
+#上面那些表都是Quartz自带的, 下面这些表自建的
 CREATE TABLE qrtz_schedule_job (
   ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   VERSION bigint(20) NOT NULL DEFAULT '0' COMMENT '版本号',
@@ -180,7 +180,6 @@ CREATE TABLE qrtz_schedule_job (
   JOB_TYPE smallint(2) NOT NULL COMMENT '任务类型 1=simple任务 2=cron任务',
   TOPIC varchar(80) NOT NULL COMMENT '消息的topic',
   TAGS varchar(100) NOT NULL COMMENT '消息的tags',
-  MSG_EVENT int(11) NOT NULL COMMENT '消息事件',
   START_TIME datetime NOT NULL COMMENT '任务开始时间',
   END_TIME datetime DEFAULT NULL COMMENT '任务结束时间',
   INTERVALS int(11) DEFAULT NULL COMMENT '任务间隔',
@@ -196,3 +195,14 @@ CREATE TABLE qrtz_schedule_job (
   PRIMARY KEY (ID),
   UNIQUE KEY uk_group_job_name (JOB_GROUP,JOB_NAME)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='任务列表';
+
+CREATE TABLE `qrtz_instance_state` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `INSTANCE_ID` varchar(50) NOT NULL COMMENT '实例ID',
+  `STATUS` tinyint(4) NOT NULL COMMENT '实例状态(1=正常 2=挂起中)',
+  `REMARK` varchar(100) NOT NULL DEFAULT '' COMMENT '备注',
+  `CREATE_TIME` datetime NOT NULL COMMENT '创建时间',
+  `UPDATE_TIME` datetime NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `uk_instance_id` (`INSTANCE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='实例状态表';

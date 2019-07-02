@@ -6,8 +6,8 @@ import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.timer.provider.core.biz.QuartzBiz;
-import org.study.timer.provider.entity.ScheduleJob;
-import org.study.timer.provider.service.QuartzService;
+import org.study.timer.api.entity.ScheduleJob;
+import org.study.timer.api.service.QuartzService;
 
 import java.util.Date;
 import java.util.List;

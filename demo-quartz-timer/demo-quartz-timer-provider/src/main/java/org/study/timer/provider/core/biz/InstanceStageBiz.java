@@ -9,7 +9,7 @@ import org.study.common.statics.pojos.ServiceResult;
 import org.study.timer.provider.core.dao.InstanceStageDao;
 import org.study.timer.provider.core.job.base.JobManager;
 import org.study.timer.provider.core.util.IPUtil;
-import org.study.timer.provider.entity.InstanceStage;
+import org.study.timer.api.entity.InstanceStage;
 
 import java.util.Date;
 

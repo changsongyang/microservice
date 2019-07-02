@@ -1,9 +1,9 @@
-package org.study.timer.provider.service;
+package org.study.timer.api.service;
 
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.ServiceResult;
-import org.study.timer.provider.entity.ScheduleJob;
+import org.study.timer.api.entity.ScheduleJob;
 
 import java.util.List;
 import java.util.Map;

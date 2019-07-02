@@ -10,7 +10,7 @@ import org.study.common.statics.enums.TimeUnitEnum;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.util.utils.StringUtil;
-import org.study.timer.provider.entity.ScheduleJob;
+import org.study.timer.api.entity.ScheduleJob;
 
 import java.util.Date;
 import java.util.List;

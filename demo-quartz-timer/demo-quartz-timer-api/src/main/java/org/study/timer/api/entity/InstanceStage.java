@@ -1,4 +1,4 @@
-package org.study.timer.provider.entity;
+package org.study.timer.api.entity;
 
 import org.study.common.statics.annotations.PK;
 

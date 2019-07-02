@@ -1,4 +1,4 @@
-package org.study.timer.provider.entity;
+package org.study.timer.api.entity;
 
 import org.study.common.statics.annotations.PK;
 
@@ -26,9 +26,21 @@ public class ScheduleJob implements Serializable {
      */
     public static final int REPEAT_FOREVER_INTERVAL = -1;
 
+    /**
+     * ID主键
+     */
     @PK
     private Long id;
+
+    /**
+     * 创建时间
+     */
     private Date createTime;
+
+    /**
+     * 版本号
+     */
+    private Long version;
 
     /**
      * 任务分组
@@ -46,9 +58,14 @@ public class ScheduleJob implements Serializable {
     private Integer jobType;
 
     /**
-     * 消息目的地（就是定时任务触发之后发往的消息目的地）
+     * 消息目的地：主题
      */
-    private String destination;
+    private String topic;
+
+    /**
+     * 消息目的地：子主题
+     */
+    private String tags;
 
     /**
      * 任务开始时间
@@ -127,6 +144,14 @@ public class ScheduleJob implements Serializable {
         this.createTime = createTime;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     public String getJobGroup() {
         return jobGroup;
     }
@@ -151,12 +176,20 @@ public class ScheduleJob implements Serializable {
         this.jobType = jobType;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getTopic() {
+        return topic;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public Date getStartTime() {
@@ -266,11 +299,12 @@ public class ScheduleJob implements Serializable {
      * 返回一个Simple任务业务对象
      * @return
      */
-    public static ScheduleJob newSimpleTask(String jobGroup, String jobName, String destination){
+    public static ScheduleJob newSimpleTask(String jobGroup, String jobName, String topic, String tags){
         ScheduleJob job = new ScheduleJob();
         job.setJobGroup(jobGroup);
         job.setJobName(jobName);
-        job.setDestination(destination);
+        job.setTopic(topic);
+        job.setTags(tags);
         job.setJobType(ScheduleJob.SIMPLE_JOB);
         return job;
     }
@@ -279,11 +313,12 @@ public class ScheduleJob implements Serializable {
      * 返回一个Cron任务业务对象
      * @return
      */
-    public static ScheduleJob newCronTask(String jobGroup, String jobName, String destination){
+    public static ScheduleJob newCronTask(String jobGroup, String jobName, String topic, String tags){
         ScheduleJob job = new ScheduleJob();
         job.setJobGroup(jobGroup);
         job.setJobName(jobName);
-        job.setDestination(destination);
+        job.setTopic(topic);
+        job.setTags(tags);
         job.setJobType(ScheduleJob.CRON_JOB);
         return job;
     }

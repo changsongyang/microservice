@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
-<mapper namespace="org.study.timer.provider.entity.ScheduleJob">
+<mapper namespace="org.study.timer.api.entity.ScheduleJob">
 	<sql id="table"> qrtz_schedule_job </sql>
 
 	<!-- 用于返回的bean对象 -->
-	<resultMap id="BaseResultMap" type="org.study.timer.provider.entity.ScheduleJob">
+	<resultMap id="BaseResultMap" type="org.study.timer.api.entity.ScheduleJob">
 		<result column="ID" property="id" jdbcType="BIGINT"/>
 		<result column="VERSION" property="version" jdbcType="BIGINT"/>
 		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP"/>
@@ -55,7 +55,7 @@
 	</sql>
 
 	<!-- 插入记录 -->
-	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="org.study.timer.provider.entity.ScheduleJob">
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="org.study.timer.api.entity.ScheduleJob">
 		INSERT INTO <include refid="table" /> (
         	VERSION,
         	CREATE_TIME,
@@ -152,7 +152,7 @@
 	</insert>
 
 	<!-- 更新 -->
-	<update id="update" parameterType="org.study.timer.provider.entity.ScheduleJob">
+	<update id="update" parameterType="org.study.timer.api.entity.ScheduleJob">
         UPDATE <include refid="table" />
 		<set>
 			VERSION = #{version,jdbcType=BIGINT} + 1,
@@ -180,7 +180,7 @@
 	</update>
 
 	<!-- 只更新不为null的属性 -->
-	<update id="updateIfNotNull" parameterType="org.study.timer.provider.entity.ScheduleJob">
+	<update id="updateIfNotNull" parameterType="org.study.timer.api.entity.ScheduleJob">
 		UPDATE <include refid="table" />
 		<set>
 			VERSION = #{version,jdbcType=BIGINT} + 1,

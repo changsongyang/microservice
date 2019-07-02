@@ -28,9 +28,9 @@ PS_ID=0
 #当前停止次数
 CUR_STOP_TIMES=0
 #最大停止次数
-MAX_STOP_TIMES=6
+MAX_STOP_TIMES=5
 #停止时的休眠时间(秒)
-STOP_SLEEP_SECOND=10
+STOP_SLEEP_SECOND=3
 
 ###################################
 #(函数)判断程序是否已启动
