@@ -25,12 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>org.study</groupId>
-            <artifactId>common-util</artifactId>
-            <version>${projectVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.study</groupId>
-            <artifactId>common-es</artifactId>
+            <artifactId>study-spring-boot-starter</artifactId>
             <version>${projectVersion}</version>
         </dependency>
 

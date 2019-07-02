@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.common.es.client.EsClient;
-import org.study.common.es.query.EsQuery;
-import org.study.common.es.query.Statistic;
-import org.study.common.es.query.MultiStatistic;
 import org.study.common.statics.pojos.PageResult;
+import org.study.starter.component.EsClient;
+import org.study.starter.dto.EsMultiStatistic;
+import org.study.starter.dto.EsQuery;
+import org.study.starter.dto.EsStatistic;
 
 import java.util.List;
 
@@ -94,7 +94,7 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/statistic", method = RequestMethod.GET)
-    public MultiStatistic statistic(String index) {
+    public EsMultiStatistic statistic(String index) {
         try{
             EsQuery esQuery = EsQuery.build().from(index);
 
@@ -109,7 +109,7 @@ public class DemoController {
                     .max("ALTER_BALANCE_LONG")
             ;
 
-            MultiStatistic result = esClient.multiStatistic(esQuery);
+            EsMultiStatistic result = esClient.multiStatistic(esQuery);
 
             return result;
         }catch(Exception e){
@@ -120,7 +120,7 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/metrics", method = RequestMethod.GET)
-    public Statistic metrics(String index) {
+    public EsStatistic metrics(String index) {
         try{
             EsQuery esQuery = EsQuery.build().from(index);
 
@@ -131,7 +131,7 @@ public class DemoController {
                     .avg("ID")
             ;
 
-            Statistic result = esClient.statistic(esQuery);
+            EsStatistic result = esClient.statistic(esQuery);
 
             return result;
         }catch(Exception e){

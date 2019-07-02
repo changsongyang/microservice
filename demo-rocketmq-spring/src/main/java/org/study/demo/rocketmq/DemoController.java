@@ -5,12 +5,12 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.common.util.component.RocketMQSender;
 import org.study.common.util.utils.JsonUtil;
 import org.study.common.util.utils.RandomUtil;
 import org.study.demo.rocketmq.consts.Const;
 import org.study.demo.rocketmq.vo.bizVo.ItemVo;
 import org.study.demo.rocketmq.vo.bizVo.OrderVo;
+import org.study.starter.component.RocketMQSender;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
