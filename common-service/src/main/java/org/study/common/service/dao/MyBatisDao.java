@@ -187,11 +187,11 @@ public class MyBatisDao<T extends Serializable, PK extends Serializable> extends
     /**
      * 取得只可能有一条记录的数据，如：根据 unique key 获取
      * 注意：请自行确保查询条件只会查到一条记录，否则会报错
-     * @param paramMap  需要使用Map类型的参数，因为listBy语句在Mapper文件中已指定是Map的参数，不然会报here is no getter for property named '*' in 'class java.lang.String'这样的异常
+     * @param param  需要使用Map类型的参数，因为listBy语句在Mapper文件中已指定是Map的参数，不然会报here is no getter for property named '*' in 'class java.lang.String'这样的异常
      * @return
      */
-    public T getOne(Map<String, Object> paramMap) {
-        return this.getOne(LIST_BY_SQL, paramMap);
+    public T getOne(Object param) {
+        return this.getOne(LIST_BY_SQL, param);
     }
 
     /**
