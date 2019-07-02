@@ -13,7 +13,7 @@ public class InstanceStage implements Serializable {
 
     @PK
     private Long id;
-    private Date createTime;
+    private Date createTime = new Date();
 
     private String instanceId;
     private Integer status;

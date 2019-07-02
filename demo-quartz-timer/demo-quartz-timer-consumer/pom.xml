@@ -17,6 +17,11 @@
             <artifactId>common-util</artifactId>
             <version>${projectVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>demo-quartz-timer-api</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -39,12 +44,11 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
-        <!-- dubbo END -->
-
         <dependency>
-            <groupId>org.study</groupId>
-            <artifactId>demo-quartz-timer-api</artifactId>
-            <version>${projectVersion}</version>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-dependencies-zookeeper</artifactId>
+            <type>pom</type>
         </dependency>
+        <!-- dubbo END -->
     </dependencies>
 </project>

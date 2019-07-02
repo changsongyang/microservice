@@ -51,9 +51,9 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency><!-- spring context support -->
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
         <dependency><!-- Quartz framework -->
             <groupId>org.quartz-scheduler</groupId>

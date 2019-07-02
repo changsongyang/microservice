@@ -12,6 +12,7 @@ import org.study.common.statics.pojos.RestResult;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.util.utils.JsonUtil;
 import org.study.timer.api.entity.ScheduleJob;
+import org.study.timer.api.service.QuartzAdminService;
 import org.study.timer.api.service.QuartzService;
 
 import java.util.Date;
@@ -24,6 +25,8 @@ import java.util.Map;
 public class TimerController {
     @Reference
     QuartzService quartzService;
+    @Reference
+    QuartzAdminService quartzAdminService;
 
     @RequestMapping(value = "addSimpleTimer", method = RequestMethod.POST)
     public RestResult addSimpleTimer(Integer intervalSecond, String jobDescription, String param){
@@ -114,5 +117,17 @@ public class TimerController {
         }else{
             return RestResult.bizFail(101, serviceResult.getMessage());
         }
+    }
+
+    @RequestMapping(value = "pauseInstance", method = RequestMethod.POST)
+    public RestResult pauseInstance(){
+        quartzAdminService.pauseInstance();
+        return RestResult.bizSuccess(100, "实例暂停成功");
+    }
+
+    @RequestMapping(value = "resumeInstance", method = RequestMethod.POST)
+    public RestResult resumeInstance(){
+        quartzAdminService.resumeInstance();
+        return RestResult.bizSuccess(100, "实例恢复成功");
     }
 }

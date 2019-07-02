@@ -14,7 +14,6 @@
 		<result column="JOB_TYPE" property="jobType" jdbcType="SMALLINT"/>
 		<result column="TOPIC" property="topic" jdbcType="VARCHAR"/>
 		<result column="TAGS" property="tags" jdbcType="VARCHAR"/>
-		<result column="MSG_EVENT" property="msgEvent" jdbcType="INTEGER"/>
 		<result column="START_TIME" property="startTime" jdbcType="TIMESTAMP"/>
 		<result column="END_TIME" property="endTime" jdbcType="TIMESTAMP"/>
 		<result column="INTERVALS" property="intervals" jdbcType="INTEGER"/>
@@ -39,7 +38,6 @@
 		JOB_TYPE,
 		TOPIC,
 		TAGS,
-		MSG_EVENT,
 		START_TIME,
 		END_TIME,
 		INTERVALS,
@@ -64,7 +62,6 @@
         	JOB_TYPE,
         	TOPIC,
         	TAGS,
-			MSG_EVENT,
         	START_TIME,
         	END_TIME,
         	INTERVALS,
@@ -85,7 +82,6 @@
 			#{jobType,jdbcType=SMALLINT},
 			#{topic,jdbcType=VARCHAR},
 			#{tags,jdbcType=VARCHAR},
-			#{msgEvent,jdbcType=INTEGER},
 			#{startTime,jdbcType=TIMESTAMP},
 			#{endTime,jdbcType=TIMESTAMP},
 			#{intervals,jdbcType=INTEGER},
@@ -111,7 +107,6 @@
         	JOB_TYPE,
         	TOPIC,
         	TAGS,
-			MSG_EVENT,
         	START_TIME,
         	END_TIME,
         	INTERVALS,
@@ -134,7 +129,6 @@
 			#{item.jobType,jdbcType=SMALLINT},
 			#{item.topic,jdbcType=VARCHAR},
 			#{item.tags,jdbcType=VARCHAR},
-			#{item.msgEvent,jdbcType=INTEGER},
 			#{item.startTime,jdbcType=TIMESTAMP},
 			#{item.endTime,jdbcType=TIMESTAMP},
 			#{item.intervals,jdbcType=INTEGER},
@@ -162,7 +156,6 @@
 			JOB_TYPE = #{jobType,jdbcType=SMALLINT},
 			TOPIC = #{topic,jdbcType=VARCHAR},
 			TAGS = #{tags,jdbcType=VARCHAR},
-			MSG_EVENT = #{msgEvent,jdbcType=INTEGER},
 			START_TIME = #{startTime,jdbcType=TIMESTAMP},
 			END_TIME = #{endTime,jdbcType=TIMESTAMP},
 			INTERVALS = #{intervals,jdbcType=INTEGER},
@@ -201,9 +194,6 @@
 			</if>
 			<if test="tags != null">
 				TAGS = #{tags,jdbcType=VARCHAR},
-			</if>
-			<if test="msgEvent != null">
-				MSG_EVENT = #{msgEvent,jdbcType=INTEGER},
 			</if>
 			<if test="startTime != null">
 				START_TIME = #{startTime,jdbcType=TIMESTAMP},
@@ -338,9 +328,6 @@
 		</if>
 		<if test="tags != null and tags !='' ">
 			AND TAGS = #{tags,jdbcType=VARCHAR}
-		</if>
-		<if test="msgEvent != null and msgEvent !='' ">
-			AND MSG_EVENT = #{msgEvent,jdbcType=INTEGER}
 		</if>
 		<if test="startTime != null ">
 			AND START_TIME = #{startTime,jdbcType=TIMESTAMP}

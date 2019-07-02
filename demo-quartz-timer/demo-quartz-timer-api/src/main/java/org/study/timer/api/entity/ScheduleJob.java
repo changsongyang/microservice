@@ -35,12 +35,12 @@ public class ScheduleJob implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Date createTime = new Date();
 
     /**
      * 版本号
      */
-    private Long version;
+    private Long version = 0L;
 
     /**
      * 任务分组
