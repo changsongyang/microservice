@@ -14,7 +14,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>demo-quartz-timer-api</module>
-        <module>demo-quartz-timer-impl</module>
+        <module>demo-quartz-timer-provider</module>
+        <module>demo-quartz-timer-consumer</module>
     </modules>
 
 

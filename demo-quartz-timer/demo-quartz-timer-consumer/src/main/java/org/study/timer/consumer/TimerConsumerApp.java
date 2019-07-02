@@ -1,11 +1,11 @@
-package org.study.demo.restful;
+package org.study.timer.consumer;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
-public class DemoRestfulApp {
+public class TimerConsumerApp {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(DemoRestfulApp.class).web(true).run(args);
+        new SpringApplicationBuilder(TimerConsumerApp.class).run(args);
     }
 }

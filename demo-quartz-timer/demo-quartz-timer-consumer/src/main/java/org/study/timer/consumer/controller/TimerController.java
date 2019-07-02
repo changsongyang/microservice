@@ -1,11 +1,9 @@
-package org.study.demo.restful.web.controllers;
+package org.study.timer.consumer.controller;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.apache.dubbo.config.annotation.Reference;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.study.common.statics.constants.MsgEvent;
 import org.study.common.statics.constants.MsgTopicAndTags;
 import org.study.common.statics.enums.TimeUnitEnum;
 import org.study.common.statics.pojos.PageParam;
@@ -13,8 +11,8 @@ import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.RestResult;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.util.utils.JsonUtil;
-import org.study.timer.provider.entity.ScheduleJob;
-import org.study.timer.provider.service.QuartzService;
+import org.study.timer.api.entity.ScheduleJob;
+import org.study.timer.api.service.QuartzService;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,10 +34,9 @@ public class TimerController {
         String jobName = "simpleTimerJob";
         ScheduleJob scheduleJob = ScheduleJob.newSimpleTask(
                 jobGroup, jobName, MsgTopicAndTags.TOPIC_USER_BIZ, MsgTopicAndTags.TAG_TIMER_SIMPLE);
-        scheduleJob.setMsgEvent(MsgEvent.TIMER_SIMPLE_JOB);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setIntervals(intervalSecond);
-        scheduleJob.setIntervalUnit(TimeUnitEnum.SECONDS.getValue());
+        scheduleJob.setIntervalUnit(TimeUnitEnum.SECOND.getValue());
         scheduleJob.setJobDescription(jobDescription);
 
         Map<String, String> paramMap = new HashMap<>();
@@ -63,7 +60,6 @@ public class TimerController {
         String jobName = "cronTimerJob";
         ScheduleJob scheduleJob = ScheduleJob.newCronTask(
                 jobGroup, jobName, MsgTopicAndTags.TOPIC_USER_BIZ, MsgTopicAndTags.TAG_TIMER_CRON);
-        scheduleJob.setMsgEvent(MsgEvent.TIMER_CRON_JOB);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setCronExpression(cron);
         scheduleJob.setJobDescription(jobDescription);
