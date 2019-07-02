@@ -21,6 +21,11 @@ public class MessageVo {
      */
     private String trxNo;
 
+    /**
+     * json格式的参数，非必填
+     */
+    private String jsonParam = null;
+
 
     public String getTopic() {
         return topic;
@@ -52,5 +57,13 @@ public class MessageVo {
 
     public void setMsgType(long msgType) {
         this.msgType = msgType;
+    }
+
+    public String getJsonParam() {
+        return jsonParam;
+    }
+
+    public void setJsonParam(String jsonParam) {
+        this.jsonParam = jsonParam;
     }
 }
