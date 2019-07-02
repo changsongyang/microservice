@@ -19,7 +19,7 @@
         <!--控制台日志输出器 -->
         <Console name="consoleAppender" target="SYSTEM_OUT">
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=yellow,INFO=green,DEBUG=bright Cyan,TRACE=bright white}"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %msg%xEx%n"/>
         </Console>
 
         <!-- 应用日志输出器 ，并配置日志压缩格式(应用名.log.年-月-日.gz) -->
@@ -38,7 +38,7 @@
                 hostName : 本地机器名
                 hostAddress : 本地ip地址
              -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=bright yellow,INFO=bright green,DEBUG=bright cyan,TRACE=bright white}"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %msg%xEx%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true" />
             </Policies>

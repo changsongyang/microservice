@@ -11,8 +11,6 @@
         <Property name="LOG_HOME">@logHome@</Property>
         <!-- 日志文件名 -->
         <property name="LOG_NAME">@appName@.log</property>
-        <!-- RocketMQ 日志文件名 -->
-        <property name="RMQ_LOG_NAME">@appName@_rmq_no_ok.log</property>
     </Properties>
     <!-- 自定义变量 END-->
 
@@ -21,7 +19,7 @@
         <!--控制台日志输出器 -->
         <Console name="consoleAppender" target="SYSTEM_OUT">
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=yellow,INFO=green,DEBUG=bright Cyan,TRACE=bright white}"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %msg%xEx%n"/>
         </Console>
 
         <!-- 应用日志输出器 ，并配置日志压缩格式(应用名.log.年-月-日.gz) -->
@@ -40,17 +38,7 @@
                 hostName : 本地机器名
                 hostAddress : 本地ip地址
              -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=bright yellow,INFO=bright green,DEBUG=bright cyan,TRACE=bright white}"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
-            </Policies>
-        </RollingRandomAccessFile>
-
-        <!-- RocketMQ专有的日志文件 -->
-        <RollingRandomAccessFile name="rmqNotOkAppender"
-                                 immediateFlush="true" fileName="${LOG_HOME}/${RMQ_LOG_NAME}"
-                                 filePattern="${LOG_HOME}/${RMQ_LOG_NAME}.%d{yyyy-MM-dd}.log.gz">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=bright yellow,INFO=bright green,DEBUG=bright cyan,TRACE=bright white}"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %msg%xEx%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true" />
             </Policies>
@@ -81,22 +69,16 @@
             <AppenderRef ref="fileAppender" level="INFO" />
         </Logger>
         <Logger name="org.apache" additivity="false">
-            <AppenderRef ref="consoleAppender" level="DEBUG" />
+            <AppenderRef ref="consoleAppender" level="INFO" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="com.alibaba" additivity="false">
+            <AppenderRef ref="consoleAppender" level="INFO" />
             <AppenderRef ref="fileAppender" level="INFO" />
         </Logger>
         <Logger name="org.study" additivity="false">
             <AppenderRef ref="consoleAppender" level="DEBUG" />
             <AppenderRef ref="fileAppender" level="INFO" />
-        </Logger>
-
-        <!-- RocketMQ 的日志打印配置 -->
-        <Logger name="org.study.common.mq" level="DEBUG" additivity="false">
-            <AppenderRef ref="consoleAppender" level="DEBUG" />
-            <AppenderRef ref="fileAppender" level="INFO" />
-        </Logger>
-        <Logger name="rmqNotOkLogger" additivity="false">
-            <AppenderRef ref="consoleAppender" level="DEBUG" />
-            <AppenderRef ref="rmqNotOkAppender" level="INFO" />
         </Logger>
     </Loggers>
     <!-- 日志实例 END-->
