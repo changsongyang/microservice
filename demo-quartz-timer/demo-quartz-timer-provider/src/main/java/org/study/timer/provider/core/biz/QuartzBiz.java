@@ -3,6 +3,7 @@ package org.study.timer.provider.core.biz;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
@@ -50,6 +51,7 @@ public class QuartzBiz {
      * @param scheduleJob
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult<Date> add(ScheduleJob scheduleJob){
         try{
             this.initScheduleJob(scheduleJob);
@@ -68,6 +70,7 @@ public class QuartzBiz {
      * @param scheduleJob
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult rescheduleJob(ScheduleJob scheduleJob){
         try{
             ScheduleJob scheduleJobTemp = scheduleJobDao.getByName(scheduleJob.getJobGroup(), scheduleJob.getJobName());
@@ -127,6 +130,7 @@ public class QuartzBiz {
      * @param jobName
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult pauseJob(String jobGroup, String jobName){
         try{
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
@@ -150,6 +154,7 @@ public class QuartzBiz {
      * @param jobName
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult resumeJob(String jobGroup, String jobName){
         try{
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
@@ -174,6 +179,7 @@ public class QuartzBiz {
      * @param jobName
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult triggerJob(String jobGroup, String jobName){
         try{
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
@@ -193,6 +199,7 @@ public class QuartzBiz {
      * @param jobName
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public ServiceResult delete(String jobGroup, String jobName){
         try{
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
@@ -240,6 +247,7 @@ public class QuartzBiz {
      * @param jobProperties
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateScheduleJobAfterExecuted(String jobGroup, String jobName, Map<String, Object> jobProperties){
         if(jobProperties == null){
             jobProperties = new HashMap<String, Object>(2);
@@ -256,6 +264,7 @@ public class QuartzBiz {
      * @param jobProperties
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateScheduleJobAfterMisfire(String jobGroup, String jobName, Map<String, Object> jobProperties){
         if(jobProperties == null){
             jobProperties = new HashMap<String, Object>(2);

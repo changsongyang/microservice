@@ -210,11 +210,12 @@ public class RedisClient {
          * @param nodeUrlList
          * @return
          */
-        public static RedisClient clusterMode(List<String> nodeUrlList){
+        public static RedisClient clusterMode(List<String> nodeUrlList, String password){
             Config config = new Config();
             String[] nodeUrlArr = addUrlAddressPrefix(nodeUrlList);
             config.useClusterServers()
-                    .addNodeAddress(nodeUrlArr);
+                    .addNodeAddress(nodeUrlArr)
+                    .setPassword(password);
             return new RedisClient(Redisson.create(config));
         }
 

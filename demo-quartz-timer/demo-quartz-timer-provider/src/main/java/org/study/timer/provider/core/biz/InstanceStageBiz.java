@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.ServiceResult;
 import org.study.timer.provider.core.dao.InstanceStageDao;
@@ -27,6 +28,7 @@ public class InstanceStageBiz {
     @Autowired
     InstanceStageDao instanceStageDao;
 
+    @Transactional(rollbackFor = Exception.class)
     public void pauseInstance(){
         synchronized (InstanceStageBiz.class){
             if(! isInitFinished()){
@@ -64,6 +66,7 @@ public class InstanceStageBiz {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void resumeInstance(){
         synchronized (InstanceStageBiz.class){
             if(! isInitFinished()){

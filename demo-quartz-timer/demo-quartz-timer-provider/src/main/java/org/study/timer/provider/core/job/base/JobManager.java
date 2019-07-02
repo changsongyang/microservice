@@ -241,8 +241,10 @@ public class JobManager {
             return ServiceResult.fail("任务的组名(jobGroup)不能为空");
         }else if(StringUtil.isEmpty(scheduleJob.getJobName())){
             return ServiceResult.fail("任务名(jobName)不能为空");
-        }else if(StringUtil.isEmpty(scheduleJob.getDestination())){
-            return ServiceResult.fail("任务通知目的地(destination)不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getTopic())){
+            return ServiceResult.fail("任务通知目的地(topic)不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getTags())){
+            return ServiceResult.fail("任务通知目的地(tags)不能为空");
         }else if(scheduleJob.getStartTime() == null){
             return ServiceResult.fail("开始时间(startTime)不能为空");
         }

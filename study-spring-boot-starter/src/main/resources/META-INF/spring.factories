@@ -1,3 +1,5 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.study.starter.config.ComponentAutoConfiguration
+org.study.starter.config.EsAutoConfiguration,\
+org.study.starter.config.RedissonAutoConfiguration,\
+org.study.starter.config.RMQAutoConfiguration

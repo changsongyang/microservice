@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RocketMQApplication {
+public class RocketMQApp {
     public static void main(String[] args) {
-        SpringApplication.run(RocketMQApplication.class, args);
+        SpringApplication.run(RocketMQApp.class, args);
     }
 }

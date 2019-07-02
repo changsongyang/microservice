@@ -52,44 +52,5 @@
             <artifactId>java-jwt</artifactId>
         </dependency>
         <!-- 第三方基础工具包 END -->
-
-
-
-        <!-- 第三方可选组件 START -->
-        <!-- java mail -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-        </dependency>
-        <!-- java mail -->
-        <!-- RocketMQ -->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!-- RocketMQ -->
-        <!-- zookeeper客户端 -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!-- redis客户端 -->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!-- 第三方可选组件 END -->
     </dependencies>
 </project>
