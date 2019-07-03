@@ -128,6 +128,7 @@ public class DemoController {
         vo.setIsFinish(true);
         vo.setJsonParam(param);
 
+        System.out.println("发送开始 sendOne");
         long start = System.currentTimeMillis();
         rmqSender.sendOne(vo);
         long timeCost = ((System.currentTimeMillis()-start));
@@ -170,6 +171,7 @@ public class DemoController {
         vo.setAmount(BigDecimal.valueOf(368.52));
         vo.setIsFinish(true);
 
+        System.out.println("发送开始 sendTrans");
         long start = System.currentTimeMillis();
         rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         long timeCost = ((System.currentTimeMillis()-start));
@@ -200,6 +202,7 @@ public class DemoController {
         }
         vo.setItemVoList(itemVos);
 
+        System.out.println("发送开始 sendTransItem");
         long start = System.currentTimeMillis();
         rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
         long timeCost = ((System.currentTimeMillis()-start));
