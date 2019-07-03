@@ -20,10 +20,10 @@ public class RMQTransactionListener implements RocketMQLocalTransactionListener 
         OrderVo vo = JSONObject.parseObject((byte[])msg.getPayload(), OrderVo.class);
 
         if(vo.getMsgType() == 20001){
-            logger.info("20001 OrderVo = {} ", JSON.toJSONString(vo));
+            logger.info("20001 COMMIT OrderVo = {} ", JSON.toJSONString(vo));
             return RocketMQLocalTransactionState.COMMIT;
         }else if(vo.getMsgType() == 20002){
-            logger.info("20002 execute with item OrderVo = {} ", JSON.toJSONString(vo));
+            logger.info("20002 UNKNOWN execute with item OrderVo = {} ", JSON.toJSONString(vo));
             return RocketMQLocalTransactionState.UNKNOWN;
         }else{
             return RocketMQLocalTransactionState.UNKNOWN;
@@ -35,9 +35,9 @@ public class RMQTransactionListener implements RocketMQLocalTransactionListener 
         OrderVo vo = JSONObject.parseObject((byte[])msg.getPayload(), OrderVo.class);
 
         if(vo.getMsgType() == 20001){
-            logger.info("20001 OrderVo = {} ", JSON.toJSONString(vo));
+            logger.info("20001 COMMIT OrderVo = {} ", JSON.toJSONString(vo));
         }else if(vo.getMsgType() == 20002){
-            logger.info("20002 check with item OrderVo = {} ", JSON.toJSONString(vo));
+            logger.info("20002 COMMIT check with item OrderVo = {} ", JSON.toJSONString(vo));
         }
 
         return RocketMQLocalTransactionState.COMMIT;

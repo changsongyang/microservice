@@ -115,7 +115,7 @@ public class DemoController {
     }
 
     @RequestMapping(value = "/sendOne")
-    public boolean sendOne(String topic, String trxNo) {
+    public boolean sendOne(String topic, String trxNo, String param) {
         String tags = "oneTag";
 
         OrderVo vo = new OrderVo();
@@ -126,12 +126,11 @@ public class DemoController {
 
         vo.setAmount(BigDecimal.valueOf(20.36));
         vo.setIsFinish(true);
+        vo.setJsonParam(param);
 
         long start = System.currentTimeMillis();
-        for(int i=0; i<messageCount; i++){
-            rmqSender.sendOne(vo);
-        }
-        long timeCost = ((System.currentTimeMillis()-start))/1000;
+        rmqSender.sendOne(vo);
+        long timeCost = ((System.currentTimeMillis()-start));
         System.out.println("发送结束 sendOne timeCost="+timeCost);
         return true;
     }
