@@ -8,8 +8,8 @@ import org.apache.rocketmq.spring.support.RocketMQUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
+import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.vo.MessageVo;
 import org.study.common.util.utils.JsonUtil;
 
@@ -68,7 +68,7 @@ public class RocketMQSender {
             return SendStatus.SEND_OK.equals(sendResult.getSendStatus());
         } catch (Throwable e) {
             log.error("sendBatch failed. topic:{}, msgList:{} ", topic, JsonUtil.toString(msgList));
-            throw new MessagingException(e.getMessage(), e);
+            throw new BizException("批量消息发送异常", e);
         }
     }
 
