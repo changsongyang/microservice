@@ -32,8 +32,8 @@ public class RocketMQSender {
     public boolean sendOne(MessageVo msg) {
         Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getTrxNo()).build();
 
-        rocketMQTemplate.syncSend(getDestination(msg.getTopic(), msg.getTags()), message);
-        return true;
+        SendResult sendResult = rocketMQTemplate.syncSend(getDestination(msg.getTopic(), msg.getTags()), message);
+        return SendStatus.SEND_OK.equals(sendResult.getSendStatus());
     }
 
     /**
@@ -65,7 +65,7 @@ public class RocketMQSender {
             SendResult sendResult = rocketMQTemplate.getProducer().send(rmsgList);
             long costTime = System.currentTimeMillis() - now;
             log.debug("sendBatch message cost: {} ms, msgId:{}", costTime, sendResult.getMsgId());
-            return sendResult.getSendStatus().equals(SendStatus.SEND_OK);
+            return SendStatus.SEND_OK.equals(sendResult.getSendStatus());
         } catch (Throwable e) {
             log.error("sendBatch failed. topic:{}, msgList:{} ", topic, JsonUtil.toString(msgList));
             throw new MessagingException(e.getMessage(), e);
@@ -81,8 +81,8 @@ public class RocketMQSender {
     public boolean sendTrans(String txProducerGroup, MessageVo msg) {
         Message message = MessageBuilder.withPayload(msg).setHeader(MessageConst.PROPERTY_KEYS, msg.getTrxNo()).build();
 
-        rocketMQTemplate.sendMessageInTransaction(txProducerGroup, getDestination(msg.getTopic(), msg.getTags()), message, null);
-        return true;
+        SendResult sendResult = rocketMQTemplate.sendMessageInTransaction(txProducerGroup, getDestination(msg.getTopic(), msg.getTags()), message, null);
+        return SendStatus.SEND_OK.equals(sendResult.getSendStatus());
     }
 
 
