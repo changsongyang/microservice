@@ -169,7 +169,11 @@ public class DemoController {
 
         vo.setAmount(BigDecimal.valueOf(368.52));
         vo.setIsFinish(true);
+
+        long start = System.currentTimeMillis();
         rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
+        long timeCost = ((System.currentTimeMillis()-start));
+        System.out.println("发送结束 sendTrans timeCost="+timeCost);
         return true;
     }
 
@@ -196,7 +200,10 @@ public class DemoController {
         }
         vo.setItemVoList(itemVos);
 
+        long start = System.currentTimeMillis();
         rmqSender.sendTrans(Const.TX_PRODUCER_GROUP, vo);
+        long timeCost = ((System.currentTimeMillis()-start));
+        System.out.println("发送结束 sendTransItem timeCost="+timeCost);
         return true;
     }
 }
