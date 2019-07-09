@@ -41,6 +41,11 @@ class SignUtil {
         $str = '';
         $i = 0;
         foreach($arr as $key => $value) {
+            //不参与签名、验签
+            if($key == "sign" || $key == "sec_key"){
+                continue;
+            }
+
             if($i !== 0){
                 $str .= '&';
             }

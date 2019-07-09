@@ -5,6 +5,7 @@ use param\RequestParam;
 use param\SecretKey;
 use utils\RequestUtil;
 use utils\RandomUtil;
+use utils\AESUtil;
 use vo\DetailVo;
 use vo\BatchVo;
 
@@ -42,7 +43,8 @@ for($i=1; $i<=10; $i++){
     $detail->setCount(1);
     $detail->setAmount($amount);
 
-//  $detail->setName(AESUtil.encryptECB(detail.getName(), aesKey));//加密
+    //加密
+    $detail->setName(AESUtil::encryptECB($detail->getName(), $aesKey));
 
     $totalCount = $totalCount + $detail->getCount();
     $totalAmount = $totalAmount + $amount;

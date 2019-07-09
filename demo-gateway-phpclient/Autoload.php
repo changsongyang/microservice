@@ -10,6 +10,7 @@ function autoload(){
     require "utils/RandomUtil.php";
     require "utils/RequestUtil.php";
     require "utils/RSAUtil.php";
+    require "utils/AESUtil.php";
     require "utils/SignUtil.php";
     require "vo/BatchVo.php";
     require "vo/DetailVo.php";
