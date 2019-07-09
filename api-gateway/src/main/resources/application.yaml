@@ -1,0 +1,111 @@
+server.port: 8099
+#\u8C03\u7528\u540E\u7AEF\u670D\u52A1\u7684\u8D85\u65F6\u65F6\u95F4
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 5000
+#\u8C03\u7528fallback\u65B9\u6CD5\u7684\u6700\u5927\u5E76\u53D1\u6570\uFF0C\u8D85\u8FC7\u6B64\u503C\u540E\uFF0C\u5176\u4ED6\u8BF7\u6C42\u5C06\u4F1A\u88ABreject
+hystrix.command.default.fallback.isolation.semaphore.maxConcurrentRequests: 20
+#\u65F6\u95F4\u7A97\u53E3\u5185(\u9ED8\u8BA410\u79D2)\uFF0C\u591A\u5C11\u6B21\u8BF7\u6C42\u5931\u8D25\u540E\u5C06\u5F00\u542F\u65AD\u8DEF\u5668
+hystrix.command.default.circuitBreaker.requestVolumeThreshold: 5
+
+#spring
+spring:
+  application:
+    name: gw-api-gateway
+  resources:
+    #\u7981\u7528\u9759\u6001\u8D44\u6E90
+    add-mappings: false
+  redis:
+    host: 10.10.10.38
+    port: 6379
+    password: adminAqq23
+  cloud:
+    zookeeper:
+      connect-string: 10.10.10.11:2181
+      discovery:
+        enabled: true
+        register: false
+    gateway:
+      routes:
+        - id: test_route
+          uri: lb://gw-api-demo-backend
+          predicates:
+            - Path=/test/**
+          filters:
+            - name: IPValid
+              args:
+                ipValidKey: payIpSeg
+            - name: RateLimiter
+              args:
+                path-redis-rate-limiter.replenishRate: 20
+                path-redis-rate-limiter.burstCapacity: 30
+                path-redis-rate-limiter.pathLimitProps:
+                  - path: test/url1
+                    replenishRate: 21
+                    burstCapacity: 50
+                  - path: test/url2
+                    replenishRate: 30
+                    burstCapacity: 60
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+        - id: test_route2
+          uri: lb://gw-api-demo-backend2
+          predicates:
+            - Path=/test2/**
+          filters:
+            - name: IPValid
+              args:
+                ipValidKey: payIpSeg
+            - name: RateLimiter
+              args:
+                path-redis-rate-limiter.replenishRate: 1
+                path-redis-rate-limiter.burstCapacity: 1
+                path-redis-rate-limiter.pathLimitProps:
+                  - path: test/url1
+                    replenishRate: 1
+                    burstCapacity: 2
+                  - path: test/url2
+                    replenishRate: 1
+                    burstCapacity: 2
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+
+#joinpay
+joinpay.api:
+  redisson:
+    enabled: true
+  mail:
+    enabled: true
+    mailers:
+      - uid: test_route
+        subject: \u6D4B\u8BD5\u7F51\u5173\u9884\u8B66
+        from: alert@joinpay.com
+        receiver: chenyufeng@joinpay.com
+        cc: chenyufeng@joinpay.com
+        sendLimitPerMin: 3
+      - uid: test_route2
+        subject: \u6D4B\u8BD5\u7F51\u5173\u9884\u8B662
+        from: alert@joinpay.com
+        receiver: chenyufeng@joinpay.com
+        cc: chenyufeng@joinpay.com
+        sendLimitPerMin: 3
+
+#dubbo
+dubbo:
+  scan:
+    base-packages: com.gw
+  application:
+    id: gw-api-gateway
+    name: gw-api-gateway
+    logger: slf4j
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: 20868
+  registry:
+    id: zookeeperResister
+    address: zookeeper://10.10.10.11:2181
+    client: curator
+    check: false

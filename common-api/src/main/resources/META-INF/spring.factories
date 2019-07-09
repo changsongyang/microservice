@@ -1,0 +1,9 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.gw.api.base.config.WebMvcCustomAutoConfiguration,\
+com.gw.api.base.config.MvcErrorHandlerAutoConfiguration,\
+com.gw.api.base.config.MvcFilterAutoConfiguration,\
+com.gw.api.base.config.WebFluxCustomAutoConfiguration,\
+com.gw.api.base.config.JacksonAutoConfiguration,\
+com.gw.api.base.config.MailAutoConfiguration,\
+com.gw.api.base.config.RedissonAutoConfiguration
