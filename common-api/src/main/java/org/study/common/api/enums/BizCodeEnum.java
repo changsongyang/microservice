@@ -1,4 +1,4 @@
-package com.gw.api.base.enums;
+package org.study.common.api.enums;
 
 /**
  * 业务码枚举类

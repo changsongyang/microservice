@@ -1,4 +1,4 @@
-package com.gw.api.base.constants;
+package org.study.common.api.constants;
 
 /**
  * 加解密运算时的逻辑算法名常量类

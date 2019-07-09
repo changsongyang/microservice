@@ -1,15 +1,5 @@
-package com.gw.api.gateway.filters.global;
+package org.study.api.gateway.filters.global;
 
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.helpers.RequestHelper;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.service.ValidFailService;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.gateway.config.conts.FilterOrder;
-import com.gw.api.gateway.config.conts.InnerErrorCode;
-import com.gw.api.gateway.utils.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +9,16 @@ import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.study.api.gateway.config.conts.FilterOrder;
+import org.study.api.gateway.config.conts.InnerErrorCode;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.helpers.RequestHelper;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.service.ValidFailService;
+import org.study.common.api.utils.IPUtil;
+import org.study.common.util.utils.JsonUtil;
 import reactor.core.publisher.Mono;
 
 /**
@@ -49,7 +49,7 @@ public class RequestAuthFilter extends AbstractGlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         boolean isVerifyOk = false;//默认为false，勿改此默认值
-        String ip = RequestUtil.getIpAddr(request);
+        String ip = IPUtil.getIpAddr(request);
         RequestParam requestParam = (RequestParam) exchange.getAttributes().get(CACHE_REQUEST_BODY_OBJECT_KEY);
         Throwable cause = null;
 

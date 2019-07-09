@@ -1,14 +1,14 @@
-package com.gw.api.base.amqHandler;
+package org.study.common.api.amqHandler;
 
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.vo.CallBackResult;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.vo.CallBackResult;
+import org.study.common.util.utils.JsonUtil;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -41,7 +41,7 @@ public class AmqRedeliverHandler {
      * @param activemqMessage
      * @param result
      * @return 如果成功进行了重新投递，就返回true，如果不需要重新投递，则返回false，如果重投失败，则会抛出ApiException异常
-     * @throws ApiException 如果重新投递失败，则会抛出ApiException异常，并且其innerCode为 {@link #REDELIVER_FAIL_INNER_ERROR_CODE}
+     * @throws org.study.common.api.exceptions.ApiException 如果重新投递失败，则会抛出ApiException异常，并且其innerCode为 {@link #REDELIVER_FAIL_INNER_ERROR_CODE}
      */
     public boolean redeliverIfNeed(ActiveMQTextMessage activemqMessage, CallBackResult result) throws ApiException {
         boolean isNeedRedeliver = false;

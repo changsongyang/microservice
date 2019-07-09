@@ -1,6 +1,6 @@
-package com.gw.api.base.params;
+package org.study.common.api.params;
 
-import com.gw.api.base.annonation.NotSign;
+import org.study.common.api.annonation.NotSign;
 
 /**
  * 用户的请求参数

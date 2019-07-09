@@ -1,4 +1,4 @@
-package com.gw.api.base.enums;
+package org.study.common.api.enums;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,9 @@ import java.util.Map;
 public enum SignTypeEnum {
     MD5("1", "MD5"),//
     RSA("2", "RSA"),//
-    RSA2("3", "RSA2");
+    RSA2("3", "RSA2"),
+
+    ;
 
     /** 枚举值 */
     private String value;

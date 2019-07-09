@@ -1,7 +1,6 @@
-package com.gw.api.base.vo;
+package org.study.common.api.vo;
 
 import com.alibaba.fastjson.JSON;
-import com.gw.api.base.constants.CommonConst;
 
 import javax.validation.Valid;
 
@@ -20,10 +19,6 @@ public class RequestVo<T> {
     private String mchNo;
     private String sign;
     private String secKey;
-
-    public String[] splitSecKey(){
-        return this.secKey.split(CommonConst.SEC_KEY_SEPARATOR);
-    }
 
     public String getMethod() {
         return method;

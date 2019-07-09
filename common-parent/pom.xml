@@ -15,7 +15,7 @@
 
         <!-- springBoot体系 -->
         <spring-boot.version>2.1.3.RELEASE</spring-boot.version>
-        <spring-cloud.version>Greenwich</spring-cloud.version>
+        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <spring-cloud-alibaba.version>0.9.0.RELEASE</spring-cloud-alibaba.version>
 
         <!-- db相关 -->
@@ -49,6 +49,7 @@
         <fastjson.version>1.2.58</fastjson.version>
         <java-jwt.version>3.8.1</java-jwt.version>
         <joda-time.version>2.10.2</joda-time.version>
+        <okhttp.version>3.14.2</okhttp.version>
 
         <appName>${project.artifactId}</appName>
         <mavenBuildTime>${maven.build.timestamp}</mavenBuildTime>
@@ -295,6 +296,14 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency><!-- Spring Boot的核心启动器，包含了自动配置、日志和YAML -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
@@ -488,6 +497,11 @@
                 <groupId>com.auth0</groupId>
                 <artifactId>java-jwt</artifactId>
                 <version>${java-jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
             <!-- ################################# 第三方工具包 END ################################# -->
         </dependencies>

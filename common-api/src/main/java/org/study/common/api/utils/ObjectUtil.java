@@ -1,4 +1,4 @@
-package com.gw.api.base.utils;
+package org.study.common.api.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

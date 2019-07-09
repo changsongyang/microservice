@@ -1,16 +1,5 @@
-package com.gw.api.gateway.filters.gateway;
+package org.study.api.gateway.filters.gateway;
 
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.helpers.RequestHelper;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.service.ValidFailService;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.utils.StringUtil;
-import com.gw.api.gateway.config.conts.InnerErrorCode;
-import com.gw.api.gateway.config.conts.ReqCacheKey;
-import com.gw.api.gateway.utils.RequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +8,17 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.study.api.gateway.config.conts.InnerErrorCode;
+import org.study.api.gateway.config.conts.ReqCacheKey;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.helpers.RequestHelper;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.service.ValidFailService;
+import org.study.common.api.utils.IPUtil;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +49,7 @@ public class IPValidGatewayFilterFactory extends AbstractGatewayFilterFactory<IP
 	public GatewayFilter apply(Config config) {
 		return (exchange, chain) -> {
 			ServerHttpRequest request = exchange.getRequest();
-			String ip = RequestUtil.getIpAddr(request);
+			String ip = IPUtil.getIpAddr(request);
 			RequestParam requestParam = (RequestParam) exchange.getAttributes().get(ReqCacheKey.CACHE_REQUEST_BODY_OBJECT_KEY);
 
 			boolean isVerifyOk = false;

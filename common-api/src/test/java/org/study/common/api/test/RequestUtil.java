@@ -1,9 +1,13 @@
-package com.joinpay.sdk.utils;
+package org.study.common.api.test;
 
-import com.joinpay.sdk.entity.Request;
-import com.joinpay.sdk.entity.Response;
-import com.joinpay.sdk.entity.SecretKey;
-import com.joinpay.sdk.exceptions.JPException;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.api.utils.SignUtil;
+import org.study.common.statics.exceptions.BizException;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.OkHttpUtil;
+import org.study.common.util.utils.RSAUtil;
+import org.study.common.util.utils.StringUtil;
 
 /**
  * 请求处理工具类
@@ -23,76 +27,79 @@ public class RequestUtil {
      * @param request
      * @param secretKey
      * @return
-     * @throws JPException
+     * @throws BizException
      */
-    public static Response doRequest(String url, Request request, SecretKey secretKey) throws JPException {
+    public static ResponseParam doRequest(String url, RequestParam request, SecretKey secretKey) throws BizException {
         requestParamValid(request, secretKey);
 
         try{
-            SignUtil.sign(request, secretKey.getMchSignPrivateKey());
+            String signStr = SignUtil.getSortedString(request, false);
+            signStr = SignUtil.sign(signStr, request.getSign_type(), secretKey.getReqSignPriKey());
+            request.setSign(signStr);
         }catch(Exception e){
-            throw new JPException("签名失败: "+e.getMessage(), e);
+            throw new BizException("签名失败: "+e.getMessage(), e);
         }
 
-        if(StringUtil.isNotEmpty(request.getAes_key()) && StringUtil.isNotEmpty(secretKey.getJpEncryptPublicKey())){
-            request.setAes_key(RSAUtil.encrypt(request.getAes_key(), secretKey.getJpEncryptPublicKey()));
+        if(StringUtil.isNotEmpty(request.getSec_key()) && StringUtil.isNotEmpty(secretKey.getSecKeyEncryptPubKey())){
+            request.setSec_key(RSAUtil.encrypt(request.getSec_key(), secretKey.getSecKeyEncryptPubKey(), false));
         }
 
         String respJson = null;
         try{
             respJson = OkHttpUtil.postJsonSync(url, JsonUtil.toString(request));
         }catch(Exception e){
-            throw new JPException("发送http请求时发生异常: "+e.getMessage(), e);
+            throw new BizException("发送http请求时发生异常: "+e.getMessage(), e);
         }
         if(StringUtil.isEmpty(respJson)){
-            throw new JPException("请求完成，但响应信息为空");
+            throw new BizException("请求完成，但响应信息为空");
         }
 
-        Response response = null;
+        ResponseParam response = null;
         try{
-            response = JsonUtil.toBeanOrderly(respJson, Response.class);
+            response = JsonUtil.toBeanOrderly(respJson, ResponseParam.class);
         }catch (Exception e){
-            throw new JPException("请求完成，但响应信息转换失败: "+e.getMessage() + "，respJson="+respJson, e);
+            throw new BizException("请求完成，但响应信息转换失败: "+e.getMessage() + "，respJson="+respJson, e);
         }
 
         try{
-            boolean isOk = SignUtil.verify(response, secretKey.getJpVerifyPublicKey());
+            String signStr = SignUtil.getSortedString(response, false);
+            boolean isOk = SignUtil.verify(signStr, response.getSign(), response.getSign_type(), secretKey.getRespVerifyPubKey());
             if(!isOk){
-                throw new JPException("验签不通过！");
+                throw new BizException("响应信息验签不通过！");
             }
         }catch (Exception e){
-            throw new JPException("请求完成，但响应信息验签失败: "+e.getMessage() + "，respJson="+respJson, e);
+            throw new BizException("请求完成，但响应信息验签异常: "+e.getMessage() + "，respJson="+respJson, e);
         }
 
-        if(StringUtil.isNotEmpty(response.getAes_key()) && StringUtil.isNotEmpty(secretKey.getMchDecryptPrivateKey())){
-            String aesKey = RSAUtil.decrypt(response.getAes_key(), secretKey.getMchDecryptPrivateKey());
-            response.setAes_key(aesKey);
+        if(StringUtil.isNotEmpty(response.getSec_key()) && StringUtil.isNotEmpty(secretKey.getSecKeyDecryptPriKey())){
+            String secKey = RSAUtil.decrypt(response.getSec_key(), secretKey.getSecKeyDecryptPriKey());
+            response.setSec_key(secKey);
         }
 
         return response;
     }
 
-    private static <T> void requestParamValid(Request request, SecretKey secretKey){
+    private static <T> void requestParamValid(RequestParam request, SecretKey secretKey){
         if(StringUtil.isEmpty(request)){
-            throw new JPException("request不能为空");
+            throw new BizException("request不能为空");
         }else if(StringUtil.isEmpty(request.getMethod())){
-            throw new JPException("Request.method不能为空");
+            throw new BizException("Request.method不能为空");
         }else if(StringUtil.isEmpty(request.getVersion())){
-            throw new JPException("Request.version不能为空");
+            throw new BizException("Request.version不能为空");
         }else if(StringUtil.isEmpty(request.getData())){
-            throw new JPException("Request.data不能为空");
+            throw new BizException("Request.data不能为空");
         }else if(StringUtil.isEmpty(request.getSign_type())){
-            throw new JPException("Request.sign_type不能为空");
+            throw new BizException("Request.sign_type不能为空");
         }else if(StringUtil.isEmpty(request.getMch_no())){
-            throw new JPException("Request.mch_no不能为空");
+            throw new BizException("Request.mch_no不能为空");
         }
 
         if(StringUtil.isEmpty(secretKey)){
-            throw new JPException("secretKey不能为空");
-        }else if(StringUtil.isEmpty(secretKey.getMchSignPrivateKey())){
-            throw new JPException("SecretKey.mchSignPrivateKey不能为空");
-        }else if(StringUtil.isEmpty(secretKey.getJpVerifyPublicKey())){
-            throw new JPException("SecretKey.jpVerifyPublicKey不能为空");
+            throw new BizException("secretKey不能为空");
+        }else if(StringUtil.isEmpty(secretKey.getReqSignPriKey())){
+            throw new BizException("SecretKey.reqSignPriKey不能为空");
+        }else if(StringUtil.isEmpty(secretKey.getRespVerifyPubKey())){
+            throw new BizException("SecretKey.respVerifyPubKey不能为空");
         }
     }
 

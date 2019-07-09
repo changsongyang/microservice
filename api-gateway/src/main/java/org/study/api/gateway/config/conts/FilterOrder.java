@@ -1,4 +1,4 @@
-package com.gw.api.gateway.config.conts;
+package org.study.api.gateway.config.conts;
 
 /**
  * @description 过滤器执行顺序的常量配置类

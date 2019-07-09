@@ -1,4 +1,4 @@
-package com.gw.api.base.annonation;
+package org.study.common.api.annonation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

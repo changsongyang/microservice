@@ -1,6 +1,5 @@
-package com.gw.api.base.config;
+package org.study.common.api.config;
 
-import com.gw.api.base.errorHandler.webflux.GlobalExceptionHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -17,6 +16,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import org.study.common.api.errorHandler.webflux.GlobalExceptionHandler;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -55,14 +56,14 @@ public class WebFluxCustomAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "joinpay.api.static-resource.disabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "study.api.static-resource.disabled", havingValue = "true", matchIfMissing = true)
     public StaticResourceForbid staticResourceForbid(ResourceProperties resourceProperties){
         resourceProperties.setAddMappings(false);
         return new StaticResourceForbid();
     }
 
     @Bean
-    @ConditionalOnProperty(name = "joinpay.api.global-error-handler.enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(name = "study.api.global-error-handler.enabled", havingValue = "true", matchIfMissing = true)
     @ConditionalOnMissingBean(value = ErrorWebExceptionHandler.class, search = SearchStrategy.CURRENT)
     @Order(-1)
     public ErrorWebExceptionHandler errorWebExceptionHandler(ErrorAttributes errorAttributes) {

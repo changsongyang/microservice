@@ -1,10 +1,12 @@
-package com.gw.api.base.utils;
+package org.study.common.api.utils;
 
-import com.gw.api.base.enums.SignTypeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.params.RequestParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.study.common.api.enums.SignTypeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.params.RequestParam;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
 
 /**
  * 参数处理工具类
@@ -37,7 +39,7 @@ public class ParamUtil {
             throw new ApiException("method 的长度不能超过64！");
         }else if(StringUtil.isLengthOver(requestParam.getVersion(), 5)){
             throw new ApiException("version 的长度不能超过5！");
-        }else if(! StringUtil.isLengthOk(requestParam.getRand_str(), 32,32)){
+        }else if(! StringUtil.isLengthOk(requestParam.getRand_str(), 32, 32)){
             throw new ApiException("rand_str 的长度须为32！");
         }else if(StringUtil.isLengthOver(requestParam.getSign_type(), 5)){
             throw new ApiException("sign_type 的长度不能超过5！");

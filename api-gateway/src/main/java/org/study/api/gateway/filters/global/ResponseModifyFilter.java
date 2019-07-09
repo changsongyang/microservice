@@ -1,14 +1,5 @@
-package com.gw.api.gateway.filters.global;
+package org.study.api.gateway.filters.global;
 
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.helpers.RequestHelper;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.utils.StringUtil;
-import com.gw.api.gateway.config.conts.FilterOrder;
-import com.gw.api.gateway.utils.ResponseUtil;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +21,15 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.server.ServerWebExchange;
+import org.study.api.gateway.config.conts.FilterOrder;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.api.helpers.RequestHelper;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.api.utils.ResponseUtil;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -106,14 +106,6 @@ public class ResponseModifyFilter extends AbstractGlobalFilter {
 		}
 
 		try{
-			if(StringUtil.isEmpty(responseParam.getResp_msg())){
-				String msg = "UNKNOWN ERROR";
-				HttpStatus httpStatus = exchange.getResponse().getStatusCode();
-				if(httpStatus != null && httpStatus.value() != HttpStatus.OK.value()){
-					msg = RespCodeEnum.ACCEPT_UNKNOWN.getMsg() +", "+ exchange.getResponse().getStatusCode().getReasonPhrase();
-				}
-				responseParam.setResp_msg(msg);
-			}
 			if(StringUtil.isEmpty(responseParam.getMch_no())){
 				responseParam.setMch_no(requestParam==null ? "" : requestParam.getMch_no());
 			}

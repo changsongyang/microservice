@@ -1,10 +1,10 @@
-package com.gw.api.gateway.ratelimit;
+package org.study.api.gateway.ratelimit;
 
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.utils.MD5Util;
-import com.gw.api.gateway.config.conts.ReqCacheKey;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.web.server.ServerWebExchange;
+import org.study.api.gateway.config.conts.ReqCacheKey;
+import org.study.common.api.params.RequestParam;
+import org.study.common.util.utils.MD5Util;
 import reactor.core.publisher.Mono;
 
 /**

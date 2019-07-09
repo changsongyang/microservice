@@ -1,21 +1,5 @@
-package com.gw.api.gateway.handler;
+package org.study.api.gateway.handler;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.helpers.RequestHelper;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.vo.BizCodeVo;
-import com.gw.api.gateway.config.conts.InnerErrorCode;
-import com.gw.api.gateway.config.conts.ReqCacheKey;
-import com.gw.api.gateway.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +13,24 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.server.RequestPredicates;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.study.api.gateway.config.conts.InnerErrorCode;
+import org.study.api.gateway.config.conts.ReqCacheKey;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.helpers.RequestHelper;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.api.utils.ResponseUtil;
+import org.study.common.util.utils.JsonUtil;
 import reactor.core.publisher.Mono;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @description 全局异常处理器
@@ -154,53 +149,45 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
         String mchNo = requestParam == null ? "" : requestParam.getMch_no();
         String signType = requestParam == null ? "" : requestParam.getSign_type();
         ResponseParam response;
-        BizCodeVo bizVo = new BizCodeVo();
 
         if (ex instanceof ApiException) {
             ApiException e = (ApiException) ex;
             response = new ResponseParam();
             response.setSign("");//默认为空串做签名内容
             response.setResp_code(e.getRespCode());
-            response.setResp_msg(e.getRespMsg());
-
-            bizVo.setBiz_code(e.getBizCode());
+            response.setBiz_code(e.getBizCode());
             if(e.getInnerCode() == InnerErrorCode.IP_BLACK_LIST){
-                bizVo.setBiz_msg("Not Allow!");
+                response.setBiz_msg("Not Allow!");
             }else{
-                bizVo.setBiz_msg(e.getBizMsg());
+                response.setBiz_msg(e.getBizMsg());
             }
         } else if(ex instanceof TimeoutException){
-            bizVo.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
-            bizVo.setBiz_msg("Time Out");
             response = ResponseParam.acceptUnknown(mchNo);
+            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+            response.setBiz_msg("Time Out");
         }else if(ex instanceof NotFoundException){//后端服务无法从注册中心被发现时
             response = new ResponseParam();
             response.setSign("");//默认为空串做签名内容
             response.setResp_code(RespCodeEnum.ACCEPT_FAIL.getCode());
-            response.setResp_msg(RespCodeEnum.ACCEPT_FAIL.getMsg());
-
-            bizVo.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
-            bizVo.setBiz_msg("Service Not Found");
+            response.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
+            response.setBiz_msg("Service Not Found");
         } else if (ex instanceof ResponseStatusException) {//访问没有配置的route path时
             ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             response = new ResponseParam();
             response.setSign("");//默认为空串做签名内容
             response.setResp_code(RespCodeEnum.ACCEPT_FAIL.getCode());
-            response.setResp_msg(RespCodeEnum.ACCEPT_FAIL.getMsg());
-
-            bizVo.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
-            bizVo.setBiz_msg(responseStatusException.getMessage());
+            response.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
+            response.setBiz_msg(responseStatusException.getMessage());
         } else {
-            bizVo.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
-            bizVo.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg() + ", Internal Server Error");
             response = ResponseParam.acceptUnknown(mchNo);
+            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+            response.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg() + ", Internal Server Error");
         }
 
         ResponseUtil.fillAcceptUnknownIfEmpty(response);
 
         response.setMch_no(mchNo);
         response.setSign_type(signType);
-        response.setData(bizVo);
         return response;
     }
 

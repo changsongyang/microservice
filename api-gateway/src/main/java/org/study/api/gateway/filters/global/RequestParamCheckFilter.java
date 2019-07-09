@@ -1,15 +1,15 @@
-package com.gw.api.gateway.filters.global;
+package org.study.api.gateway.filters.global;
 
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.enums.SignTypeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.utils.StringUtil;
-import com.gw.api.gateway.config.conts.FilterOrder;
-import com.gw.api.gateway.config.conts.InnerErrorCode;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.study.api.gateway.config.conts.FilterOrder;
+import org.study.api.gateway.config.conts.InnerErrorCode;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.SignTypeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.params.RequestParam;
+import org.study.common.util.utils.StringUtil;
 import reactor.core.publisher.Mono;
 
 /**

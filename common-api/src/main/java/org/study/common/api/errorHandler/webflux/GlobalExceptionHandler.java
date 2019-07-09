@@ -1,29 +1,23 @@
-package com.gw.api.base.errorHandler.webflux;
+package org.study.common.api.errorHandler.webflux;
 
-import com.gw.api.base.constants.CommonConst;
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.utils.RequestUtil;
-import com.gw.api.base.vo.BizCodeVo;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.DefaultErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.study.common.api.constants.CommonConst;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -48,15 +42,12 @@ public class GlobalExceptionHandler extends DefaultErrorWebExceptionHandler {
     protected Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
         boolean includeStackTrace = isIncludeStackTrace(request, MediaType.ALL);
         Map<String, Object> error = getErrorAttributes(request, includeStackTrace);
-        HttpStatus errorStatus = getHttpStatus(error);
         if(error.containsKey(HTTP_STATUS_KEY)){
             error.remove(HTTP_STATUS_KEY);
         }
-
         return ServerResponse.status(HttpStatus.OK)//统一返回200响应码
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(error))
-                .doOnNext((resp) -> logError(request, errorStatus));
+                .body(BodyInserters.fromObject(error));
     }
 
     /**
@@ -106,33 +97,27 @@ public class GlobalExceptionHandler extends DefaultErrorWebExceptionHandler {
         String mchNo = requestParam.getMch_no();
         String signType = requestParam.getSign_type();
         ResponseParam response;
-        BizCodeVo bizVo = new BizCodeVo();
 
         if (ex instanceof ApiException) {
             ApiException e = (ApiException) ex;
             response = new ResponseParam();
             response.setResp_code(e.getRespCode());
-            response.setResp_msg(e.getRespMsg());
-
-            bizVo.setBiz_code(e.getBizCode());
-            bizVo.setBiz_msg(e.getBizMsg());
+            response.setBiz_code(e.getBizCode());
+            response.setBiz_msg(e.getBizMsg());
         } else if (ex instanceof ResponseStatusException) {
             ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             response = new ResponseParam();
             response.setResp_code(RespCodeEnum.ACCEPT_FAIL.getCode());
-            response.setResp_msg(RespCodeEnum.ACCEPT_FAIL.getMsg());
-
-            bizVo.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
-            bizVo.setBiz_msg(responseStatusException.getMessage());
+            response.setBiz_code(BizCodeEnum.PARAM_VALID_FAIL.getCode());
+            response.setBiz_msg(responseStatusException.getMessage());
         } else {
-            bizVo.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
-            bizVo.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg() + ", Internal Server Error");
             response = ResponseParam.acceptUnknown(mchNo);
+            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+            response.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg() + ", Internal Server Error");
         }
 
         response.setMch_no(mchNo);
         response.setSign_type(signType);
-        response.setData(bizVo);
         return response;
     }
 

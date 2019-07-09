@@ -1,17 +1,17 @@
-package com.gw.api.base.helpers;
+package org.study.common.api.helpers;
 
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.service.UserService;
-import com.gw.api.base.utils.RSAUtil;
-import com.gw.api.base.utils.SignUtil;
-import com.gw.api.base.utils.StringUtil;
-import com.gw.api.base.vo.CallBackRespVo;
-import com.gw.api.base.vo.MerchantInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.api.service.UserService;
+import org.study.common.api.utils.SignUtil;
+import org.study.common.api.vo.CallBackRespVo;
+import org.study.common.api.vo.MerchantInfo;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.RSAUtil;
+import org.study.common.util.utils.StringUtil;
 
 import java.util.Map;
 
@@ -75,7 +75,7 @@ public final class RequestHelper {
             isSignOk = SignUtil.verify(requestParam, merchantInfo.getSignValidKey());
         }catch(Throwable e){
             result.setOtherInfo(e);
-            logger.error("验签失败，因为验签时出现异常 RequestParam = {}", e);
+            logger.error("验签失败，因为验签时出现异常 RequestParam = {}", JsonUtil.toString(requestParam), e);
         }
         result.setVerifyOk(isSignOk);
         return result;
@@ -125,7 +125,7 @@ public final class RequestHelper {
     /**
      * 生成签名
      * @param responseParam
-     * @throws ApiException
+     * @throws org.study.common.api.exceptions.ApiException
      */
     public void signAndEncrypt(ResponseParam responseParam, APIParam param){
         if(responseParam == null || StringUtil.isEmpty(responseParam.getMch_no())){

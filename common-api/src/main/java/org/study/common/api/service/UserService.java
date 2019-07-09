@@ -1,7 +1,7 @@
-package com.gw.api.base.service;
+package org.study.common.api.service;
 
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.vo.MerchantInfo;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.vo.MerchantInfo;
 
 /**
  * 获取用户信息，需要用户自行实现并配置SpringBean

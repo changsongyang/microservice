@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    nacos:
+      config:
+        server-addr: 10.10.10.38:8848
+        file-extension: yaml
+        namespace: 96807440-5bf6-4a42-83fc-6356b75d59bb
+        shared-dataids: activemq.properties
+        refreshable-dataids: activemq.properties

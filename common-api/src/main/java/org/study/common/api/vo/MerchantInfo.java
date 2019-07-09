@@ -1,6 +1,4 @@
-package com.gw.api.base.vo;
-
-import com.gw.api.base.constants.IPValidKeyConst;
+package org.study.common.api.vo;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -22,6 +20,11 @@ public class MerchantInfo implements Serializable {
      * 商户名称
      */
     private String mchName;
+
+    /**
+     * 商户状态
+     */
+    private Integer mchStatus;
 
     /**
      * 签名类型
@@ -49,7 +52,7 @@ public class MerchantInfo implements Serializable {
     private String secKeyEncryptKey;
 
     /**
-     * 如果需要进行IP校验，则需要设置值，此Map的key参照 {@link IPValidKeyConst}
+     * 如果需要进行IP校验，则需要设置值，此Map的key参照 {@link org.study.common.api.constants.IPValidKeyConst}
      */
     private Map<String, String> ipValidMap;
 
@@ -67,6 +70,14 @@ public class MerchantInfo implements Serializable {
 
     public void setMchName(String mchName) {
         this.mchName = mchName;
+    }
+
+    public Integer getMchStatus() {
+        return mchStatus;
+    }
+
+    public void setMchStatus(Integer mchStatus) {
+        this.mchStatus = mchStatus;
     }
 
     public String getSignType() {

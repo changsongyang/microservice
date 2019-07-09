@@ -1,21 +1,13 @@
-package com.gw.api.base.service.impl;
+package org.study.common.api.service.impl;
 
-import com.alibaba.dubbo.config.annotation.Reference;
-import com.gw.api.base.clients.RedisClient;
-import com.gw.api.base.constants.IPValidKeyConst;
-import com.gw.api.base.enums.SignTypeEnum;
-import com.gw.api.base.service.UserService;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.vo.MerchantInfo;
-import com.gw.facade.user.entity.MerchantOnline;
-import com.gw.facade.user.entity.MerchantSecret;
-import com.gw.facade.user.service.MerchantOnlineFacade;
-import com.gw.facade.user.service.MerchantSecretFacade;
-import org.redisson.api.LocalCachedMapOptions;
-import org.redisson.api.RLocalCachedMap;
+import com.google.common.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import org.study.common.api.enums.SignTypeEnum;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.service.UserService;
+import org.study.common.api.vo.MerchantInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,31 +19,10 @@ import java.util.Map;
  */
 public class UserServiceImpl implements UserService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final static String GATEWAY_MERCHANT_INFO_LOCAL_CACHE_KEY = "GATEWAY_MERCHANT_INFO_LOCAL_CACHE_KEY";
+    private Cache<String, MerchantInfo> cache;//使用本地缓存，避免网络传输的开销
 
-    private RedisClient redisClient;
-    private LocalCachedMapOptions cacheOptions;//本地缓存时 过期时间、最大缓存数 等等的配置
-    private RLocalCachedMap<String, MerchantInfo> mchInfoCacheMap;//使用本地缓存，避免网络传输的开销
-
-    @Reference(check = false)
-    MerchantOnlineFacade merchantOnlineFacade;
-    @Reference(check = false)
-    private MerchantSecretFacade merchantSecretFacade;
-
-    public UserServiceImpl(@Nullable RedisClient redisClient, @Nullable LocalCachedMapOptions localCachedMapOptions){
-        this.redisClient = redisClient;
-        this.cacheOptions = localCachedMapOptions;
-        initRedisLocalCache();
-    }
-
-    private void initRedisLocalCache(){
-        if(redisClient != null && cacheOptions != null){
-            logger.warn("本地缓存开启，将使用本地缓存存储商户信息 cacheSize={} cacheExpireMills={} maxIdleMills={}",
-                    cacheOptions.getCacheSize(), cacheOptions.getTimeToLiveInMillis(), cacheOptions.getMaxIdleInMillis());
-            mchInfoCacheMap = redisClient.getClient().getLocalCachedMap(GATEWAY_MERCHANT_INFO_LOCAL_CACHE_KEY, cacheOptions);
-        }else{
-            logger.warn("未开启本地缓存，频繁从数据库取商户信息将严重影响性能，同时给数据库带来巨大压力");
-        }
+    public UserServiceImpl(@Nullable Cache<String, MerchantInfo> cache){
+        this.cache = cache;
     }
 
     /**
@@ -75,59 +46,45 @@ public class UserServiceImpl implements UserService {
     }
 
     private MerchantInfo getFromCache(String key){
-        if(mchInfoCacheMap != null){
-            return mchInfoCacheMap.get(key);
+        if (cache != null) {
+            return (MerchantInfo) cache.getIfPresent(key);
         }
         return null;
     }
 
-    private void storeToCache(String key, MerchantInfo merchantInfo){
-        if(mchInfoCacheMap != null && merchantInfo != null){
-            mchInfoCacheMap.fastPutIfAbsentAsync(key, merchantInfo);
+    private void storeToCache(String key, MerchantInfo merchantInfo) {
+        if (cache != null && merchantInfo != null) {
+            cache.put(key, merchantInfo);
         }
     }
 
     private MerchantInfo getFromDb(String mchNo, APIParam param){
         MerchantInfo merchantInfo = new MerchantInfo();
 
-        MerchantOnline merchantOnline = merchantOnlineFacade.getMerchantOnlineByMerchantNo(mchNo);
-        if(merchantOnline == null || merchantOnline.getEncryptType() == null){
-            throw new RuntimeException("mchNo="+mchNo+" 对应的商户信息为空或者加密类型为空");
-        }
+        String md5Key = "12345678qwertyui";
+        String sysPublicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCCD1PquVQz6inIH66ZMndawRmihQ/4GLX/nHieaX8Htu5NZcn2hB3OZe+rk05AJgcUuUhkNqxhtkArOJJdhxxdF4BNFSQ70Zx9APuda4GgwGnpiA5yJey9awmsmUUS/k4KkQX6bLJWvbKz7TEa5Z6NDD7UBoYu6uFqZH+AL51IlQIDAQAB";
+        String sysPrivateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIIPU+q5VDPqKcgfrpkyd1rBGaKFD/gYtf+ceJ5pfwe27k1lyfaEHc5l76uTTkAmBxS5SGQ2rGG2QCs4kl2HHF0XgE0VJDvRnH0A+51rgaDAaemIDnIl7L1rCayZRRL+TgqRBfpssla9srPtMRrlno0MPtQGhi7q4Wpkf4AvnUiVAgMBAAECgYBHSsehHr29R1pnzJYUe8lZAghfQbkjMchxuP+VNhbfz7KI0ocGjh0Yil/6GOEH4NB416eK5z1OwmwiRPxWMD2nMFfwgSpH+tewAl6raNhTy9fumyQD6ZNs3y8swCj9e54P4Ph3B+u/OUDB1BZQu6zb2pO0FNIbFPsxPlBN5FDQcQJBAMz/RHGKG16kdTdYyHSHXLR4qtk2xik798i8i9CDJ+OnKfc8VCvGNilWoR6S4a+FcJHEhYs5QcRxNsCClmd0md8CQQCiayLa/sS2lY4dgY3n/G12cAQVhqPSyx8QGcqtLl3jTJQLUbO0fSLo542ZV4azgc/j+f0C/tML4mAY2IozktQLAkBTlQzyAi5woztLqr5ojLxmtQBr+iJHs7SuuvmCtccw0fqRXJ6xDmsM5c5hqd+s8gpY1LjicCD5mHOLgHMUkX0fAkBlR4+Vpha+kGXtalM2HUeY+mLhlXLkyHrXTG4BLg+n5KHQqSL5Yqr5NyMqQtUhbMpZLBMk4ghyubgY5jbP0DhfAkB7+lMimzHiMjLh56AZnsg3UFH+MoupkctS4oseK5vET70tSO0xiUhikf3+0BXZNhnsSfnR493ScDQbyYDKKY1d";
+
+        String mchPublicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkMtwOfeouGA5T8w8bv5xA4nV1aCTDNxU7T+kMwhkQpNT329k8S+HcIQc4t8CnivpZ5ZgquXA94MUH42S3AO3BTuCQCghhob+iWg0m9SohLh5GYloBlgI+OBFIpynib/dFfCwtLCS/afFsd4PDhrISx6M1cPv0A10QY2JOO1INpQIDAQAB";
+        String mchPrivateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAKQy3A596i4YDlPzDxu/nEDidXVoJMM3FTtP6QzCGRCk1Pfb2TxL4dwhBzi3wKeK+lnlmCq5cD3gxQfjZLcA7cFO4JAKCGGhv6JaDSb1KiEuHkZiWgGWAj44EUinKeJv90V8LC0sJL9p8Wx3g8OGshLHozVw+/QDXRBjYk47Ug2lAgMBAAECgYA4A5WoZ/H8eX5hyxgLWklepSJ2w+lOozrd+fvBu3E7iU+RonEwLZ7GLoo9IgpZ3YJcKoPHh20v3r64Wy1fdLSmYlQ1Lk/DasEshXthwWKam+w+lBh7QS+jnChSNxlCzMebQUhKCzFV4Du28ROVVYU/UTS76+LlL5TgwOw/owSQQQJBANX1V4vw2GsS7ri7dR9gJUMl7B80/ciXEMTk1/jO6OfDfhMhWUgHPndTo+OVgyLgpagmeDFSbCCfN1Oa6kwU29UCQQDEdnn46UR1Ye0pYxu1p5YvY4wC036OX4XxLR94DShu24d104prN0ogni6pc6Jh7vtkE1LyM4sh2EiL5x/48mKRAkAUv0StAj7KKzzQ1wSldTpHx56c7BOL5vIuVY6HxvCYwMEx87LnpCQviAHFaNMdh7EonApdpgNsKmRADC6aEA+9AkB24yc+jJLD4eWttO7wx6BnvvrcPvYH3CBm6SJw+K1uIGTh1YifBw9Rm8eq/XHXh9ITJmp8bNqWOZb1KoE7mhoxAkBCxC++0ACafWKKFp8baJmILhdTu0BDKxvXflF5xWpBn2nCOY6eztJYZ9acnzI2HTL4XLe2tYFSr7V8u0e/SN0h";
 
         merchantInfo.setMchNo(mchNo);
-        merchantInfo.setMchName(merchantOnline.getFullName());
-        if(merchantOnline.getEncryptType().intValue() == SignTypeEnum.getIntValue(SignTypeEnum.MD5)){
-            merchantInfo.setSignType(SignTypeEnum.MD5.getValue());
-        }else if(merchantOnline.getEncryptType().intValue() == SignTypeEnum.getIntValue(SignTypeEnum.RSA)){
-            merchantInfo.setSignType(SignTypeEnum.RSA.getValue());
-        }else{
-            //此处勿抛出ApiException，因为此时不确定是否受理失败
-            throw new RuntimeException("暂不支持的签名类型:"+merchantOnline.getEncryptType().intValue());
-        }
+        merchantInfo.setMchName("xx商户");
+        merchantInfo.setMchStatus(100);
+        merchantInfo.setSignType(SignTypeEnum.RSA.getValue());
 
         //默认使用这个共享密钥作为签名、验签、加密、解密
-        merchantInfo.setSignValidKey(merchantOnline.getMerchantKey());
-        merchantInfo.setSignGenerateKey(merchantOnline.getMerchantKey());
-        merchantInfo.setSecKeyDecryptKey(merchantOnline.getMerchantKey());
-        merchantInfo.setSecKeyEncryptKey(merchantOnline.getMerchantKey());
-
-        if(merchantOnline.getEncryptType().intValue() == SignTypeEnum.getIntValue(SignTypeEnum.RSA)){
-            MerchantSecret merchantSecret = merchantSecretFacade.getByMerchantNo(mchNo);
-
-            merchantInfo.setSignValidKey(merchantSecret.getMerchantPublicKey());//验签，是使用商户公钥来验证
-            merchantInfo.setSignGenerateKey(merchantSecret.getPrivateKey());//响应商户时，需要生成签名，使用汇聚平台私钥
-
-            //因为现在还没有分开签名(验签)公私钥、加解密公私钥，所以还是共用同一把公私钥
-            merchantInfo.setSecKeyDecryptKey(merchantSecret.getPrivateKey());//收到商户请求，需要解密sec_key时，肯定使用汇聚密钥
-            merchantInfo.setSecKeyEncryptKey(merchantSecret.getMerchantPublicKey());//响应商户，需要加密sec_key，肯定使用商户公钥
+        if(SignTypeEnum.MD5.getValue().equals(merchantInfo.getSignType())){
+            merchantInfo.setSignValidKey(md5Key);
+            merchantInfo.setSignGenerateKey(md5Key);
+            merchantInfo.setSecKeyDecryptKey(md5Key);
+            merchantInfo.setSecKeyEncryptKey(md5Key);
+        }else{
+            merchantInfo.setSignValidKey(mchPublicKey);//验签用商户公钥
+            merchantInfo.setSignGenerateKey(sysPrivateKey);//签名用系统密钥
+            merchantInfo.setSecKeyDecryptKey(sysPrivateKey);//解密用系统密钥
+            merchantInfo.setSecKeyEncryptKey(mchPublicKey);//加密用商户公钥
         }
-
-        //设置ip校验的地址
-        Map<String, String> ipValidMap = new HashMap<>();
-        ipValidMap.put(IPValidKeyConst.RECEIVE_KEY, merchantOnline.getIpSeg());//收单
-        ipValidMap.put(IPValidKeyConst.PAYMENT_KEY, merchantOnline.getPayIpSeg());//代付
-        merchantInfo.setIpValidMap(ipValidMap);
 
         return merchantInfo;
     }

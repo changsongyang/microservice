@@ -1,4 +1,4 @@
-package com.gw.api.gateway.config.conts;
+package org.study.api.gateway.config.conts;
 
 /**
  * @description 在ServerRequest中缓存的key

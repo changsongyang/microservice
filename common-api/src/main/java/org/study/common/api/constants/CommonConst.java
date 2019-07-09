@@ -1,4 +1,4 @@
-package com.gw.api.base.constants;
+package org.study.common.api.constants;
 
 /**
  * 公共常量类
@@ -24,8 +24,4 @@ public class CommonConst {
      * 网关转发请求到后端服务之前，往http header中存放sign_type的key
      */
     public static final String REQUEST_HEADER_STORE_SIGNTYPE_KEY = "REQUEST-SIGNTYPE-KEY";
-    /**
-     * 请求/响应参数 sec_key 这个字段中的值的分割符
-     */
-    public static final String SEC_KEY_SEPARATOR = ":";
 }

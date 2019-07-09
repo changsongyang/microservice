@@ -1,6 +1,5 @@
-package com.gw.api.base.config;
+package org.study.common.api.config;
 
-import com.gw.api.base.filters.RequestFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.study.common.api.servlets.ServletRequestFilter;
 
 import javax.servlet.Servlet;
 
@@ -19,9 +19,9 @@ import javax.servlet.Servlet;
 public class MvcFilterAutoConfiguration {
 
     @Bean
-    @ConditionalOnProperty(name = "joinpay.api.servlet-wrapper-filter.enabled", havingValue = "true")
-    public RequestFilter requestFilter(){
-        return new RequestFilter();
+    @ConditionalOnProperty(name = "study.api.servlet-wrapper-filter.enabled", havingValue = "true", matchIfMissing = false)
+    public ServletRequestFilter servletRequestFilter(){
+        return new ServletRequestFilter();
     }
 
     /**
@@ -29,10 +29,10 @@ public class MvcFilterAutoConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnBean(RequestFilter.class)
+    @ConditionalOnBean(ServletRequestFilter.class)
     public FilterRegistrationBean requestFilterRegistrationBean() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(requestFilter());
+        registration.setFilter(servletRequestFilter());
         registration.setEnabled(true); // 设置是否可用
         return registration;
     }

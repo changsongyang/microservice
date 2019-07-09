@@ -1,4 +1,4 @@
-package com.gw.api.base.enums;
+package org.study.common.api.enums;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,17 +1,18 @@
-package com.gw.api.gateway.utils;
+package org.study.common.api.utils;
 
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.utils.StringUtil;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 
 /**
- * 响应处理工具类，可通过HttpServletResponse对响应信息进行修改等操作
+ * 响应处理工具类
  * @author chenyf
  * @date 2018-12-15
  */
@@ -21,8 +22,8 @@ public class ResponseUtil {
         if(StringUtil.isEmpty(response.getResp_code())){
             response.setResp_code(RespCodeEnum.ACCEPT_UNKNOWN.getCode());
         }
-        if(StringUtil.isEmpty(response.getResp_msg())){
-            response.setResp_msg(RespCodeEnum.ACCEPT_UNKNOWN.getMsg());
+        if(StringUtil.isEmpty(response.getBiz_code())){
+            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
         }
     }
 

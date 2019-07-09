@@ -1,8 +1,9 @@
-package com.gw.api.base.params;
+package org.study.common.api.params;
 
-import com.gw.api.base.annonation.NotSign;
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.utils.RandomUtil;
+import org.study.common.api.annonation.NotSign;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.util.utils.RandomUtil;
 
 /**
  * 响应用户请求的参数
@@ -11,30 +12,33 @@ import com.gw.api.base.utils.RandomUtil;
  */
 public class ResponseParam {
     private String resp_code;
-    private String resp_msg;
+    private String biz_code;
+    private String biz_msg;
     private String mch_no;
-    private Object data;
+    private String data;
     private String rand_str;
     private String sign_type;
     @NotSign
     private String sign;
     @NotSign
-    private String sec_key = "";
+    private String sec_key;
 
     public static ResponseParam acceptUnknown(String mchNo){
         ResponseParam responseParam = new ResponseParam();
         responseParam.setResp_code(RespCodeEnum.ACCEPT_UNKNOWN.getCode());
-        responseParam.setResp_msg(RespCodeEnum.ACCEPT_UNKNOWN.getMsg());
+        responseParam.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+        responseParam.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
         responseParam.setMch_no(mchNo);
         responseParam.setSign("");
         responseParam.setRand_str(RandomUtil.get32LenStr());
         return responseParam;
     }
 
-    public static ResponseParam acceptFail(String mchNo){
+    public static ResponseParam acceptFail(String mchNo, String bizCode, String bizMsg){
         ResponseParam responseParam = new ResponseParam();
         responseParam.setResp_code(RespCodeEnum.ACCEPT_FAIL.getCode());
-        responseParam.setResp_msg(RespCodeEnum.ACCEPT_FAIL.getMsg());
+        responseParam.setBiz_code(bizCode);
+        responseParam.setBiz_msg(bizMsg);
         responseParam.setMch_no(mchNo);
         responseParam.setSign("");
         responseParam.setRand_str(RandomUtil.get32LenStr());
@@ -49,12 +53,20 @@ public class ResponseParam {
         this.resp_code = resp_code;
     }
 
-    public String getResp_msg() {
-        return resp_msg;
+    public String getBiz_code() {
+        return biz_code;
     }
 
-    public void setResp_msg(String resp_msg) {
-        this.resp_msg = resp_msg;
+    public void setBiz_code(String biz_code) {
+        this.biz_code = biz_code;
+    }
+
+    public String getBiz_msg() {
+        return biz_msg;
+    }
+
+    public void setBiz_msg(String biz_msg) {
+        this.biz_msg = biz_msg;
     }
 
     public String getMch_no() {
@@ -65,11 +77,11 @@ public class ResponseParam {
         this.mch_no = mch_no;
     }
 
-    public Object getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(String data) {
         this.data = data;
     }
 

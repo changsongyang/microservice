@@ -1,9 +1,5 @@
-package com.gw.api.gateway.config;
+package org.study.api.gateway.config;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.gw.api.gateway.handler.JsonExceptionHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -13,11 +9,14 @@ import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import org.study.api.gateway.handler.JsonExceptionHandler;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @description 覆盖默认的异常处理
@@ -26,7 +25,7 @@ import org.springframework.web.reactive.result.view.ViewResolver;
  */
 @SpringBootConfiguration
 @EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class})
-public class ExceptionHandlerConfig {
+public class ErrorHandlerConfig {
 
     private final ServerProperties serverProperties;
 
@@ -38,11 +37,11 @@ public class ExceptionHandlerConfig {
 
     private final ServerCodecConfigurer serverCodecConfigurer;
 
-    public ExceptionHandlerConfig(ServerProperties serverProperties,
-                                  ResourceProperties resourceProperties,
-                                  ObjectProvider<List<ViewResolver>> viewResolversProvider,
-                                  ServerCodecConfigurer serverCodecConfigurer,
-                                  ApplicationContext applicationContext) {
+    public ErrorHandlerConfig(ServerProperties serverProperties,
+                              ResourceProperties resourceProperties,
+                              ObjectProvider<List<ViewResolver>> viewResolversProvider,
+                              ServerCodecConfigurer serverCodecConfigurer,
+                              ApplicationContext applicationContext) {
         this.serverProperties = serverProperties;
         this.applicationContext = applicationContext;
         this.resourceProperties = resourceProperties;
@@ -50,6 +49,11 @@ public class ExceptionHandlerConfig {
         this.serverCodecConfigurer = serverCodecConfigurer;
     }
 
+    /**
+     * 定义全局异常处理器，同时定义Ordered为最高级，以覆盖common-api下的全局异常处理器
+     * @param errorAttributes
+     * @return
+     */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public ErrorWebExceptionHandler errorWebExceptionHandler(ErrorAttributes errorAttributes) {

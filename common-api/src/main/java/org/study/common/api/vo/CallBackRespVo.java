@@ -1,8 +1,8 @@
-package com.gw.api.base.vo;
+package org.study.common.api.vo;
 
-import com.gw.api.base.annonation.NotSign;
-import com.gw.api.base.enums.RespCodeEnum;
 import org.springframework.http.HttpStatus;
+import org.study.common.api.annonation.NotSign;
+import org.study.common.api.enums.RespCodeEnum;
 
 /**
  * 异步回调商户的响应VO

@@ -1,53 +1,52 @@
-package com.joinpay.sdk.entity;
+package org.study.common.api.test;
 
 public class SecretKey {
     /**
-     * 必填：发送请求时用以签名的商户密钥
+     * 必填：发送请求时用以签名的密钥
      */
-    private String mchSignPrivateKey;
+    private String reqSignPriKey;
     /**
-     * 必填：汇聚响应时，用以验证签名的汇聚公钥
+     * 必填：对响应信息进行验签的公钥
      */
-    private String jpVerifyPublicKey;
-
+    private String respVerifyPubKey;
     /**
-     * 选填：发送请求时，用以对aes_key进行加密的汇聚公钥
+     * 选填：请求时，对sec_key进行加密的公钥
      */
-    private String jpEncryptPublicKey;
+    private String secKeyEncryptPubKey;
     /**
-     * 选填：汇聚响应时，用以对aes_key进行解密密的商户密钥
+     * 选填：响应时，对ec_key进行解密密的密钥
      */
-    private String mchDecryptPrivateKey;
+    private String secKeyDecryptPriKey;
 
-    public String getMchSignPrivateKey() {
-        return mchSignPrivateKey;
+    public String getReqSignPriKey() {
+        return reqSignPriKey;
     }
 
-    public void setMchSignPrivateKey(String mchSignPrivateKey) {
-        this.mchSignPrivateKey = mchSignPrivateKey;
+    public void setReqSignPriKey(String reqSignPriKey) {
+        this.reqSignPriKey = reqSignPriKey;
     }
 
-    public String getJpVerifyPublicKey() {
-        return jpVerifyPublicKey;
+    public String getRespVerifyPubKey() {
+        return respVerifyPubKey;
     }
 
-    public void setJpVerifyPublicKey(String jpVerifyPublicKey) {
-        this.jpVerifyPublicKey = jpVerifyPublicKey;
+    public void setRespVerifyPubKey(String respVerifyPubKey) {
+        this.respVerifyPubKey = respVerifyPubKey;
     }
 
-    public String getJpEncryptPublicKey() {
-        return jpEncryptPublicKey;
+    public String getSecKeyEncryptPubKey() {
+        return secKeyEncryptPubKey;
     }
 
-    public void setJpEncryptPublicKey(String jpEncryptPublicKey) {
-        this.jpEncryptPublicKey = jpEncryptPublicKey;
+    public void setSecKeyEncryptPubKey(String secKeyEncryptPubKey) {
+        this.secKeyEncryptPubKey = secKeyEncryptPubKey;
     }
 
-    public String getMchDecryptPrivateKey() {
-        return mchDecryptPrivateKey;
+    public String getSecKeyDecryptPriKey() {
+        return secKeyDecryptPriKey;
     }
 
-    public void setMchDecryptPrivateKey(String mchDecryptPrivateKey) {
-        this.mchDecryptPrivateKey = mchDecryptPrivateKey;
+    public void setSecKeyDecryptPriKey(String secKeyDecryptPriKey) {
+        this.secKeyDecryptPriKey = secKeyDecryptPriKey;
     }
 }

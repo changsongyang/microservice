@@ -1,4 +1,4 @@
-package com.gw.api.base.params;
+package org.study.common.api.params;
 
 /**
  * API处理过程中的额外参数，主要用作预留，方便日后做一些拓展变动

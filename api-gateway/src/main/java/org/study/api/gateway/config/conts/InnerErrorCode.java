@@ -1,4 +1,4 @@
-package com.gw.api.gateway.config.conts;
+package org.study.api.gateway.config.conts;
 
 /**
  * @description 内部错误码，供网关内部处理使用

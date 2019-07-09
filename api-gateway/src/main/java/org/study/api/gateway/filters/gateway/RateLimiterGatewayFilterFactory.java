@@ -1,8 +1,5 @@
-package com.gw.api.gateway.filters.gateway;
+package org.study.api.gateway.filters.gateway;
 
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.gateway.config.conts.InnerErrorCode;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
@@ -10,6 +7,9 @@ import org.springframework.cloud.gateway.filter.ratelimit.RateLimiter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpStatus;
+import org.study.api.gateway.config.conts.InnerErrorCode;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.exceptions.ApiException;
 
 import java.util.Arrays;
 import java.util.List;

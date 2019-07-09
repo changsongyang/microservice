@@ -1,8 +1,8 @@
-package com.gw.api.base.vo;
+package org.study.common.api.vo;
 
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.utils.StringUtil;
 import org.springframework.http.HttpStatus;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.util.utils.StringUtil;
 
 public class CallBackResult<T> {
     public final static int RESULT_TYPE_SUCCESS = 200;//回调成功

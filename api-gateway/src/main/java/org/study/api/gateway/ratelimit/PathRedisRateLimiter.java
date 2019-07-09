@@ -1,6 +1,5 @@
-package com.gw.api.gateway.ratelimit;
+package org.study.api.gateway.ratelimit;
 
-import com.gw.api.gateway.config.PathRateLimitProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +12,7 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import org.study.api.gateway.config.properties.PathRateLimitProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

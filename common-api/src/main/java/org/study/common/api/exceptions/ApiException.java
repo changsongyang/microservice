@@ -1,7 +1,8 @@
-package com.gw.api.base.exceptions;
+package org.study.common.api.exceptions;
 
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.enums.RespCodeEnum;
+
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
 
 /**
  * @Description: api接口层专用异常类
@@ -13,11 +14,6 @@ public class ApiException extends RuntimeException {
      * 响应码
      */
     protected String respCode;
-
-    /**
-     * 响应码描述
-     */
-    protected String respMsg;
 
     /**
      * 业务码
@@ -60,7 +56,6 @@ public class ApiException extends RuntimeException {
     public static ApiException acceptFail(String bizCode, String bizMsg){
         ApiException exception = new ApiException(bizCode + ", " + bizMsg);
         exception.respCode = RespCodeEnum.ACCEPT_FAIL.getCode();
-        exception.respMsg = RespCodeEnum.ACCEPT_FAIL.getMsg();
         exception.bizCode = bizCode;
         exception.bizMsg = bizMsg;
         return exception;
@@ -73,7 +68,6 @@ public class ApiException extends RuntimeException {
     public static ApiException acceptUnknown(){
         ApiException exception = new ApiException(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
         exception.respCode = RespCodeEnum.ACCEPT_UNKNOWN.getCode();
-        exception.respMsg = RespCodeEnum.ACCEPT_UNKNOWN.getMsg();
         exception.bizCode = BizCodeEnum.ACCEPT_UNKNOWN.getCode();
         exception.bizMsg = BizCodeEnum.ACCEPT_UNKNOWN.getMsg();
         return exception;
@@ -85,14 +79,6 @@ public class ApiException extends RuntimeException {
 
     public void setRespCode(String respCode) {
         this.respCode = respCode;
-    }
-
-    public String getRespMsg() {
-        return respMsg;
-    }
-
-    public void setRespMsg(String respMsg) {
-        this.respMsg = respMsg;
     }
 
     public String getBizCode() {

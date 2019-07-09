@@ -1,4 +1,4 @@
-package com.gw.api.base.config;
+package org.study.common.api.config;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,12 +14,13 @@ public class JacksonAutoConfiguration {
      * 配置jackson
      * @return
      */
+    @ConditionalOnProperty(name = "study.api.jackson-snake-case.enabled", havingValue = "true", matchIfMissing = true)
     @Bean
-    @ConditionalOnProperty(name = "joinpay.api.jackson-snake-case.enabled", havingValue = "true", matchIfMissing = true)
-    public Jackson2ObjectMapperBuilderCustomizer customJackson() {
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return new Jackson2ObjectMapperBuilderCustomizer() {
             @Override
             public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
+                //驼峰命名的参数会自动转为下划线分割的参数，下划线分割的参数会自动转为驼峰命名的参数，如： orderNo <--> order_no
                 jacksonObjectMapperBuilder.propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
             }
         };

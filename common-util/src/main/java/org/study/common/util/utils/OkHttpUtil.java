@@ -1,4 +1,4 @@
-package com.joinpay.sdk.utils;
+package org.study.common.util.utils;
 
 import okhttp3.*;
 

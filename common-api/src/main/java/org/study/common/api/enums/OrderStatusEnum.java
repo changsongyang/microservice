@@ -1,4 +1,4 @@
-package com.gw.api.base.enums;
+package org.study.common.api.enums;
 
 /**
  * 订单状态枚举类

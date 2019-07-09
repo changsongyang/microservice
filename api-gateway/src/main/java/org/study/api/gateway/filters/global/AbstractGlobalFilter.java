@@ -1,8 +1,8 @@
-package com.gw.api.gateway.filters.global;
+package org.study.api.gateway.filters.global;
 
-import com.gw.api.gateway.config.conts.ReqCacheKey;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.study.api.gateway.config.conts.ReqCacheKey;
 
 /**
  * @description 全局过滤器抽象类，负责处理子类全局过滤器的一些公共逻辑

@@ -19,8 +19,10 @@ import java.util.List;
 
 public final class JsonUtil {
 	static SerializeConfig snakeCaseConfig = new SerializeConfig();
+	static SerializeConfig camelCaseConfig = new SerializeConfig();
 	static {
 		snakeCaseConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+		camelCaseConfig.propertyNamingStrategy = PropertyNamingStrategy.CamelCase;
 	}
 
 	/**
@@ -81,6 +83,16 @@ public final class JsonUtil {
 	public static String toStringUnderline(Object obj){
 		return JSON.toJSONString(obj, snakeCaseConfig, SerializerFeature.SortField, SerializerFeature.WriteMapNullValue);
 	}
+
+	/**
+	 * 把字段的属性命名方式从下划线转成驼峰(只对POJO起效，对Map的key不起效)
+	 * @param obj
+	 * @return
+	 */
+	public static String toStringCamel(Object obj){
+		return JSON.toJSONString(obj, camelCaseConfig, SerializerFeature.SortField, SerializerFeature.WriteMapNullValue);
+	}
+
 
 	public static <T> T toBeanOrderly(byte[] bytes, Class<T> clazz) {
 		return JSON.parseObject(bytes, clazz, Feature.OrderedField);

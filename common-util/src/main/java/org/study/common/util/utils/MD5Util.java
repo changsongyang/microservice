@@ -1,5 +1,6 @@
 package org.study.common.util.utils;
 
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.study.common.statics.exceptions.BizException;
@@ -17,7 +18,7 @@ public class MD5Util {
     private static Logger logger = LoggerFactory.getLogger(MD5Util.class);
 
     public static String getMD5Hex(String str) {
-        return HEXUtil.encode(getMD5(str), true);
+        return String.valueOf(Hex.encodeHex(getMD5(str), true));
     }
 
     /**
@@ -40,4 +41,6 @@ public class MD5Util {
         }
         return messageDigest.digest();
     }
+
+
 }

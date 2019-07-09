@@ -8,8 +8,8 @@ import org.study.common.util.utils.StringUtil;
 
 import java.util.List;
 
-public class RequestUtil {
-    private static Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+public class IPUtil {
+    private static Logger logger = LoggerFactory.getLogger(IPUtil.class);
     private static final String HEADER_X_FORWARD = "x-forwarded-for";
     private static final String HEADER_PROXY_CLIENT = "Proxy-Client-IP";
     private static final String HEADER_WL_PROXY_CLIENT = "WL-Proxy-Client-IP";

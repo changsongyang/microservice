@@ -1,6 +1,6 @@
-package com.gw.api.base.service;
+package org.study.common.api.service;
 
-import com.gw.api.base.params.RequestParam;
+import org.study.common.api.params.RequestParam;
 
 /**
  * 验证失败之后的处理器(包括验签、验IP等)，如：发送邮件通知或短信预警，需要用户自行实现，如果不需要此功能也可以不实现，

@@ -1,6 +1,6 @@
-package com.gw.api.base.wrapper;
+package org.study.common.api.wrapper;
 
-import com.gw.api.base.utils.RequestUtil;
+import org.study.common.api.servlets.ServletUtil;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -21,7 +21,7 @@ public class ContentCachingRequestWrapper extends HttpServletRequestWrapper {
 
     public ContentCachingRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
-        body = RequestUtil.readBody(request);
+        body = ServletUtil.readBody(request);
         replaceInputContent(body);
     }
 

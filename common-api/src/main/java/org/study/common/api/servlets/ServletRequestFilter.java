@@ -1,4 +1,4 @@
-package org.study.common.api.filters;
+package org.study.common.api.servlets;
 
 import org.study.common.api.wrapper.ContentCachingRequestWrapper;
 

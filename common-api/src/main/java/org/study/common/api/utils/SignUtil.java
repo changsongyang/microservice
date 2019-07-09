@@ -1,13 +1,14 @@
-package com.gw.api.base.utils;
+package org.study.common.api.utils;
 
-import com.gw.api.base.annonation.NotSign;
-import com.gw.api.base.enums.SignTypeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.params.ResponseParam;
-import com.gw.api.base.vo.CallBackRespVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.study.common.api.annonation.NotSign;
+import org.study.common.api.enums.SignTypeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.params.RequestParam;
+import org.study.common.api.params.ResponseParam;
+import org.study.common.api.vo.CallBackRespVo;
+import org.study.common.util.utils.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -25,39 +26,46 @@ public class SignUtil {
     public final static String SIGN_EQUAL = "=";//等于号
     public final static String SIGN_KEY_PARAM_NAME = "key";
 
-    public static boolean verify(CallBackRespVo respVo, String key){
-        String signStr = getSortedString(respVo, true);
-        if(SignTypeEnum.MD5.getValue().equals(respVo.getSign_type())){
-            signStr = HEXUtil.encode(genMD5Sign(signStr, key), true);
-            if(signStr.equals(respVo.getSign().toUpperCase())){
-                return true;
-            }else{
-                return false;
-            }
-        }else if(SignTypeEnum.RSA.getValue().equals(respVo.getSign_type())){
-            return RSAUtil.verify(signStr, key, HEXUtil.decode(respVo.getSign()), true);
-        }else{
-            return false;
-        }
+    /**
+     * 验证回调时的响应签名
+     * @param respVo
+     * @param secKey
+     * @return
+     */
+    public static boolean verify(CallBackRespVo respVo, String secKey){
+        String signData = getSortedString(respVo, true);
+        return verify(signData, respVo.getSign(), respVo.getSign_type(), secKey);
+    }
+
+    /**
+     * 验证签名请求的签名
+     * @param requestParam
+     * @param secKey
+     * @return
+     */
+    public static boolean verify(RequestParam requestParam, String secKey){
+        String signData = getSortedString(requestParam, false);
+        return verify(signData, requestParam.getSign(), requestParam.getSign_type(), secKey);
     }
 
     /**
      * 验证签名
-     * @param requestParam
-     * @param key
+     * @param signData
+     * @param signParam
+     * @param signType
+     * @param secKey
      * @return
      */
-    public static boolean verify(RequestParam requestParam, String key){
-        String signStr = getSortedString(requestParam, false);
-        if(SignTypeEnum.MD5.getValue().equals(requestParam.getSign_type())){
-            signStr = HEXUtil.encode(genMD5Sign(signStr, key), true);
-            if(signStr.equals(requestParam.getSign().toUpperCase())){
+    public static boolean verify(String signData, String signParam, String signType, String secKey) {
+        if(SignTypeEnum.MD5.getValue().equals(signType)){
+            signData = genMD5Sign(signData, secKey);
+            if(signData.equals(signParam)){
                 return true;
             }else{
                 return false;
             }
-        }else if(SignTypeEnum.RSA.getValue().equals(requestParam.getSign_type())){
-            return RSAUtil.verify(signStr, key, HEXUtil.decode(requestParam.getSign()), true);
+        }else if(SignTypeEnum.RSA.getValue().equals(signType)){
+            return RSAUtil.verify(signData, secKey, signParam, true);
         }else{
             return false;
         }
@@ -81,19 +89,28 @@ public class SignUtil {
         }
 
         String signStr = getSortedString(responseParam, false);
-        if(SignTypeEnum.MD5.getValue().equals(responseParam.getSign_type())){
-            signStr = HEXUtil.encode(genMD5Sign(signStr, key), true);
-        }else if(SignTypeEnum.RSA.getValue().equals(responseParam.getSign_type())){
-            signStr = HEXUtil.encode(RSAUtil.sign(signStr, key, true));
-        }else{
-            //抛出签名失败的异常
-            throw new ApiException("签名失败，未预期的签名类型："+responseParam.getSign_type());
-        }
-
-        responseParam.setSign(signStr);
+        responseParam.setSign(sign(signStr, responseParam.getSign_type(), key));
     }
 
-    protected static String getSortedString(Object obj, boolean ignoreEmpty){
+    /**
+     * 生成签名串
+     * @param signData
+     * @param signType
+     * @param secKey
+     * @return
+     */
+    public static String sign(String signData, String signType, String secKey){
+        if(SignTypeEnum.MD5.getValue().equals(signType)){
+            return genMD5Sign(signData, secKey);
+        }else if(SignTypeEnum.RSA.getValue().equals(signType)){
+            return RSAUtil.sign(signData, secKey, true);
+        }else{
+            //抛出签名失败的异常
+            throw new ApiException("签名失败，未预期的签名类型：" + signType);
+        }
+    }
+
+    public static String getSortedString(Object obj, boolean ignoreEmpty){
         Field[] fields = obj.getClass().getDeclaredFields();
 
         Map<String, Object> map = new HashMap<>();
@@ -139,8 +156,8 @@ public class SignUtil {
         return content.toString();
     }
 
-    private static byte[] genMD5Sign(String signStr, String key){
-        return MD5Util.getMD5(signStr + SIGN_SEPARATOR + SIGN_KEY_PARAM_NAME + SIGN_EQUAL + key);
+    private static String genMD5Sign(String signStr, String key){
+        return CodeUtil.base64Encode(MD5Util.getMD5(signStr + SIGN_SEPARATOR + SIGN_KEY_PARAM_NAME + SIGN_EQUAL + key));
     }
 
     public static void main(String[] args) throws Exception {
@@ -164,9 +181,9 @@ public class SignUtil {
         String signStr = getSortedString(requestParam, false);
 
         if(SignTypeEnum.MD5.getValue().equals(requestParam.getSign_type())){
-            signStr = HEXUtil.encode(genMD5Sign(signStr, secretKey), true);
+            signStr = genMD5Sign(signStr, secretKey);
         }else if(SignTypeEnum.RSA.getValue().equals(requestParam.getSign_type())){
-            signStr = HEXUtil.encode(RSAUtil.sign(signStr, secretKey, true));
+            signStr = RSAUtil.sign(signStr, secretKey, true);
         }else{
             signStr = "";
             System.out.println("未预期的签名类型："+requestParam.getSign_type());

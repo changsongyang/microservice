@@ -1,14 +1,7 @@
-package com.gw.api.gateway.filters.global;
+package org.study.api.gateway.filters.global;
 
-import com.gw.api.base.constants.CommonConst;
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.exceptions.ApiException;
-import com.gw.api.base.helpers.RequestHelper;
-import com.gw.api.base.params.APIParam;
-import com.gw.api.base.params.RequestParam;
-import com.gw.api.base.utils.JsonUtil;
-import com.gw.api.base.utils.StringUtil;
-import com.gw.api.gateway.config.conts.FilterOrder;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.support.BodyInserterContext;
@@ -22,6 +15,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.server.ServerWebExchange;
+import org.study.api.gateway.config.conts.FilterOrder;
+import org.study.common.api.constants.CommonConst;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.exceptions.ApiException;
+import org.study.common.api.helpers.RequestHelper;
+import org.study.common.api.params.APIParam;
+import org.study.common.api.params.RequestParam;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,17 +49,9 @@ public class RequestModifyFilter extends AbstractGlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         RequestParam requestParam = (RequestParam) exchange.getAttributes().get(CACHE_REQUEST_BODY_OBJECT_KEY);
-        boolean isBodyChange = false;
 
-        isBodyChange = secKeyDecrypt(requestParam);
-
-        if(! isBodyChange){
-            ServerHttpRequest request = exchange.getRequest().mutate()
-                    .header(CommonConst.REQUEST_HEADER_STORE_MCHNO_KEY, requestParam.getMch_no())
-                    .header(CommonConst.REQUEST_HEADER_STORE_SIGNTYPE_KEY, requestParam.getSign_type())
-                    .build();
-            return chain.filter(exchange.mutate().request(request).build());
-        }
+        secKeyDecrypt(requestParam);
+        modifyData(requestParam);
 
         //1.重新封装请求体
         HttpHeaders headers = new HttpHeaders();
@@ -109,6 +103,14 @@ public class RequestModifyFilter extends AbstractGlobalFilter {
             return true;
         }catch(Throwable ex){
             throw ApiException.acceptFail(BizCodeEnum.PARAM_VALID_FAIL.getCode(), "sec_key解密失败");
+        }
+    }
+
+    private void modifyData(RequestParam requestParam){
+        try{
+            requestParam.setData(JSON.parseObject(requestParam.getData().toString(), Feature.OrderedField));
+        }catch(Throwable ex){
+            throw ApiException.acceptFail(BizCodeEnum.PARAM_VALID_FAIL.getCode(), "data序列化失败，清确保为JSON格式，且没有特殊字符");
         }
     }
 }

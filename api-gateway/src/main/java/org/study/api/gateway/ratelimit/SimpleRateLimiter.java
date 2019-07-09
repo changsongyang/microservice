@@ -1,9 +1,10 @@
-package com.gw.api.gateway.ratelimit;
+package org.study.api.gateway.ratelimit;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @description 简易限流器

@@ -1,10 +1,9 @@
-package com.gw.api.base.vo;
+package org.study.common.api.vo;
 
 import com.alibaba.fastjson.JSON;
-import com.gw.api.base.constants.CommonConst;
-import com.gw.api.base.enums.BizCodeEnum;
-import com.gw.api.base.enums.RespCodeEnum;
-import com.gw.api.base.utils.RandomUtil;
+import org.study.common.api.enums.BizCodeEnum;
+import org.study.common.api.enums.RespCodeEnum;
+import org.study.common.util.utils.RandomUtil;
 
 /**
  * 响应给商户的VO，主要用作Controller的出参
@@ -13,7 +12,8 @@ import com.gw.api.base.utils.RandomUtil;
  */
 public class ResponseVo<T> {
     private String respCode;
-    private String respMsg;
+    private String bizCode;
+    private String bizMsg;
     private String mchNo;
     private T data;
     private String randStr;
@@ -22,9 +22,14 @@ public class ResponseVo<T> {
     private String secKey = "";
 
     public static <V> ResponseVo<V> success(String mchNo, String signType, V data) {
+        return success(mchNo, signType, BizCodeEnum.ACCEPT_SUCCESS.getCode(), BizCodeEnum.ACCEPT_SUCCESS.getMsg(), data);
+    }
+
+    public static <V> ResponseVo<V> success(String mchNo, String signType, String bizCode, String bizMsg, V data) {
         ResponseVo<V> vo = new ResponseVo();
         vo.setRespCode(RespCodeEnum.ACCEPT_SUCCESS.getCode());
-        vo.setRespMsg(RespCodeEnum.ACCEPT_SUCCESS.getMsg());
+        vo.setBizCode(bizCode);
+        vo.setBizMsg(bizMsg);
         vo.setMchNo(mchNo);
         vo.setData(data);
         vo.setRandStr(RandomUtil.get32LenStr());
@@ -32,53 +37,26 @@ public class ResponseVo<T> {
         return vo;
     }
 
-    public static ResponseVo<BizCodeVo> acceptFail(String mchNo, String signType, String bizMsg){
-        return acceptFail(mchNo, signType, "", bizMsg);
-    }
-
-    public static ResponseVo<BizCodeVo> acceptFail(String mchNo, String signType, String bizCode, String bizMsg){
-        ResponseVo<BizCodeVo> vo = new ResponseVo();
+    public static ResponseVo acceptFail(String mchNo, String signType, String bizCode, String bizMsg){
+        ResponseVo vo = new ResponseVo();
         vo.setRespCode(RespCodeEnum.ACCEPT_FAIL.getCode());
-        vo.setRespMsg(RespCodeEnum.ACCEPT_FAIL.getMsg());
+        vo.setBizCode(bizCode);
+        vo.setBizMsg(bizMsg);
         vo.setMchNo(mchNo);
         vo.setRandStr(RandomUtil.get32LenStr());
         vo.setSignType(signType);
-
-        BizCodeVo codeVo = new BizCodeVo();
-        codeVo.setBiz_code(bizCode);
-        codeVo.setBiz_msg(bizMsg);
-        vo.setData(codeVo);
         return vo;
     }
 
-    public static <V> ResponseVo<V> acceptFail(String mchNo, String signType, V data){
-        ResponseVo<V> vo = new ResponseVo();
-        vo.setRespCode(RespCodeEnum.ACCEPT_FAIL.getCode());
-        vo.setRespMsg(RespCodeEnum.ACCEPT_FAIL.getMsg());
-        vo.setMchNo(mchNo);
-        vo.setRandStr(RandomUtil.get32LenStr());
-        vo.setSignType(signType);
-        vo.setData(data);
-        return vo;
-    }
-
-    public static ResponseVo<BizCodeVo> acceptUnknown(String mchNo, String signType){
+    public static ResponseVo acceptUnknown(String mchNo, String signType){
         ResponseVo vo = new ResponseVo();
         vo.setRespCode(RespCodeEnum.ACCEPT_UNKNOWN.getCode());
-        vo.setRespMsg(RespCodeEnum.ACCEPT_UNKNOWN.getMsg());
+        vo.setBizCode(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+        vo.setBizMsg(RespCodeEnum.ACCEPT_UNKNOWN.getMsg());
         vo.setMchNo(mchNo);
         vo.setRandStr(RandomUtil.get32LenStr());
         vo.setSignType(signType);
-
-        BizCodeVo codeVo = new BizCodeVo();
-        codeVo.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
-        codeVo.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
-        vo.setData(codeVo);
         return vo;
-    }
-
-    public void joinSecKey(String secretKey, String iv){
-        this.secKey = secretKey + CommonConst.SEC_KEY_SEPARATOR + iv;
     }
 
     public String getRespCode() {
@@ -89,12 +67,20 @@ public class ResponseVo<T> {
         this.respCode = respCode;
     }
 
-    public String getRespMsg() {
-        return respMsg;
+    public String getBizCode() {
+        return bizCode;
     }
 
-    public void setRespMsg(String respMsg) {
-        this.respMsg = respMsg;
+    public void setBizCode(String bizCode) {
+        this.bizCode = bizCode;
+    }
+
+    public String getBizMsg() {
+        return bizMsg;
+    }
+
+    public void setBizMsg(String bizMsg) {
+        this.bizMsg = bizMsg;
     }
 
     public String getMchNo() {

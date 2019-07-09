@@ -1,4 +1,4 @@
-package org.study.common.api.utils;
+package org.study.common.util.utils;
 
 import java.util.Base64;
 
