@@ -28,15 +28,25 @@
             <artifactId>common-util</artifactId>
             <version>${projectVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>common-api</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <dependency> <!-- 需要使用nacos作为注册中心时引入 -->
+        <dependency> <!-- 需要使用nacos作为配置中心时引入 -->
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
         </dependency>
     </dependencies>
 </project>

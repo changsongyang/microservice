@@ -1,33 +1,40 @@
 package org.study.demo.gateway.backend.vo;
 
-import java.io.Serializable;
+public class DetailVo {
+    private String detailNo;
+    private String name;
+    private Integer count;
+    private String amount;
 
-public class DetailVo implements Serializable {
-    private String cnName;
-    private String enName;
-    private Integer num;
-
-    public String getCnName() {
-        return cnName;
+    public String getDetailNo() {
+        return detailNo;
     }
 
-    public void setCnName(String cnName) {
-        this.cnName = cnName;
+    public void setDetailNo(String detailNo) {
+        this.detailNo = detailNo;
     }
 
-    public String getEnName() {
-        return enName;
+    public String getName() {
+        return name;
     }
 
-    public void setEnName(String enName) {
-        this.enName = enName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Integer getNum() {
-        return num;
+    public Integer getCount() {
+        return count;
     }
 
-    public void setNum(Integer num) {
-        this.num = num;
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 }

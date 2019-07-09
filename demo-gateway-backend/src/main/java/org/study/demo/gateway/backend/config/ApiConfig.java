@@ -1,10 +1,7 @@
 package org.study.demo.gateway.backend.config;
 
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.study.demo.gateway.backend.MyInterceptor;
 
 /**
  * API项目的配置类，需要在@SpringBootApplication中增加此模块的包扫描才能起作用
@@ -15,10 +12,10 @@ import org.study.demo.gateway.backend.MyInterceptor;
 @SpringBootConfiguration
 public class ApiConfig extends WebMvcConfigurerAdapter {
 
-    @Bean
-    public MyInterceptor myInterceptor(){
-        return new MyInterceptor();
-    }
+//    @Bean
+//    public MyInterceptor myInterceptor(){
+//        return new MyInterceptor();
+//    }
 
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
