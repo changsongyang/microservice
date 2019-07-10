@@ -46,7 +46,7 @@ for($i=1; $i<=1; $i++){
 
     $itemName = str_pad($i, 5, "0", STR_PAD_LEFT);
     $detail->setDetailNo($detailNo . $itemName);
-    $detail->setName("明细" . $itemName);
+    $detail->setName("明细明细明细明细明细明细明细明细abcdefghijklmnopqrstuvwxyz" . $itemName);
     $detail->setCount(1);
     $detail->setAmount($amount);
 
