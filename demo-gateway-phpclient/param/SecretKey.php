@@ -1,10 +1,14 @@
 <?php
 namespace param;
 
-
+/**
+ * 密钥类
+ * Class SecretKey
+ * @package param
+ */
 class SecretKey {
     /**
-     * 必填：发送请求时用以签名的密钥
+     * 必填：发送请求时用以签名的私钥
      */
     private $reqSignPriKey;
     /**
@@ -16,7 +20,7 @@ class SecretKey {
      */
     private $secKeyEncryptPubKey;
     /**
-     * 选填：响应时，对ec_key进行解密密的密钥
+     * 选填：响应时，对ec_key进行解密的私钥
      */
     private $secKeyDecryptPriKey;
 

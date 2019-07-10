@@ -1,6 +1,11 @@
 <?php
 namespace param;
 
+/**
+ * 请求参数类
+ * Class RequestParam
+ * @package param
+ */
 class RequestParam{
     public $method;
     public $version;

@@ -3,8 +3,19 @@
 
 namespace utils;
 
-
+/**
+ * http工具类
+ * Class HttpUtil
+ * @package utils
+ */
 class HttpUtil {
+
+    /**
+     * 以post方式发起http请求，请求参数为json格式
+     * @param string $url
+     * @param string $jsonData
+     * @return bool|string
+     */
     public static function postJsonSync(string $url, string $jsonData){
         $curl = curl_init();
         //设置抓取的url
@@ -18,6 +29,10 @@ class HttpUtil {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         //设置post方式提交
         curl_setopt($curl, CURLOPT_POST, 1);
+        //设置连接超时时间(秒)
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+        //设置超时时间(秒)
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
         //执行命令
         $data = curl_exec($curl);
         curl_close($curl);

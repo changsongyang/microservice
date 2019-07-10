@@ -1,4 +1,8 @@
 <?php
+/**
+ * 测试入口类
+ */
+
 require "Autoload.php";
 
 use param\RequestParam;
@@ -10,6 +14,8 @@ use vo\DetailVo;
 use vo\BatchVo;
 
 $aesKey = RandomUtil::randomStr(16);
+$iv = RandomUtil::randomStr(16);
+
 $md5Key = "12345678qwertyui";
 $sysPublicKey = '-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCCD1PquVQz6inIH66ZMndawRmihQ/4GLX/nHieaX8Htu5NZcn2hB3OZe+rk05AJgcUuUhkNqxhtkArOJJdhxxdF4BNFSQ70Zx9APuda4GgwGnpiA5yJey9awmsmUUS/k4KkQX6bLJWvbKz7TEa5Z6NDD7UBoYu6uFqZH+AL51IlQIDAQAB
@@ -31,8 +37,7 @@ $totalCount = 0;
 $totalAmount = 0;
 
 $details = [];
-
-for($i=1; $i<=10; $i++){
+for($i=1; $i<=1; $i++){
     $amount = 1.02;
 
     $detail = new DetailVo();
@@ -44,7 +49,7 @@ for($i=1; $i<=10; $i++){
     $detail->setAmount($amount);
 
     //加密
-    $detail->setName(AESUtil::encryptECB($detail->getName(), $aesKey));
+    $detail->setName(AESUtil::encryptECB($detail->getName(), $aesKey, $iv));
 
     $totalCount = $totalCount + $detail->getCount();
     $totalAmount = $totalAmount + $amount;
@@ -83,5 +88,10 @@ if("1" == $request->getSign()){
 }
 
 $url = "127.0.0.1:8099/test";
-$response = RequestUtil::doRequest($url, $request, $secretKey);
-print_r($response);
+try{
+    $response = RequestUtil::doRequest($url, $request, $secretKey);
+    print_r($response);
+}catch(Exception $e){
+    print_r($e);
+}
+

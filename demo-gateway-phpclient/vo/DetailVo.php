@@ -1,6 +1,11 @@
 <?php
 namespace vo;
 
+/**
+ * 样例VO，模拟批量交易的明细业务对象
+ * Class DetailVo
+ * @package vo
+ */
 class DetailVo implements \JsonSerializable {
     private $detail_no;
     private $name;

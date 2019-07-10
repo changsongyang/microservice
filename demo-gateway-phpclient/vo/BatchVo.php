@@ -1,6 +1,11 @@
 <?php
 namespace vo;
 
+/**
+ * 样例VO，模拟批量交易的批次业务对象
+ * Class BatchVo
+ * @package vo
+ */
 class BatchVo implements \JsonSerializable {
     private $batch_no;
     private $total_count;

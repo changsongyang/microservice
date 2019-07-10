@@ -1,6 +1,11 @@
 <?php
 namespace param;
 
+/**
+ * 响应参数类
+ * Class ResponseParam
+ * @package param
+ */
 class ResponseParam{
     private $resp_code;
     private $biz_code;
