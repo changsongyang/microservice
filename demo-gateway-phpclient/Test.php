@@ -1,6 +1,8 @@
 <?php
 /**
  * 测试入口类
+ *
+ * PHP VERSION = PHP 7.2.20
  */
 
 require "Autoload.php";

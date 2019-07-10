@@ -16,13 +16,6 @@ import java.util.*;
 public class TestUtil {
 
     public static void main(String[] args){
-
-        String testKey = "JNJqExBv3uikdbl5";
-        String encryed = AESUtil.encryptECB("发的发生的211fsdfds", testKey);
-        System.out.println(encryed);
-        System.out.println(AESUtil.decryptECB(encryed, testKey));
-        System.exit(1);
-
         String aesKey = RandomUtil.get16LenStr();
 
         String md5Key = "12345678qwertyui";
