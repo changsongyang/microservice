@@ -9,6 +9,7 @@ import org.study.common.api.vo.RequestVo;
 import org.study.common.api.vo.ResponseVo;
 import org.study.common.util.utils.AESUtil;
 import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.RandomUtil;
 import org.study.demo.gateway.backend.vo.BatchVo;
 import org.study.demo.gateway.backend.vo.DetailVo;
 import org.study.demo.gateway.backend.vo.ProductVo;
@@ -37,7 +38,15 @@ public class DemoController {
         }
         log.info("处理后 RequestVo = {}", JsonUtil.toString(requestVo));
 
-        return ResponseVo.success(requestVo.getMchNo(), requestVo.getSignType(), requestVo.getData());
+        //重新加密返回给客户端，用以测试客户端解密是否正常
+        String newSecKey = RandomUtil.get16LenStr();
+        for(DetailVo detail : requestVo.getData().getDetails()){
+            detail.setName(AESUtil.encryptECB(detail.getName() + "_return", newSecKey));
+        }
+
+        ResponseVo responseVo = ResponseVo.success(requestVo.getMchNo(), requestVo.getSignType(), requestVo.getData());
+        responseVo.setSecKey(newSecKey);
+        return responseVo;
     }
 
 }

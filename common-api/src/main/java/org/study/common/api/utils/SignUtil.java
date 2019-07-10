@@ -33,7 +33,7 @@ public class SignUtil {
      * @return
      */
     public static boolean verify(CallBackRespVo respVo, String secKey){
-        String signData = getSortedString(respVo, true);
+        String signData = getSortedString(respVo, false);
         return verify(signData, respVo.getSign(), respVo.getSign_type(), secKey);
     }
 

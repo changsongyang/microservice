@@ -28,7 +28,7 @@ public class FallbackController {
 
         //因为调用后端服务超时的时候也会进入fallback，此时，我们并不知道业务处理结果，所以，统一返回"受理未知"响应信息
         ResponseParam responseParam = ResponseParam.acceptUnknown(mchNo);
-        responseParam.setBiz_msg("SERVICE UNAVAILABLE");
+        responseParam.setBiz_msg(responseParam.getBiz_msg() + ", SERVICE BUSY");
         responseParam.setSign_type(signType);
         return Mono.just(responseParam);
     }

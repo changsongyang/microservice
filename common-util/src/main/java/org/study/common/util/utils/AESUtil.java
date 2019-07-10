@@ -3,10 +3,7 @@ package org.study.common.util.utils;
 import org.study.common.statics.exceptions.BizException;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
 
 /**
  * AES加解密工具类
@@ -20,8 +17,8 @@ public class AESUtil {
 
     public static String encryptECB(String content, String secKey){
         try {
-            SecretKeySpec secSpec = genSecretKeySpec(secKey);
             Cipher cipher = Cipher.getInstance(ECB_MODE);
+            SecretKeySpec secSpec = genSecretKeySpec(secKey);
             cipher.init(Cipher.ENCRYPT_MODE, secSpec);
             byte[] encrypted = cipher.doFinal(content.getBytes(ENCODING_UTF_8));
             return CodeUtil.base64Encode(encrypted);
@@ -32,8 +29,8 @@ public class AESUtil {
 
     public static String decryptECB(String content, String secKey){
         try {
-            SecretKeySpec secSpec = genSecretKeySpec(secKey);
             Cipher cipher = Cipher.getInstance(ECB_MODE);
+            SecretKeySpec secSpec = genSecretKeySpec(secKey);
             cipher.init(Cipher.DECRYPT_MODE, secSpec);
             byte[] encrypted1 = CodeUtil.base64Decode(content);
             byte[] original = cipher.doFinal(encrypted1);
@@ -53,12 +50,6 @@ public class AESUtil {
         if (secKey == null || (secKey.length() != 16 && secKey.length() != 32)) {
             throw new BizException("密钥长度须为16或32位");
         }
-        KeyGenerator kGen = KeyGenerator.getInstance(ALG_AES);
-        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
-        secureRandom.setSeed(secKey.getBytes());
-        kGen.init(secKey.length()==16 ? 128 : 256, secureRandom);
-        SecretKey secretKey = kGen.generateKey();
-        byte[] enCodeFormat = secretKey.getEncoded();
-        return new SecretKeySpec(enCodeFormat, ALG_AES);
+        return new SecretKeySpec(secKey.getBytes(ENCODING_UTF_8), ALG_AES);
     }
 }

@@ -23,7 +23,11 @@ public class ResponseUtil {
             response.setResp_code(RespCodeEnum.ACCEPT_UNKNOWN.getCode());
         }
         if(StringUtil.isEmpty(response.getBiz_code())){
-            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
+            response.setBiz_code(BizCodeEnum.ACCEPT_UNKNOWN.getCode());
+
+            if(StringUtil.isEmpty(response.getBiz_msg())){
+                response.setBiz_msg(BizCodeEnum.ACCEPT_UNKNOWN.getMsg());
+            }
         }
     }
 
