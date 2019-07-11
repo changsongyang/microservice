@@ -80,7 +80,9 @@ public class RequestParamCheckFilter extends AbstractGlobalFilter {
             return "sign 为空！";
         }
 
-        if(StringUtil.isLengthOver(requestParam.getMethod(), 64)){
+        if(! (requestParam.getData() instanceof String)){
+            return "data 只能是string类型！";
+        }else if(StringUtil.isLengthOver(requestParam.getMethod(), 64)){
             return "method 的长度不能超过64！";
         }else if(StringUtil.isLengthOver(requestParam.getVersion(), 5)){
             return "version 的长度不能超过5！";

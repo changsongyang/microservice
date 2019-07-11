@@ -18,6 +18,16 @@ class ResponseParam{
     private $sec_key;
 
     /**
+     * 魔术方法，通用的setter方法，可以给所有属性赋值
+     * @param $name
+     * @param $value
+     */
+    public function __set($name, $value) {
+        $this->$name = $value;
+    }
+
+
+    /**
      * @return mixed
      */
     public function getRespCode()
@@ -28,7 +38,7 @@ class ResponseParam{
     /**
      * @param mixed $resp_code
      */
-    public function setRespCode($resp_code)
+    public function setRespCode($resp_code): void
     {
         $this->resp_code = $resp_code;
     }
@@ -44,7 +54,7 @@ class ResponseParam{
     /**
      * @param mixed $biz_code
      */
-    public function setBizCode($biz_code)
+    public function setBizCode($biz_code): void
     {
         $this->biz_code = $biz_code;
     }
@@ -60,7 +70,7 @@ class ResponseParam{
     /**
      * @param mixed $biz_msg
      */
-    public function setBizMsg($biz_msg)
+    public function setBizMsg($biz_msg): void
     {
         $this->biz_msg = $biz_msg;
     }
@@ -76,7 +86,7 @@ class ResponseParam{
     /**
      * @param mixed $mch_no
      */
-    public function setMchNo($mch_no)
+    public function setMchNo($mch_no): void
     {
         $this->mch_no = $mch_no;
     }
@@ -92,7 +102,7 @@ class ResponseParam{
     /**
      * @param mixed $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }
@@ -108,7 +118,7 @@ class ResponseParam{
     /**
      * @param mixed $rand_str
      */
-    public function setRandStr($rand_str)
+    public function setRandStr($rand_str): void
     {
         $this->rand_str = $rand_str;
     }
@@ -124,7 +134,7 @@ class ResponseParam{
     /**
      * @param mixed $sign_type
      */
-    public function setSignType($sign_type)
+    public function setSignType($sign_type): void
     {
         $this->sign_type = $sign_type;
     }
@@ -140,7 +150,7 @@ class ResponseParam{
     /**
      * @param mixed $sign
      */
-    public function setSign($sign)
+    public function setSign($sign): void
     {
         $this->sign = $sign;
     }
@@ -156,7 +166,7 @@ class ResponseParam{
     /**
      * @param mixed $sec_key
      */
-    public function setSecKey($sec_key)
+    public function setSecKey($sec_key): void
     {
         $this->sec_key = $sec_key;
     }

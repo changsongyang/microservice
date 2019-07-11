@@ -60,7 +60,7 @@ public class TestUtil {
         request.setMch_no("888000000000000");
         request.setSign_type(SignTypeEnum.RSA.getValue());
         request.setRand_str(RandomUtil.get32LenStr());
-        request.setData(JsonUtil.toString(batchVo));
+        request.setData(JsonUtil.toString(batchVo));//设置json格式字符串
         request.setSec_key(aesKey);//rsa有效
 
         final SecretKey key = new SecretKey();

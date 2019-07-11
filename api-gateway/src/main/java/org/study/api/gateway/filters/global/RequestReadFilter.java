@@ -65,7 +65,7 @@ public class RequestReadFilter extends AbstractGlobalFilter{
                         return ServerRequest.create(mutatedExchange, messageReaders)
                                 .bodyToMono(String.class)
                                 .doOnNext(objectValue -> {
-                                    RequestParam requestParam = JsonUtil.toBeanOrderly(objectValue, RequestParam.class);
+                                    RequestParam requestParam = JsonUtil.toBean(objectValue, RequestParam.class);
                                     exchange.getAttributes().put(CACHE_REQUEST_BODY_OBJECT_KEY, requestParam);
                                 }).then(chain.filter(mutatedExchange));
                     });

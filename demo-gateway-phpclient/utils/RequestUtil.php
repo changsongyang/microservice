@@ -103,35 +103,13 @@ class RequestUtil{
      * @param string $respJson
      */
     private static function fillResponse(ResponseParam &$response, string $respJson){
-        $arr = get_object_vars(json_decode($respJson));
+        $arr = json_decode($respJson, true);
 
         if($arr && is_array($arr)){
-            if(isset($arr['resp_code'])){
-                $response->setRespCode($arr['resp_code']);
-            }
-            if(isset($arr['biz_code'])){
-                $response->setBizCode($arr['biz_code']);
-            }
-            if(isset($arr['biz_msg'])){
-                $response->setBizMsg($arr['biz_msg']);
-            }
-            if(isset($arr['mch_no'])){
-                $response->setMchNo($arr['mch_no']);
-            }
-            if(isset($arr['data'])){
-                $response->setData($arr['data']);
-            }
-            if(isset($arr['rand_str'])){
-                $response->setRandStr($arr['rand_str']);
-            }
-            if(isset($arr['sign_type'])){
-                $response->setSignType($arr['sign_type']);
-            }
-            if(isset($arr['sign'])){
-                $response->setSign($arr['sign']);
-            }
-            if(isset($arr['sec_key'])){
-                $response->setSecKey($arr['sec_key']);
+            foreach($arr as $key => $value) {
+                if(property_exists($response, $key)) {
+                    $response->$key = $value;
+                }
             }
         }
     }

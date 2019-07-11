@@ -108,9 +108,10 @@ public class RequestModifyFilter extends AbstractGlobalFilter {
 
     private void modifyData(RequestParam requestParam){
         try{
-            requestParam.setData(JSON.parseObject(requestParam.getData().toString(), Feature.OrderedField));
+        	//把string类型的data转换成JSONObject，是为了让后端服务能够实现参数自动注入
+            requestParam.setData(JSON.parseObject((String) requestParam.getData()));
         }catch(Throwable ex){
-            throw ApiException.acceptFail(BizCodeEnum.PARAM_VALID_FAIL.getCode(), "data序列化失败，清确保为JSON格式，且没有特殊字符");
+            throw ApiException.acceptFail(BizCodeEnum.PARAM_VALID_FAIL.getCode(), "data序列化失败，请确保为JSON格式，且没有特殊字符");
         }
     }
 }
