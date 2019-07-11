@@ -47,8 +47,8 @@ public class AESUtil {
      * @throws Exception
      */
     public static SecretKeySpec genSecretKeySpec(String secKey) throws Exception {
-        if (secKey == null || (secKey.length() != 16 && secKey.length() != 32)) {
-            throw new BizException("密钥长度须为16或32位");
+        if (secKey == null || (secKey.length() != 16)) {
+            throw new BizException("密钥长度须为16位");
         }
         return new SecretKeySpec(secKey.getBytes(ENCODING_UTF_8), ALG_AES);
     }

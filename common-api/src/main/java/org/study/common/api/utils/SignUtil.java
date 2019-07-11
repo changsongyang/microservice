@@ -65,7 +65,7 @@ public class SignUtil {
                 return false;
             }
         }else if(SignTypeEnum.RSA.getValue().equals(signType)){
-            return RSAUtil.verify(signData, secKey, signParam, true);
+            return RSAUtil.verify(signData, secKey, signParam);
         }else{
             return false;
         }
@@ -103,7 +103,7 @@ public class SignUtil {
         if(SignTypeEnum.MD5.getValue().equals(signType)){
             return genMD5Sign(signData, secKey);
         }else if(SignTypeEnum.RSA.getValue().equals(signType)){
-            return RSAUtil.sign(signData, secKey, true);
+            return RSAUtil.sign(signData, secKey);
         }else{
             //抛出签名失败的异常
             throw new ApiException("签名失败，未预期的签名类型：" + signType);
@@ -183,7 +183,7 @@ public class SignUtil {
         if(SignTypeEnum.MD5.getValue().equals(requestParam.getSign_type())){
             signStr = genMD5Sign(signStr, secretKey);
         }else if(SignTypeEnum.RSA.getValue().equals(requestParam.getSign_type())){
-            signStr = RSAUtil.sign(signStr, secretKey, true);
+            signStr = RSAUtil.sign(signStr, secretKey);
         }else{
             signStr = "";
             System.out.println("未预期的签名类型："+requestParam.getSign_type());

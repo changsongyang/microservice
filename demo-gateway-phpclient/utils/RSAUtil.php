@@ -70,7 +70,7 @@ class RSAUtil
         }
 
         $binary_signature = '';
-        $isSuccess = openssl_sign($data, $binary_signature, $priKey);
+        $isSuccess = openssl_sign($data, $binary_signature, $priKey, OPENSSL_ALGO_MD5);
         openssl_free_key($priKey);
         if(! $isSuccess){
             throw new BizException(BizException::BIZ_ERROR, "rsa签名失败");
@@ -92,7 +92,8 @@ class RSAUtil
             throw new BizException(BizException::BIZ_ERROR, "rsa验签公钥无效");
         }
 
-        $isMatch = openssl_verify($signData, base64_decode($signParam), $pubKey) === 1;
+        $signParam = base64_decode($signParam);
+        $isMatch = openssl_verify($signData, $signParam, $pubKey, OPENSSL_ALGO_MD5) === 1;
         openssl_free_key($pubKey);
         return $isMatch;
     }
