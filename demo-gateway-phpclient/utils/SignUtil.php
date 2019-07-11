@@ -84,7 +84,7 @@ class SignUtil {
             }
 
             if($value === null){
-                $value = 'null';
+                $value = '';
             }
 
             if($i !== 0){

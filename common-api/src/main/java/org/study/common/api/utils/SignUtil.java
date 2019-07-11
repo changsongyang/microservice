@@ -110,7 +110,7 @@ public class SignUtil {
         }
     }
 
-    public static String getSortedString(Object obj, boolean ignoreEmpty){
+    public static String getSortedString(Object obj){
         Field[] fields = obj.getClass().getDeclaredFields();
 
         Map<String, Object> map = new HashMap<>();
@@ -130,8 +130,8 @@ public class SignUtil {
                 throw new RuntimeException(e);
             }
 
-            if(ignoreEmpty && StringUtil.isEmpty(value)){//忽略空值
-                continue;
+            if(value == null){
+                value = "";
             }
             map.put(name, value);
         }
