@@ -12,6 +12,7 @@ function autoload(){
     require "param/SecretKey.php";
     require "utils/AESUtil.php";
     require "utils/HttpUtil.php";
+    require "utils/MD5Util.php";
     require "utils/RandomUtil.php";
     require "utils/RequestUtil.php";
     require "utils/RSAUtil.php";
