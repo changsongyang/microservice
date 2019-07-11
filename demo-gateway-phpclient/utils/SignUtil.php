@@ -23,7 +23,7 @@ class SignUtil {
      */
     public static function sign(string $signData, string $signType, string $secKey){
         if("1" === $signType){
-            return base64_encode(md5($signData . self::MS5_BOUND_SYMBOL . $secKey, true));
+            return MD5Util::getMd5Str($signData . self::MS5_BOUND_SYMBOL . $secKey);
         }else if("2" === $signType){
             return RSAUtil::sign($signData, $secKey);
         }else{
@@ -42,7 +42,7 @@ class SignUtil {
      */
     public static function verify(string $signData, string $signParam, string $signType, string $secKey){
         if("1" === $signType){
-            $signData = base64_encode(md5($signData . self::MS5_BOUND_SYMBOL . $secKey, true));
+            $signData = MD5Util::getMd5Str($signData . self::MS5_BOUND_SYMBOL . $secKey);
             return $signData === $signParam;
         }else if("2" === $signType){
             return RSAUtil::verify($signData, $signParam, $secKey);
