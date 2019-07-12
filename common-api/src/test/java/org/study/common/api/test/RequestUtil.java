@@ -33,7 +33,7 @@ public class RequestUtil {
         requestParamValid(request, secretKey);
 
         try{
-            String signStr = SignUtil.getSortedString(request, false);
+            String signStr = SignUtil.getSortedString(request);
             signStr = SignUtil.sign(signStr, request.getSign_type(), secretKey.getReqSignPriKey());
             request.setSign(signStr);
         }catch(Exception e){
@@ -56,13 +56,13 @@ public class RequestUtil {
 
         ResponseParam response = null;
         try{
-            response = JsonUtil.toBeanOrderly(respJson, ResponseParam.class);
+            response = JsonUtil.toBean(respJson, ResponseParam.class);
         }catch (Exception e){
             throw new BizException("请求完成，但响应信息转换失败: "+e.getMessage() + "，respJson="+respJson, e);
         }
 
         try{
-            String signStr = SignUtil.getSortedString(response, false);
+            String signStr = SignUtil.getSortedString(response);
             boolean isOk = SignUtil.verify(signStr, response.getSign(), response.getSign_type(), secretKey.getRespVerifyPubKey());
             if(!isOk){
                 throw new BizException("响应信息验签不通过！");

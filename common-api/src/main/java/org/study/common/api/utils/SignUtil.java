@@ -33,7 +33,7 @@ public class SignUtil {
      * @return
      */
     public static boolean verify(CallBackRespVo respVo, String secKey){
-        String signData = getSortedString(respVo, false);
+        String signData = getSortedString(respVo);
         return verify(signData, respVo.getSign(), respVo.getSign_type(), secKey);
     }
 
@@ -44,7 +44,7 @@ public class SignUtil {
      * @return
      */
     public static boolean verify(RequestParam requestParam, String secKey){
-        String signData = getSortedString(requestParam, false);
+        String signData = getSortedString(requestParam);
         return verify(signData, requestParam.getSign(), requestParam.getSign_type(), secKey);
     }
 
@@ -88,7 +88,7 @@ public class SignUtil {
             responseParam.setRand_str(RandomUtil.get32LenStr());
         }
 
-        String signStr = getSortedString(responseParam, false);
+        String signStr = getSortedString(responseParam);
         responseParam.setSign(sign(signStr, responseParam.getSign_type(), key));
     }
 
@@ -178,7 +178,7 @@ public class SignUtil {
         dataMap.put("price", "28000");
         requestParam.setData(JsonUtil.toString(dataMap));
 
-        String signStr = getSortedString(requestParam, false);
+        String signStr = getSortedString(requestParam);
 
         if(SignTypeEnum.MD5.getValue().equals(requestParam.getSign_type())){
             signStr = genMD5Sign(signStr, secretKey);
