@@ -412,25 +412,25 @@ public class EsClient {
         }
     }
 
-    private void fillEsAggResult(EsAggResult aggrResult, String groupValue, Iterator<Aggregation> iterator){
+    private void fillEsAggResult(EsAggResult aggResult, String groupValue, Iterator<Aggregation> iterator){
         while(iterator.hasNext()) {
             Aggregation agg = iterator.next();
             String fieldName = splitFieldName(agg.getName());
 
             org.study.starter.dto.Aggregation aggr;
             if(groupValue == null){
-                aggr = aggrResult.getAggMap().get(fieldName);
+                aggr = aggResult.getAggMap().get(fieldName);
                 if (aggr == null) {
                     aggr = new org.study.starter.dto.Aggregation();
-                    aggrResult.getAggMap().put(fieldName, aggr);
+                    aggResult.getAggMap().put(fieldName, aggr);
                 }
             }else{
-                Map<String, org.study.starter.dto.Aggregation> aggMap = aggrResult.getAggGroupMap().get(fieldName);
+                Map<String, org.study.starter.dto.Aggregation> aggMap = aggResult.getAggGroupMap().get(fieldName);
                 if(aggMap == null){
                     aggr = new org.study.starter.dto.Aggregation();
                     aggMap = new HashMap<>();
                     aggMap.put(groupValue, aggr);
-                    aggrResult.getAggGroupMap().put(fieldName, aggMap);
+                    aggResult.getAggGroupMap().put(fieldName, aggMap);
                 }else if((aggr = aggMap.get(groupValue)) == null){
                     aggr = new org.study.starter.dto.Aggregation();
                     aggMap.put(groupValue, aggr);
