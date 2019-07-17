@@ -1,7 +1,5 @@
 package org.study.starter.dto;
 
-import org.study.common.statics.exceptions.BizException;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,10 +10,10 @@ import java.util.Map;
  */
 public class EsQuery implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final int INI_PARAM_MAP_CAP = 8;//参数的初始容量
 
-    private String index;
-    private String type;
-    private String groupBy;
+    private String index;//一张表就是一个index
+    private String groupBy;//仅在统计时有用
     private String orderBy;
     private String returnClassName;
 
@@ -26,14 +24,16 @@ public class EsQuery implements Serializable {
     private int pageSize = 10;
 
     private String[] selectFields;
-    private Map<String, Object> eqMap;
-    private Map<String, Object> gtMap;
-    private Map<String, Object> gteMap;
-    private Map<String, Object> ltMap;
-    private Map<String, Object> lteMap;
-    private Map<String, Object> likeMap;
-    private Map<String, Object[]> inMap;
-    private Map<String, StatisField> statisFieldMap;
+    private Map<String, Object> eqMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> neqMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> gtMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> gteMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> ltMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> lteMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object> likeMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object[]> inMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Object[]> notInMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, StatisField> statisFieldMap = new HashMap(INI_PARAM_MAP_CAP);
 
     public static EsQuery build(){
         return new EsQuery();
@@ -60,25 +60,24 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 查询数据源
-     * @param index
-     * @return
-     */
-    public EsQuery from(String index, String type){
-        this.index = index;
-        this.type = type;
-        return this;
-    }
-
-    /**
      * 等于(精确匹配)
      * @param field
      * @param value
      * @return
      */
     public EsQuery eq(String field, Object value){
-        initMapIfNeed(MapType.EQ_MAP);
         this.eqMap.put(field, value);
+        return this;
+    }
+
+    /**
+     * 不等于(精确匹配)
+     * @param field
+     * @param value
+     * @return
+     */
+    public EsQuery neq(String field, Object value){
+        this.neqMap.put(field, value);
         return this;
     }
 
@@ -89,7 +88,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gt(String field, Object value){
-        initMapIfNeed(MapType.GT_MAP);
+        this.gtMap.put(field, value);
         return this;
     }
 
@@ -100,7 +99,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gte(String field, Object value){
-        initMapIfNeed(MapType.GTE_MAP);
+        this.gteMap.put(field, value);
         return this;
     }
 
@@ -111,7 +110,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lt(String field, Object value){
-        initMapIfNeed(MapType.LT_MAP);
+        this.ltMap.put(field, value);
         return this;
     }
 
@@ -122,7 +121,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lte(String field, Object value){
-        initMapIfNeed(MapType.LTE_MAP);
+        this.lteMap.put(field, value);
         return this;
     }
 
@@ -140,14 +139,24 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 等同于sql的in查询
+     * 等同于sql的 in(...) 查询
      * @param field
      * @param values
      * @return
      */
     public EsQuery in(String field, Collection values){
-        initMapIfNeed(MapType.IN_MAP);
         this.inMap.put(field, values.toArray());
+        return this;
+    }
+
+    /**
+     * 等同于sql的 not in(...) 查询
+     * @param field
+     * @param values
+     * @return
+     */
+    public EsQuery notIn(String field, Collection values){
+        this.notInMap.put(field, values.toArray());
         return this;
     }
 
@@ -158,7 +167,6 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery like(String field, Object value){
-        initMapIfNeed(MapType.LIKE_MAP);
         this.likeMap.put(field, value);
         return this;
     }
@@ -219,7 +227,7 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 分组
+     * 分组，仅在统计时有用
      * @param fields
      * @return
      */
@@ -286,32 +294,12 @@ public class EsQuery implements Serializable {
     }
 
 
-
-
-
-
     public String getIndex() {
         return index;
     }
 
     public void setIndex(String index) {
         this.index = index;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Map<String, StatisField> getStatisFieldMap() {
-        return statisFieldMap;
-    }
-
-    public void setStatisFieldMap(Map<String, StatisField> statisFieldMap) {
-        this.statisFieldMap = statisFieldMap;
     }
 
     public String getGroupBy() {
@@ -342,8 +330,8 @@ public class EsQuery implements Serializable {
         return isScroll;
     }
 
-    public void setIsScroll(boolean isScroll) {
-        this.isScroll = isScroll;
+    public void setIsScroll(boolean scroll) {
+        isScroll = scroll;
     }
 
     public String getScrollId() {
@@ -394,6 +382,14 @@ public class EsQuery implements Serializable {
         this.eqMap = eqMap;
     }
 
+    public Map<String, Object> getNeqMap() {
+        return neqMap;
+    }
+
+    public void setNeqMap(Map<String, Object> neqMap) {
+        this.neqMap = neqMap;
+    }
+
     public Map<String, Object> getGtMap() {
         return gtMap;
     }
@@ -426,14 +422,6 @@ public class EsQuery implements Serializable {
         this.lteMap = lteMap;
     }
 
-    public Map<String, Object[]> getInMap() {
-        return inMap;
-    }
-
-    public void setInMap(Map<String, Object[]> inMap) {
-        this.inMap = inMap;
-    }
-
     public Map<String, Object> getLikeMap() {
         return likeMap;
     }
@@ -442,90 +430,31 @@ public class EsQuery implements Serializable {
         this.likeMap = likeMap;
     }
 
-    private void initMapIfNeed(int type){
-        boolean isEmpty = true;
-        switch (type){
-            case MapType.EQ_MAP:
-                isEmpty = eqMap == null;
-                break;
-            case MapType.GT_MAP:
-                isEmpty = gtMap == null;
-                break;
-            case MapType.GTE_MAP:
-                isEmpty = gteMap == null;
-                break;
-            case MapType.LT_MAP:
-                isEmpty = ltMap == null;
-                break;
-            case MapType.LTE_MAP:
-                isEmpty = lteMap == null;
-                break;
-            case MapType.IN_MAP:
-                isEmpty = inMap == null;
-                break;
-            case MapType.LIKE_MAP:
-                isEmpty = likeMap == null;
-                break;
-            case MapType.STATISTIC_MAP:
-                isEmpty = statisFieldMap == null;
-                break;
-        }
+    public Map<String, Object[]> getInMap() {
+        return inMap;
+    }
 
-        if(!isEmpty){
-            return;
-        }
+    public void setInMap(Map<String, Object[]> inMap) {
+        this.inMap = inMap;
+    }
 
-        synchronized (this){
-            switch (type){
-                case MapType.EQ_MAP:
-                    if(eqMap == null){
-                        eqMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.GT_MAP:
-                    if(gtMap == null){
-                        gtMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.GTE_MAP:
-                    if(gteMap == null){
-                        gteMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.LT_MAP:
-                    if(ltMap == null){
-                        ltMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.LTE_MAP:
-                    if(lteMap == null){
-                        lteMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.IN_MAP:
-                    if(inMap == null){
-                        inMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.LIKE_MAP:
-                    if(likeMap == null){
-                        likeMap = new HashMap<>();
-                    }
-                    break;
-                case MapType.STATISTIC_MAP:
-                    if(statisFieldMap == null){
-                        statisFieldMap = new HashMap<>();
-                    }
-                    break;
-                default:
-                    throw new BizException("未支持的类型type="+type);
-            }
-        }
+    public Map<String, Object[]> getNotInMap() {
+        return notInMap;
+    }
+
+    public void setNotInMap(Map<String, Object[]> notInMap) {
+        this.notInMap = notInMap;
+    }
+
+    public Map<String, StatisField> getStatisFieldMap() {
+        return statisFieldMap;
+    }
+
+    public void setStatisFieldMap(Map<String, StatisField> statisFieldMap) {
+        this.statisFieldMap = statisFieldMap;
     }
 
     private void initStatisIfNeed(String field){
-        initMapIfNeed(MapType.STATISTIC_MAP);
-
         if(! statisFieldMap.containsKey(field)){
             synchronized (this){
                 if(! statisFieldMap.containsKey(field)){

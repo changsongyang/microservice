@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.common.statics.pojos.PageResult;
 import org.study.starter.component.EsClient;
-import org.study.starter.dto.EsMultiStatistic;
 import org.study.starter.dto.EsQuery;
-import org.study.starter.dto.EsStatistic;
+import org.study.starter.dto.EsAggResult;
 
 import java.util.List;
 
@@ -93,50 +92,21 @@ public class DemoController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/statistic", method = RequestMethod.GET)
-    public EsMultiStatistic statistic(String index) {
-        try{
-            EsQuery esQuery = EsQuery.build().from(index);
+    @RequestMapping(value = "/aggregation", method = RequestMethod.GET)
+    public EsAggResult aggregation(String index, String groupBy) {
+        EsQuery esQuery = EsQuery.build().from(index);
 
-            esQuery.eq("USER_NO", "888100000005252")
-                    .count("ID")
-                    .max("ID")
-                    .min("ID")
-                    .avg("ID")
-                    .sum("ALTER_BALANCE_LONG")
-                    .avg("ALTER_BALANCE_LONG")
-                    .min("ALTER_BALANCE_LONG")
-                    .max("ALTER_BALANCE_LONG")
-            ;
+        esQuery.count("ID")
+                .sum("ALTER_BALANCE_LONG")
+                .avg("ALTER_BALANCE_LONG")
+                .min("ALTER_BALANCE_LONG")
+                .max("ALTER_BALANCE_LONG")
+                .eq("USER_NO", "888100000005252")
+                .groupBy(groupBy)
+        ;
 
-            EsMultiStatistic result = esClient.multiStatistic(esQuery);
+        EsAggResult result = esClient.aggregation(esQuery);
 
-            return result;
-        }catch(Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/metrics", method = RequestMethod.GET)
-    public EsStatistic metrics(String index) {
-        try{
-            EsQuery esQuery = EsQuery.build().from(index);
-
-            esQuery.eq("USER_NO", "888100000005252")
-                    .count("ID")
-                    .max("ID")
-                    .min("ID")
-                    .avg("ID")
-            ;
-
-            EsStatistic result = esClient.statistic(esQuery);
-
-            return result;
-        }catch(Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        return result;
     }
 }

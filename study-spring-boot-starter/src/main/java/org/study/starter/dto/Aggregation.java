@@ -3,7 +3,10 @@ package org.study.starter.dto;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class EsStatistic implements Serializable {
+/**
+ * ES聚合统计维度值
+ */
+public class Aggregation implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long count;
