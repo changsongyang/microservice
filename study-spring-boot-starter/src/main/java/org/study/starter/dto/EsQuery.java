@@ -13,7 +13,7 @@ public class EsQuery implements Serializable {
     private static final int INI_PARAM_MAP_CAP = 8;//参数的初始容量
 
     private String index;//一张表就是一个index
-    private String groupBy;//仅在统计时有用
+    private String groupBy;//仅在统计时有用,且仅支持单个字段分组
     private String orderBy;
     private String returnClassName;
 

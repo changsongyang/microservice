@@ -41,6 +41,7 @@ import java.util.*;
  * elasticsearch客户端，提供一些常规的方法，如果需要复杂的查询，可通过 #getRestEsClient() 方法取得ES的原生客户端来处理
  */
 public class EsClient {
+    public static final int MAX_GROUP_SIZE = 1000;//最大分组数量
     private RestHighLevelClient restEsClient;
     private Cache<String, Map<String, String>> cache;
 
@@ -340,7 +341,7 @@ public class EsClient {
     private void appendAggregation(SearchSourceBuilder sourceBuilder, EsQuery esQuery){
         TermsAggregationBuilder termsAggBuilder = null;
         if (StringUtil.isNotEmpty(esQuery.getGroupBy())) {
-            termsAggBuilder = AggregationBuilders.terms(esQuery.getGroupBy()).field(esQuery.getGroupBy()).size(2000);
+            termsAggBuilder = AggregationBuilders.terms(esQuery.getGroupBy()).field(esQuery.getGroupBy()).size(MAX_GROUP_SIZE);
         }
 
         for(Map.Entry<String, EsQuery.StatisField> entry : esQuery.getStatisFieldMap().entrySet()){
