@@ -418,7 +418,7 @@ public class EsClient {
             String fieldName = splitFieldName(agg.getName());
 
             org.study.starter.dto.Aggregation aggr;
-            if(isEmpty(groupValue)){
+            if(groupValue == null){
                 aggr = aggrResult.getAggMap().get(fieldName);
                 if (aggr == null) {
                     aggr = new org.study.starter.dto.Aggregation();
