@@ -1,4 +1,4 @@
-package org.study.starter.utils;
+package org.study.common.util.utils;
 
 import com.google.common.base.CaseFormat;
 

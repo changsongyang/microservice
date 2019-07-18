@@ -50,6 +50,7 @@
         <java-jwt.version>3.8.1</java-jwt.version>
         <joda-time.version>2.10.2</joda-time.version>
         <okhttp.version>3.14.2</okhttp.version>
+        <guava.version>28.0-jre</guava.version>
 
         <appName>${project.artifactId}</appName>
         <mavenBuildTime>${maven.build.timestamp}</mavenBuildTime>
@@ -502,6 +503,11 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
             <!-- ################################# 第三方工具包 END ################################# -->
         </dependencies>

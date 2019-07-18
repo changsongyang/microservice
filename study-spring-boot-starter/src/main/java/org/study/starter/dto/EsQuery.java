@@ -1,6 +1,6 @@
 package org.study.starter.dto;
 
-import org.study.starter.utils.SnakeCaseUtil;
+import org.study.common.util.utils.SnakeCaseUtil;
 
 import java.io.Serializable;
 import java.util.HashMap;
