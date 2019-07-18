@@ -32,8 +32,10 @@ import org.study.common.util.utils.JsonUtil;
 import org.study.common.util.utils.StringUtil;
 import org.study.starter.dto.EsQuery;
 import org.study.starter.dto.EsAggResult;
+import org.study.starter.utils.SnakeCaseUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -73,10 +75,19 @@ public class EsClient {
 
         SearchResponse response = executeQuery(esQuery);
         if(response.getHits().getTotalHits().value > 0){
-            if(isString(clz)){
-                return (T) response.getHits().getHits()[0].getSourceAsString();
+            if(esQuery.getSnakeCase()){
+                Map<String, Object> resultMap = snakeCaseKey(response.getHits().getHits()[0].getSourceAsMap());
+                if(isString(clz)){
+                    return (T)JsonUtil.toString(resultMap);
+                }else{
+                    return JsonUtil.toBean(JsonUtil.toString(resultMap), clz);
+                }
             }else{
-                return JsonUtil.toBean(response.getHits().getHits()[0].getSourceAsString(), clz);
+                if(isString(clz)){
+                    return (T) response.getHits().getHits()[0].getSourceAsString();
+                }else{
+                    return JsonUtil.toBean(response.getHits().getHits()[0].getSourceAsString(), clz);
+                }
             }
         }else{
             return null;
@@ -96,7 +107,7 @@ public class EsClient {
         if(response.getHits().getTotalHits().value <= 0){
             return new ArrayList<>();
         }
-        return getEntityList(response, clz);
+        return getEntityList(response, clz, esQuery.getSnakeCase());
     }
 
     /**
@@ -112,7 +123,7 @@ public class EsClient {
         if(totalRecord <= 0){
             return PageResult.newInstance(new ArrayList<>(), esQuery.getPageCurrent(), esQuery.getPageSize());
         }
-        List<T> entityList = getEntityList(response, clz);
+        List<T> entityList = getEntityList(response, clz, esQuery.getSnakeCase());
         PageResult result = PageResult.newInstance(entityList, esQuery.getPageCurrent(), esQuery.getPageSize(), totalRecord);
         result.setScrollId(response.getScrollId());
         return result;
@@ -126,15 +137,15 @@ public class EsClient {
     public EsAggResult aggregation(EsQuery esQuery){
         SearchResponse response = executeAggregation(esQuery);
 
-        EsAggResult aggrResult = new EsAggResult();
+        EsAggResult aggResult = new EsAggResult();
         if(response.getHits().getTotalHits().value > 0){
             if (isEmpty(esQuery.getGroupBy())){
-                fillEsAggResult(aggrResult, null, response.getAggregations().iterator());
+                fillEsAggResult(aggResult, null, response.getAggregations().iterator(), esQuery.getSnakeCase());
             }else{
                 Iterator<Aggregation> iterator = response.getAggregations().iterator();
                 while (iterator.hasNext()){
-                    Aggregation aggr = iterator.next();
-                    ParsedTerms terms = (ParsedTerms) aggr;
+                    Aggregation agg = iterator.next();
+                    ParsedTerms terms = (ParsedTerms) agg;
 
                     if(terms.getBuckets().isEmpty()){
                         continue;
@@ -142,13 +153,13 @@ public class EsClient {
 
                     for(Terms.Bucket bucket : terms.getBuckets()){
                         String groupValue = ((Terms.Bucket) bucket).getKeyAsString();
-                        Aggregations bucketAggr = ((Terms.Bucket) bucket).getAggregations();
-                        fillEsAggResult(aggrResult, groupValue, bucketAggr.iterator());
+                        Aggregations bucketAgg = ((Terms.Bucket) bucket).getAggregations();
+                        fillEsAggResult(aggResult, groupValue, bucketAgg.iterator(), esQuery.getSnakeCase());
                     }
                 }
             }
         }
-        return aggrResult;
+        return aggResult;
     }
 
     /**
@@ -156,16 +167,25 @@ public class EsClient {
      * @param response
      * @return
      */
-    public  <T> List<T> getEntityList(SearchResponse response, Class<T> clz){
+    public  <T> List<T> getEntityList(SearchResponse response, Class<T> clz, boolean snakeCase){
         List<T> entityList = new ArrayList<>();
         boolean isString = isString(clz);
         if(response.getHits().getTotalHits().value > 0){
             SearchHit[] hits = response.getHits().getHits();
             for(int i=0; i<hits.length; i++){
-                if(isString){
-                    entityList.add((T)hits[i].getSourceAsString());
+                if(snakeCase){
+                    Map<String, Object> resultMap = snakeCaseKey(hits[i].getSourceAsMap());
+                    if(isString){
+                        entityList.add((T)JsonUtil.toString(resultMap));
+                    }else{
+                        entityList.add(JsonUtil.toBean(JsonUtil.toString(resultMap), clz));
+                    }
                 }else{
-                    entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
+                    if(isString){
+                        entityList.add((T)hits[i].getSourceAsString());
+                    }else{
+                        entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
+                    }
                 }
             }
         }
@@ -175,7 +195,7 @@ public class EsClient {
     private SearchResponse executeQuery(EsQuery esQuery){
         paramCheck(esQuery, false);
 
-        if(esQuery.getIsScroll() && StringUtil.isNotEmpty(esQuery.getScrollId())){
+        if(esQuery.getScrollMode() && StringUtil.isNotEmpty(esQuery.getScrollId())){
             SearchScrollRequest scrollRequest = new SearchScrollRequest(esQuery.getScrollId());
             scrollRequest.scroll(TimeValue.timeValueSeconds(esQuery.getScrollExpireSec()));
             try{
@@ -198,7 +218,7 @@ public class EsClient {
         SearchRequest searchRequest = new SearchRequest(esQuery.getIndex());
         searchRequest.source(sourceBuilder);
         //处理分页查询
-        if(esQuery.getIsScroll()){
+        if(esQuery.getScrollMode()){
             searchRequest.scroll(TimeValue.timeValueSeconds(esQuery.getScrollExpireSec()));
             sourceBuilder.size(esQuery.getPageSize());
         }else{
@@ -231,7 +251,7 @@ public class EsClient {
     }
 
     private QueryBuilder getQueryBuilder(EsQuery esQuery){
-        Map<String, String> fieldMap = getFieldMap(esQuery.getIndex());
+        Map<String, String> fieldMap = getESMappingFieldMap(esQuery.getIndex());
         if(fieldMap == null || fieldMap.isEmpty()){
             throw new BizException("es mapping not exist of index: " + esQuery.getIndex());
         }else if(! isEmpty(esQuery.getGroupBy()) && ! fieldMap.containsKey(esQuery.getGroupBy())){
@@ -339,115 +359,119 @@ public class EsClient {
     }
 
     private void appendAggregation(SearchSourceBuilder sourceBuilder, EsQuery esQuery){
+        Map<String, String> fieldMap = getESMappingFieldMap(esQuery.getIndex());
+        boolean isNeedTerms = StringUtil.isNotEmpty(esQuery.getGroupBy());
         TermsAggregationBuilder termsAggBuilder = null;
-        if (StringUtil.isNotEmpty(esQuery.getGroupBy())) {
+        if (isNeedTerms) {
             termsAggBuilder = AggregationBuilders.terms(esQuery.getGroupBy()).field(esQuery.getGroupBy()).size(MAX_GROUP_SIZE);
         }
 
-        for(Map.Entry<String, EsQuery.StatisField> entry : esQuery.getStatisFieldMap().entrySet()){
-            String fieldName = entry.getKey();
-            if(StringUtil.isEmpty(fieldName)){
-                throw new BizException("参数非法，统计时存在为空的参数名");
+        Field[] fields = EsQuery.Aggregation.class.getDeclaredFields();
+        for(Map.Entry<String, EsQuery.Aggregation> entry : esQuery.getAggMap().entrySet()){
+            String aggField = entry.getKey();
+            if(! fieldMap.containsKey(aggField)){ //ES中不存在的字段将直接忽略
+                continue;
             }
 
-            EsQuery.StatisField field = entry.getValue();
-            boolean isNoneMatch = true;
+            EsQuery.Aggregation agg = entry.getValue();
+            for(Field field : fields){
+                field.setAccessible(true);
 
-            if(field.getCount()){
-                isNoneMatch = false;
-                ValuesSourceAggregationBuilder aggBuilder = AggregationBuilders.count(fillFieldName(fieldName, "count")).field(fieldName);
-                if(termsAggBuilder == null){
-                    sourceBuilder.aggregation(aggBuilder);
-                }else{
-                    termsAggBuilder.subAggregation(aggBuilder);
+                String name = field.getName();
+                if(name.contains("this$") || "field".equals(name)){
+                    continue;
                 }
-            }
 
-            if(field.getSum()){
-                isNoneMatch = false;
-                ValuesSourceAggregationBuilder aggBuilder = AggregationBuilders.sum(fillFieldName(fieldName, "sum")).field(fieldName);
-                if(termsAggBuilder == null){
-                    sourceBuilder.aggregation(aggBuilder);
-                }else{
-                    termsAggBuilder.subAggregation(aggBuilder);
+                Boolean value;
+                try{
+                    value = field.getBoolean(agg);
+                }catch(Throwable e){
+                    throw new BizException("EsQuery.Aggregation 获取"+name+"的属性值出现异常：", e);
                 }
-            }
-
-            if(field.getMax()){
-                isNoneMatch = false;
-                ValuesSourceAggregationBuilder aggBuilder = AggregationBuilders.max(fillFieldName(fieldName,"max")).field(fieldName);
-                if(termsAggBuilder == null){
-                    sourceBuilder.aggregation(aggBuilder);
-                }else{
-                    termsAggBuilder.subAggregation(aggBuilder);
+                if(value == null || value == false){
+                    continue;
                 }
-            }
 
-            if(field.getMin()){
-                isNoneMatch = false;
-                ValuesSourceAggregationBuilder aggBuilder = AggregationBuilders.min(fillFieldName(fieldName, "min")).field(fieldName);
-                if(termsAggBuilder == null){
-                    sourceBuilder.aggregation(aggBuilder);
-                }else{
-                    termsAggBuilder.subAggregation(aggBuilder);
+                ValuesSourceAggregationBuilder aggBuilder;
+                switch(name){
+                    case "count":
+                        aggBuilder = AggregationBuilders.count(fillFieldName(aggField, "count")).field(aggField);
+                        break;
+                    case "sum":
+                        aggBuilder = AggregationBuilders.sum(fillFieldName(aggField, "sum")).field(aggField);
+                        break;
+                    case "min":
+                        aggBuilder = AggregationBuilders.min(fillFieldName(aggField, "min")).field(aggField);
+                        break;
+                    case "max":
+                        aggBuilder = AggregationBuilders.max(fillFieldName(aggField,"max")).field(aggField);
+                        break;
+                    case "avg":
+                        aggBuilder = AggregationBuilders.avg(fillFieldName(aggField,"avg" )).field(aggField);
+                        break;
+                    default:
+                        throw new BizException("EsQuery.Aggregation 未预期的属性名称：" + name);
                 }
-            }
 
-            if(field.getAvg()){
-                isNoneMatch = false;
-                ValuesSourceAggregationBuilder aggBuilder = AggregationBuilders.avg(fillFieldName(fieldName,"avg" )).field(fieldName);
-                if(termsAggBuilder == null){
-                    sourceBuilder.aggregation(aggBuilder);
-                }else{
+                if(isNeedTerms){
                     termsAggBuilder.subAggregation(aggBuilder);
+                }else{
+                    sourceBuilder.aggregation(aggBuilder);
                 }
-            }
-
-            if(isNoneMatch){
-                throw new BizException(fieldName+" 需指定至少一个统计项");
             }
         }
-        if(termsAggBuilder != null){
+
+        if(isNeedTerms){
             sourceBuilder.aggregation(termsAggBuilder);
         }
     }
 
-    private void fillEsAggResult(EsAggResult aggResult, String groupValue, Iterator<Aggregation> iterator){
+    private void fillEsAggResult(EsAggResult aggResult, String groupValue, Iterator<Aggregation> iterator, boolean snakeCase){
         while(iterator.hasNext()) {
-            Aggregation agg = iterator.next();
-            String fieldName = splitFieldName(agg.getName());
+            Aggregation aggEs = iterator.next();
+            String fieldName = splitFieldName(aggEs.getName());
+            if(snakeCase){
+                fieldName = SnakeCaseUtil.toSnakeCase(fieldName, true);
+            }
 
-            org.study.starter.dto.Aggregation aggr;
+            org.study.starter.dto.Aggregation agg;
             if(groupValue == null){
-                aggr = aggResult.getAggMap().get(fieldName);
-                if (aggr == null) {
-                    aggr = new org.study.starter.dto.Aggregation();
-                    aggResult.getAggMap().put(fieldName, aggr);
+                agg = aggResult.getAggMap().get(fieldName);
+                if (agg == null) {
+                    agg = new org.study.starter.dto.Aggregation();
+                    aggResult.getAggMap().put(fieldName, agg);
                 }
             }else{
                 Map<String, org.study.starter.dto.Aggregation> aggMap = aggResult.getAggGroupMap().get(fieldName);
                 if(aggMap == null){
-                    aggr = new org.study.starter.dto.Aggregation();
+                    agg = new org.study.starter.dto.Aggregation();
                     aggMap = new HashMap<>();
-                    aggMap.put(groupValue, aggr);
+                    aggMap.put(groupValue, agg);
                     aggResult.getAggGroupMap().put(fieldName, aggMap);
-                }else if((aggr = aggMap.get(groupValue)) == null){
-                    aggr = new org.study.starter.dto.Aggregation();
-                    aggMap.put(groupValue, aggr);
+                }else if((agg = aggMap.get(groupValue)) == null){
+                    agg = new org.study.starter.dto.Aggregation();
+                    aggMap.put(groupValue, agg);
                 }
             }
 
-            String type = agg.getType();
-            if(ValueCountAggregationBuilder.NAME.equals(type)){
-                aggr.setCount( ((ParsedValueCount)agg).getValue() );
-            }else if(MaxAggregationBuilder.NAME.equals(type)){
-                aggr.setMax(BigDecimal.valueOf( ((ParsedMax)agg).getValue() ));
-            }else if(MinAggregationBuilder.NAME.equals(type)){
-                aggr.setMin(BigDecimal.valueOf( ((ParsedMin)agg).getValue() ));
-            }else if(SumAggregationBuilder.NAME.equals(type)){
-                aggr.setSum(BigDecimal.valueOf( ((ParsedSum)agg).getValue() ));
-            }else if(AvgAggregationBuilder.NAME.equals(type)){
-                aggr.setAvg(BigDecimal.valueOf( ((ParsedAvg)agg).getValue() ));
+            switch(aggEs.getType()){
+                case ValueCountAggregationBuilder.NAME:
+                    agg.setCount(((ParsedValueCount) aggEs).getValue());
+                    break;
+                case MaxAggregationBuilder.NAME:
+                    agg.setMax(BigDecimal.valueOf(((ParsedMax) aggEs).getValue()));
+                    break;
+                case MinAggregationBuilder.NAME:
+                    agg.setMin(BigDecimal.valueOf(((ParsedMin) aggEs).getValue()));
+                    break;
+                case SumAggregationBuilder.NAME:
+                    agg.setSum(BigDecimal.valueOf(((ParsedSum) aggEs).getValue()));
+                    break;
+                case AvgAggregationBuilder.NAME:
+                    agg.setAvg(BigDecimal.valueOf(((ParsedAvg) aggEs).getValue()));
+                    break;
+                default:
+                    throw new BizException("未支持的聚合类型：" + aggEs.getType());
             }
         }
     }
@@ -490,23 +514,23 @@ public class EsClient {
         }
     }
 
-    private void paramCheck(EsQuery esQuery, boolean statisFieldMust){
+    private void paramCheck(EsQuery esQuery, boolean aggMapMust){
         if(esQuery == null){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "esQuery不能为空");
         }else if(StringUtil.isEmpty(esQuery.getIndex())){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "index不能为空");
         }else if(esQuery.getPageSize() <= 0 || esQuery.getPageCurrent() <= 0){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "pageCurrent和pageSize都需大于0");
-        }else if(statisFieldMust && (esQuery.getStatisFieldMap() == null || esQuery.getStatisFieldMap().isEmpty())){
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "statisFieldMap不能为空");
+        }else if(aggMapMust && (esQuery.getAggMap() == null || esQuery.getAggMap().isEmpty())){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "aggMap不能为空");
         }
     }
 
     private boolean isNotEmpty(String key, Object value){
-        return ! ((key == null || key.trim().length() <= 0) || (value == null || value.toString().trim().length() <= 0));
+        return ! (isEmpty(key) || (value == null || value.toString().trim().length() <= 0));
     }
-    private boolean isNotEmpty(String key, Object[] value){
-        return ! ((key == null || key.trim().length() <= 0) || (value == null || value.length <= 0));
+    private boolean isNotEmpty(String key, Object[] values){
+        return ! (isEmpty(key) || (values == null || values.length <= 0));
     }
     private boolean isEmpty(String key){
         return (key == null || key.trim().length() <= 0);
@@ -528,12 +552,20 @@ public class EsClient {
         return field.split("\\|")[0];
     }
 
+    private Map<String, Object> snakeCaseKey(Map<String, Object> entryMap){
+        Map<String, Object> resultMap = new HashMap<>();
+        for(Map.Entry<String, Object> entry : entryMap.entrySet()) {
+            resultMap.put(SnakeCaseUtil.toSnakeCase(entry.getKey(), true), entry.getValue());
+        }
+        return resultMap;
+    }
+
     /**
      * 返回Mapping，其中key为字段名，value为字段的数据类型
      * @param index
      * @return
      */
-    private Map<String, String> getFieldMap(String index){
+    private Map<String, String> getESMappingFieldMap(String index){
         if(cache != null && cache.getIfPresent(index) != null){
             return cache.getIfPresent(index);
         }
@@ -558,7 +590,9 @@ public class EsClient {
 
             for(Map.Entry<String, Object> entry1 : res.entrySet()){
                 LinkedHashMap<String, Object> map = (LinkedHashMap) entry1.getValue();
-                fieldMap.put(entry1.getKey(), (String) map.get("type"));
+                if(StringUtil.isNotEmpty(entry1.getKey())){
+                    fieldMap.put(entry1.getKey(), (String) map.get("type"));
+                }
             }
         }
         cache.put(index, fieldMap);

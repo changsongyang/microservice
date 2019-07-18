@@ -12,6 +12,7 @@ import org.study.starter.component.EsClient;
 import org.study.starter.dto.EsQuery;
 import org.study.starter.dto.EsAggResult;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -61,9 +62,14 @@ public class DemoController {
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public PageResult<List<String>> listPage(String index, Integer pageCurrent) {
         try{
-            EsQuery esQuery = EsQuery.build().from(index);
+            EsQuery esQuery = EsQuery.build(true).from(index);
 
-            esQuery.eq("USER_NO", "888100000005252").page(pageCurrent, 2);
+            esQuery
+//                    .eq("userNo", "888100000005252")
+                    .neq("userNo", "888100000005252")
+                    .notIn("alterType", "1,2,3".split(","))
+                    .page(pageCurrent, 20)
+                    .result(HashMap.class);
 
             PageResult<List<String>> result = esClient.listPage(esQuery);
 
@@ -78,9 +84,9 @@ public class DemoController {
     @RequestMapping(value = "/scrollPage", method = RequestMethod.GET)
     public PageResult<List<String>> scrollPage(String index, String scrollId, Integer pagSize) {
         try{
-            EsQuery esQuery = EsQuery.build().from(index);
+            EsQuery esQuery = EsQuery.build(true).from(index);
 
-            esQuery.eq("USER_NO", "888100000005252").scroll(scrollId, 60, pagSize);
+            esQuery.eq("userNo", "888100000005252").scroll(scrollId, 60, pagSize);
 
             PageResult<List<String>> result = esClient.listPage(esQuery);
 
@@ -94,14 +100,14 @@ public class DemoController {
     @ResponseBody
     @RequestMapping(value = "/aggregation", method = RequestMethod.GET)
     public EsAggResult aggregation(String index, String groupBy) {
-        EsQuery esQuery = EsQuery.build().from(index);
+        EsQuery esQuery = EsQuery.build(true).from(index);
 
-        esQuery.count("ID")
-                .sum("ALTER_BALANCE_LONG")
-                .avg("ALTER_BALANCE_LONG")
-                .min("ALTER_BALANCE_LONG")
-                .max("ALTER_BALANCE_LONG")
-                .eq("USER_NO", "888100000005252")
+        esQuery.count("id")
+                .sum("alterBalanceLong")
+                .avg("alterBalanceLong")
+                .min("alterBalanceLong")
+                .max("alterBalanceLong")
+                .eq("userNo", "888100000005252")
                 .groupBy(groupBy)
         ;
 

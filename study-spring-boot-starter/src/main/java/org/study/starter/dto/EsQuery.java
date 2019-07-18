@@ -1,12 +1,14 @@
 package org.study.starter.dto;
 
+import org.study.starter.utils.SnakeCaseUtil;
+
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 使用elasticsearch查询的请求参数
+ * 注意：为避免参数错乱，请勿直接操作当前类的 getter、setter 方法
  */
 public class EsQuery implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -17,7 +19,8 @@ public class EsQuery implements Serializable {
     private String orderBy;
     private String returnClassName;
 
-    private boolean isScroll;
+    private boolean snakeCase = false;//是否需要执行驼峰、下划线互转，比如，查询参数为驼峰，ES字段为下划线，查询参数会自动转为下划线，查询结果返回又会把下划线转成驼峰
+    private boolean scrollMode;
     private String scrollId;
     private long scrollExpireSec;
     private int pageCurrent = 1;
@@ -33,10 +36,19 @@ public class EsQuery implements Serializable {
     private Map<String, Object> likeMap = new HashMap(INI_PARAM_MAP_CAP);
     private Map<String, Object[]> inMap = new HashMap(INI_PARAM_MAP_CAP);
     private Map<String, Object[]> notInMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, StatisField> statisFieldMap = new HashMap(INI_PARAM_MAP_CAP);
+    private Map<String, Aggregation> aggMap = new HashMap(INI_PARAM_MAP_CAP);
+
+    public EsQuery(){}
+    public EsQuery(boolean snakeCase){
+        this.snakeCase = snakeCase;
+    }
 
     public static EsQuery build(){
         return new EsQuery();
+    }
+
+    public static EsQuery build(boolean snakeCase){
+        return new EsQuery(snakeCase);
     }
 
     /**
@@ -45,7 +57,13 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery select(String... fields){
-        this.selectFields = fields;
+        if(fields != null && fields.length > 0){
+            String[] newFields = new String[]{};
+            for(int i=0; i<fields.length; i++){
+                filedSnakeCase(fields[i]);
+            }
+            this.selectFields = newFields;
+        }
         return this;
     }
 
@@ -66,7 +84,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery eq(String field, Object value){
-        this.eqMap.put(field, value);
+        this.eqMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -77,7 +95,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery neq(String field, Object value){
-        this.neqMap.put(field, value);
+        this.neqMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -88,7 +106,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gt(String field, Object value){
-        this.gtMap.put(field, value);
+        this.gtMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -99,7 +117,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gte(String field, Object value){
-        this.gteMap.put(field, value);
+        this.gteMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -110,7 +128,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lt(String field, Object value){
-        this.ltMap.put(field, value);
+        this.ltMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -121,7 +139,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lte(String field, Object value){
-        this.lteMap.put(field, value);
+        this.lteMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -144,8 +162,8 @@ public class EsQuery implements Serializable {
      * @param values
      * @return
      */
-    public EsQuery in(String field, Collection values){
-        this.inMap.put(field, values.toArray());
+    public EsQuery in(String field, Object[] values){
+        this.inMap.put(filedSnakeCase(field), values);
         return this;
     }
 
@@ -155,8 +173,8 @@ public class EsQuery implements Serializable {
      * @param values
      * @return
      */
-    public EsQuery notIn(String field, Collection values){
-        this.notInMap.put(field, values.toArray());
+    public EsQuery notIn(String field, Object[] values){
+        this.notInMap.put(filedSnakeCase(field), values);
         return this;
     }
 
@@ -167,7 +185,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery like(String field, Object value){
-        this.likeMap.put(field, value);
+        this.likeMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -177,8 +195,8 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery count(String field){
-        initStatisIfNeed(field);
-        this.statisFieldMap.get(field).setCount(true);
+        initAggMapIfNeed(filedSnakeCase(field));
+        this.aggMap.get(filedSnakeCase(field)).setCount(true);
         return this;
     }
 
@@ -188,8 +206,8 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery sum(String field){
-        initStatisIfNeed(field);
-        this.statisFieldMap.get(field).setSum(true);
+        initAggMapIfNeed(filedSnakeCase(field));
+        this.aggMap.get(filedSnakeCase(field)).setSum(true);
         return this;
     }
 
@@ -199,8 +217,8 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery max(String field){
-        initStatisIfNeed(field);
-        this.statisFieldMap.get(field).setMax(true);
+        initAggMapIfNeed(filedSnakeCase(field));
+        this.aggMap.get(filedSnakeCase(field)).setMax(true);
         return this;
     }
 
@@ -210,8 +228,8 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery min(String field){
-        initStatisIfNeed(field);
-        this.statisFieldMap.get(field).setMin(true);
+        initAggMapIfNeed(filedSnakeCase(field));
+        this.aggMap.get(filedSnakeCase(field)).setMin(true);
         return this;
     }
 
@@ -221,28 +239,28 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery avg(String field){
-        initStatisIfNeed(field);
-        this.statisFieldMap.get(field).setAvg(true);
+        initAggMapIfNeed(filedSnakeCase(field));
+        this.aggMap.get(filedSnakeCase(field)).setAvg(true);
         return this;
     }
 
     /**
      * 分组，仅在统计时有用
-     * @param fields
+     * @param field
      * @return
      */
-    public EsQuery groupBy(String fields){
-        this.groupBy = fields;
+    public EsQuery groupBy(String field){
+        this.groupBy = filedSnakeCase(field);
         return this;
     }
 
     /**
      * 排序
-     * @param fields
+     * @param field
      * @return
      */
-    public EsQuery orderBy(String fields){
-        this.orderBy = fields;
+    public EsQuery orderBy(String field){
+        this.orderBy = filedSnakeCase(field);
         return this;
     }
 
@@ -276,7 +294,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery scroll(String scrollId, long expireSec, int pageSize){
-        this.isScroll = true;
+        this.scrollMode = true;
         this.scrollId = scrollId;
         this.scrollExpireSec = expireSec;
         this.pageSize = pageSize;
@@ -293,6 +311,9 @@ public class EsQuery implements Serializable {
         return this;
     }
 
+    private String filedSnakeCase(String field){
+        return snakeCase ? SnakeCaseUtil.toSnakeCase(field, false) : field;
+    }
 
     public String getIndex() {
         return index;
@@ -326,12 +347,20 @@ public class EsQuery implements Serializable {
         this.returnClassName = returnClassName;
     }
 
-    public boolean getIsScroll() {
-        return isScroll;
+    public boolean getSnakeCase() {
+        return snakeCase;
     }
 
-    public void setIsScroll(boolean scroll) {
-        isScroll = scroll;
+    public void setSnakeCase(boolean snakeCase) {
+        this.snakeCase = snakeCase;
+    }
+
+    public boolean getScrollMode() {
+        return scrollMode;
+    }
+
+    public void setScrollMode(boolean scrollMode) {
+        this.scrollMode = scrollMode;
     }
 
     public String getScrollId() {
@@ -446,25 +475,25 @@ public class EsQuery implements Serializable {
         this.notInMap = notInMap;
     }
 
-    public Map<String, StatisField> getStatisFieldMap() {
-        return statisFieldMap;
+    public Map<String, Aggregation> getAggMap() {
+        return aggMap;
     }
 
-    public void setStatisFieldMap(Map<String, StatisField> statisFieldMap) {
-        this.statisFieldMap = statisFieldMap;
+    public void setAggMap(Map<String, Aggregation> aggMap) {
+        this.aggMap = aggMap;
     }
 
-    private void initStatisIfNeed(String field){
-        if(! statisFieldMap.containsKey(field)){
+    private void initAggMapIfNeed(String field){
+        if(! aggMap.containsKey(field)){
             synchronized (this){
-                if(! statisFieldMap.containsKey(field)){
-                    statisFieldMap.put(field, new StatisField(field));
+                if(! aggMap.containsKey(field)){
+                    aggMap.put(field, new Aggregation(field));
                 }
             }
         }
     }
 
-    public class StatisField {
+    public class Aggregation {
         private String field;
         private boolean count = false;
         private boolean sum = false;
@@ -472,7 +501,7 @@ public class EsQuery implements Serializable {
         private boolean min = false;
         private boolean avg = false;
 
-        public StatisField(String field){
+        public Aggregation(String field){
             this.field = field;
         }
 
@@ -523,16 +552,5 @@ public class EsQuery implements Serializable {
         public void setAvg(boolean avg) {
             this.avg = avg;
         }
-    }
-
-    class MapType {
-        final static int EQ_MAP = 1;
-        final static int GT_MAP = 2;
-        final static int GTE_MAP = 3;
-        final static int LT_MAP = 4;
-        final static int LTE_MAP = 5;
-        final static int LIKE_MAP = 6;
-        final static int IN_MAP = 7;
-        final static int STATISTIC_MAP = 8;
     }
 }
