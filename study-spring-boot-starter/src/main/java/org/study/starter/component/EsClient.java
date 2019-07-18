@@ -27,12 +27,12 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageResult;
+import org.study.common.util.dto.EsAggResult;
+import org.study.common.util.dto.EsQuery;
 import org.study.common.util.utils.ClassUtil;
 import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.SnakeCaseUtil;
 import org.study.common.util.utils.StringUtil;
-import org.study.starter.dto.EsQuery;
-import org.study.starter.dto.EsAggResult;
-import org.study.starter.utils.SnakeCaseUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -434,22 +434,22 @@ public class EsClient {
                 fieldName = SnakeCaseUtil.toSnakeCase(fieldName, true);
             }
 
-            org.study.starter.dto.Aggregation agg;
+            org.study.common.util.dto.Aggregation agg;
             if(groupValue == null){
                 agg = aggResult.getAggMap().get(fieldName);
                 if (agg == null) {
-                    agg = new org.study.starter.dto.Aggregation();
+                    agg = new org.study.common.util.dto.Aggregation();
                     aggResult.getAggMap().put(fieldName, agg);
                 }
             }else{
-                Map<String, org.study.starter.dto.Aggregation> aggMap = aggResult.getAggGroupMap().get(fieldName);
+                Map<String, org.study.common.util.dto.Aggregation> aggMap = aggResult.getAggGroupMap().get(fieldName);
                 if(aggMap == null){
-                    agg = new org.study.starter.dto.Aggregation();
+                    agg = new org.study.common.util.dto.Aggregation();
                     aggMap = new HashMap<>();
                     aggMap.put(groupValue, agg);
                     aggResult.getAggGroupMap().put(fieldName, aggMap);
                 }else if((agg = aggMap.get(groupValue)) == null){
-                    agg = new org.study.starter.dto.Aggregation();
+                    agg = new org.study.common.util.dto.Aggregation();
                     aggMap.put(groupValue, agg);
                 }
             }

@@ -1,4 +1,4 @@
-package org.study.starter.dto;
+package org.study.common.util.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

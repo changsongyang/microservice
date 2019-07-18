@@ -1,4 +1,4 @@
-package org.study.starter.dto;
+package org.study.common.util.dto;
 
 import org.study.common.util.utils.SnakeCaseUtil;
 
