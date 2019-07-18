@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.common.statics.pojos.PageResult;
-import org.study.starter.component.EsClient;
-import org.study.starter.dto.EsQuery;
-import org.study.starter.dto.EsAggResult;
+import org.study.common.util.dto.EsAggResult;
+import org.study.common.util.dto.EsQuery;
+import org.study.starter.component.ESClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ public class DemoController {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    EsClient esClient;
+    ESClient esClient;
 
     @ResponseBody
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)

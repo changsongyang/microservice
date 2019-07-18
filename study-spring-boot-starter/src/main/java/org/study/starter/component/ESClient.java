@@ -1,9 +1,8 @@
 package org.study.starter.component;
 
 import com.google.common.cache.Cache;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetMappingsRequest;
@@ -25,6 +24,8 @@ import org.elasticsearch.search.aggregations.metrics.*;
 import org.elasticsearch.search.aggregations.support.ValuesSourceAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.util.dto.EsAggResult;
@@ -38,20 +39,22 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * elasticsearch客户端，提供一些常规的方法，如果需要复杂的查询，可通过 #getRestEsClient() 方法取得ES的原生客户端来处理
  */
-public class EsClient {
+public class ESClient {
     public static final int MAX_GROUP_SIZE = 1000;//最大分组数量
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private RestHighLevelClient restEsClient;
     private Cache<String, Map<String, String>> cache;
 
-    public EsClient(RestHighLevelClient restEsClient){
+    public ESClient(RestHighLevelClient restEsClient){
         this.restEsClient = restEsClient;
     }
 
-    public EsClient(RestHighLevelClient restEsClient, Cache<String, Map<String, String>> cache){
+    public ESClient(RestHighLevelClient restEsClient, Cache<String, Map<String, String>> cache){
         this.restEsClient = restEsClient;
         this.cache = cache;
     }
@@ -107,7 +110,12 @@ public class EsClient {
         if(response.getHits().getTotalHits().value <= 0){
             return new ArrayList<>();
         }
-        return getEntityList(response, clz, esQuery.getSnakeCase());
+
+        List<T> entityList = getEntityList(response, clz, esQuery.getSnakeCase());
+        if((entityList == null || entityList.isEmpty()) && StringUtil.isNotEmpty(response.getScrollId())){
+            clearScroll(response.getScrollId());
+        }
+        return entityList;
     }
 
     /**
@@ -124,6 +132,9 @@ public class EsClient {
             return PageResult.newInstance(new ArrayList<>(), esQuery.getPageCurrent(), esQuery.getPageSize());
         }
         List<T> entityList = getEntityList(response, clz, esQuery.getSnakeCase());
+        if((entityList == null || entityList.isEmpty()) && StringUtil.isNotEmpty(response.getScrollId())){
+            clearScroll(response.getScrollId());
+        }
         PageResult result = PageResult.newInstance(entityList, esQuery.getPageCurrent(), esQuery.getPageSize(), totalRecord);
         result.setScrollId(response.getScrollId());
         return result;
@@ -170,22 +181,24 @@ public class EsClient {
     public  <T> List<T> getEntityList(SearchResponse response, Class<T> clz, boolean snakeCase){
         List<T> entityList = new ArrayList<>();
         boolean isString = isString(clz);
-        if(response.getHits().getTotalHits().value > 0){
-            SearchHit[] hits = response.getHits().getHits();
-            for(int i=0; i<hits.length; i++){
-                if(snakeCase){
-                    Map<String, Object> resultMap = snakeCaseKey(hits[i].getSourceAsMap());
-                    if(isString){
-                        entityList.add((T)JsonUtil.toString(resultMap));
-                    }else{
-                        entityList.add(JsonUtil.toBean(JsonUtil.toString(resultMap), clz));
-                    }
+        if(response.getHits().getHits().length <= 0){
+            return entityList;
+        }
+
+        SearchHit[] hits = response.getHits().getHits();
+        for(int i=0; i<hits.length; i++){
+            if(snakeCase){
+                Map<String, Object> resultMap = snakeCaseKey(hits[i].getSourceAsMap());
+                if(isString){
+                    entityList.add((T)JsonUtil.toString(resultMap));
                 }else{
-                    if(isString){
-                        entityList.add((T)hits[i].getSourceAsString());
-                    }else{
-                        entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
-                    }
+                    entityList.add(JsonUtil.toBean(JsonUtil.toString(resultMap), clz));
+                }
+            }else{
+                if(isString){
+                    entityList.add((T)hits[i].getSourceAsString());
+                }else{
+                    entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
                 }
             }
         }
@@ -597,6 +610,29 @@ public class EsClient {
         }
         cache.put(index, fieldMap);
         return fieldMap;
+    }
+
+    private void clearScroll(String scrollId){
+        ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+        clearScrollRequest.addScrollId(scrollId);
+        getRestEsClient().clearScrollAsync(clearScrollRequest, RequestOptions.DEFAULT, new ActionListener<ClearScrollResponse>() {
+            @Override
+            public void onResponse(ClearScrollResponse clearScrollResponse) {
+                logger.info("scrollId={} 清除成功", scrollId);
+            }
+            @Override
+            public void onFailure(Exception e) {
+                logger.info("scrollId={} 清除失败 Exception={} ", scrollId, e.getMessage());
+            }
+        });
+    }
+
+    public void destroy(){
+        try{
+            this.getRestEsClient().close();
+        }catch(Throwable e){
+
+        }
     }
 }
 

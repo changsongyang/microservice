@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.study.starter.component.EsClient;
+import org.study.starter.component.ESClient;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class EsAutoConfiguration {
 
     @ConditionalOnBean(RestHighLevelClient.class)
-    @Bean
-    public EsClient esClient(RestHighLevelClient restHighLevelClient){
-        return new EsClient(restHighLevelClient, esMappingCache());
+    @Bean(destroyMethod = "destroy")
+    public ESClient esClient(RestHighLevelClient restHighLevelClient){
+        return new ESClient(restHighLevelClient, esMappingCache());
     }
 
     /**
