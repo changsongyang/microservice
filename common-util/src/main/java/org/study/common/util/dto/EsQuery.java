@@ -49,7 +49,6 @@ public class EsQuery implements Serializable {
 
     public static EsQuery build(boolean snakeCase){
         return new EsQuery(snakeCase);
-
     }
 
     /**
