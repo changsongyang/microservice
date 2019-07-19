@@ -43,7 +43,7 @@ public class DemoController {
                 .notIn("alterType", "1,2,3".split(","))
                 .page(1, 20)
                 .orderBy("userNo asc")
-                .result(HashMap.class);
+                .resultClass(HashMap.class);
         return demoFacade.hello(esQuery);
     }
 }

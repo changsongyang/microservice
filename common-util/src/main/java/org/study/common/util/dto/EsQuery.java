@@ -7,14 +7,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 使用elasticsearch查询的请求参数
- * 注意：为避免参数错乱，请勿直接操作当前类的 getter、setter 方法
+ * 使用elasticsearch查询的请求参数，当前类当做客户端的查询参数，而{@link org.study.starter.component.ESClient}则作为服务端，
+ * 进行参数解析、执行查询、返回结果等处理
+ *
+ * 使用注意事项：
+ *      1、此类尽可能贴近sql语法和含义，但并没有完全支持所有sql功能，已支持的功能可直接查看当前类提供的方法
+ *      2、进行模糊查询时，在ES中是进行全文检索，这跟数据库中like查询会有一些不同
+ *      3、聚合统计只支持count、sum、min、max、avg，也支持在聚合统计时进行分组 group by，聚合查询不支持order by
+ *      4、非聚合查询(即常规查询)支持order by，但不支持 group by
+ *      5、如果ES中存储的字段名和查询参数名格式不一致(如ES中是下划线，查询参数是驼峰)，可使用{@link #EsQuery(boolean snakeCase)}这个
+ *         构造方法设置为true，那么在查询和返回时会自动进行转换，但会损耗一部分性能
+ *      6、如果查询参数中，在ES中并不存在此字段，则在ESClient中拼接查询参数时会自动过滤掉
+ *
  */
 public class EsQuery implements Serializable {
     private static final long serialVersionUID = 1L;
     private QueryParam queryParam = new QueryParam();
 
     public EsQuery(){}
+
+    /**
+     * @param snakeCase 是否需要自动参数转换，如果为true，则输入参数为驼峰时，查询ES时会转成下划线，返回结果时又会转成驼峰，反之亦然
+     */
     public EsQuery(boolean snakeCase){
         this.queryParam.setSnakeCase(snakeCase);
     }
@@ -44,7 +58,7 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 查询数据源
+     * 查询数据源，即ES中的index名
      * @param index
      * @return
      */
@@ -136,7 +150,7 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 等同于sql的between
+     * 区间查询，等同于sql的between
      * @param field
      * @param start
      * @param end
@@ -171,12 +185,12 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 模糊匹配(全文检索)
+     * 全文检索，类似于sql的like查询
      * @param field
      * @param value
      * @return
      */
-    public EsQuery like(String field, Object value){
+    public EsQuery fullText(String field, Object value){
         this.queryParam.likeMap.put(filedSnakeCase(field), value);
         return this;
     }
@@ -242,7 +256,7 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 排序
+     * 排序，仅在常规查询有用，聚合查询不起作用
      * @param sortColumns 排序的字段，如果有多个字段，使用英文的逗号分割
      * @return
      */
@@ -284,7 +298,7 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * scroll查询
+     * scroll滚动查询
      * @param scrollId
      * @param expireSec
      * @param pageSize
@@ -299,11 +313,11 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * 查询返回的实体类，如果不调用此方法设置实体类，默认会返回String
+     * 查询结果返回的类，如果这个类在服务端也存在，则查询结果会直接返回这个类的实体对象，如果这个类在服务端不存在，则会抛出异常，如果不设置，默认返回String
      * @param clz
      * @return
      */
-    public EsQuery result(Class clz){
+    public EsQuery resultClass(Class clz){
         this.queryParam.setReturnClassName(clz.getName());
         return this;
     }
