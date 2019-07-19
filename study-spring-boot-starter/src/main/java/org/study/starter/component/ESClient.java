@@ -39,10 +39,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
- * elasticsearch客户端，提供一些常规的方法，如果需要复杂的查询，可通过 #getRestEsClient() 方法取得ES的原生客户端来处理
+ * elasticsearch客户端，提供一些常规的方法，如果需要更复杂的操作，可通过 {@link #getRestEsClient()}方法取得ES的原生客户端来处理
  */
 public class ESClient {
     public static final int MAX_GROUP_SIZE = 1000;//最大分组数量
