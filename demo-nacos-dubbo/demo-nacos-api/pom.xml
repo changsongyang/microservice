@@ -11,4 +11,12 @@
 
     <groupId>org.study</groupId>
     <artifactId>demo-nacos-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+    </dependencies>
 </project>

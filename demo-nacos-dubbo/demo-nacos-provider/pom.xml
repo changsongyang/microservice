@@ -26,6 +26,11 @@
     <dependencies>
         <dependency>
             <groupId>org.study</groupId>
+            <artifactId>common-service</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.study</groupId>
             <artifactId>demo-nacos-api</artifactId>
             <version>${projectVersion}</version>
         </dependency>
@@ -41,15 +46,14 @@
         </dependency>
         <!-- nacos END -->
 
-        <!-- dubbo START -->
         <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <groupId>org.study</groupId>
+            <artifactId>study-spring-boot-starter</artifactId>
+            <version>${projectVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo</artifactId>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
         </dependency>
-        <!-- dubbo END -->
     </dependencies>
 </project>

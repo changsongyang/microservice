@@ -10,6 +10,7 @@ import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.RestResult;
 import org.study.common.statics.pojos.ServiceResult;
+import org.study.common.util.dto.EsQuery;
 import org.study.common.util.utils.JsonUtil;
 import org.study.timer.api.entity.ScheduleJob;
 import org.study.timer.api.service.QuartzAdminService;
@@ -129,5 +130,22 @@ public class TimerController {
     public RestResult resumeInstance(){
         quartzAdminService.resumeInstance();
         return RestResult.bizSuccess(100, "实例恢复成功");
+    }
+
+    @RequestMapping(value = "/esQuery", method = RequestMethod.GET)
+    public EsQuery esQuery(String index){
+        EsQuery esQuery = EsQuery.build(true).from(index);
+
+        esQuery
+//                    .eq("userNo", "888100000005252")
+//                .neq("userNo", "888100000005252")
+                .notIn("alterType", "1,2,3".split(","))
+                .page(1, 20)
+                .orderBy("userNo asc")
+                .result(HashMap.class);
+
+//        esQuery.setQueryParam(new EsQuery.QueryParam());
+//        esQuery.setInnerConfig(new EsQuery.InnerConfig());
+        return quartzAdminService.hello(esQuery);
     }
 }

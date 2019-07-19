@@ -2,6 +2,7 @@ package org.study.timer.provider.facade;
 
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.study.common.util.dto.EsQuery;
 import org.study.timer.provider.core.biz.InstanceStageBiz;
 import org.study.timer.api.service.QuartzAdminService;
 
@@ -42,5 +43,9 @@ public class QuartzAdminServiceImpl implements QuartzAdminService {
     @Override
     public void assertRunning(){
         instanceStageBiz.assertRunning();
+    }
+
+    public EsQuery hello(EsQuery esQuery){
+        return esQuery;
     }
 }

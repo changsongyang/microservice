@@ -1,6 +1,7 @@
 package org.study.timer.api.service;
 
 import org.study.common.statics.exceptions.BizException;
+import org.study.common.util.dto.EsQuery;
 
 /**
  * Quartz实例管理接口，需要消费端启动 cluster="broadcast" 来配合使用
@@ -35,4 +36,6 @@ public interface QuartzAdminService {
      * 断言实例是运行中，如果当前实例为暂停中，则会抛出异常
      */
     public void assertRunning() throws BizException;
+
+    public EsQuery hello(EsQuery esQuery);
 }

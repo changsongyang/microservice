@@ -12,35 +12,11 @@ import java.util.Map;
  */
 public class EsQuery implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final int INI_PARAM_MAP_CAP = 8;//参数的初始容量
-
-    private String index;//一张表就是一个index
-    private String groupBy;//仅在统计时有用,且仅支持单个字段分组
-    private String orderBy;
-    private String returnClassName;
-
-    private boolean snakeCase = false;//是否需要执行驼峰、下划线互转，比如，查询参数为驼峰，ES字段为下划线，查询参数会自动转为下划线，查询结果返回又会把下划线转成驼峰
-    private boolean scrollMode;
-    private String scrollId;
-    private long scrollExpireSec;
-    private int pageCurrent = 1;
-    private int pageSize = 10;
-
-    private String[] selectFields;
-    private Map<String, Object> eqMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> neqMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> gtMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> gteMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> ltMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> lteMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object> likeMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object[]> inMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Object[]> notInMap = new HashMap(INI_PARAM_MAP_CAP);
-    private Map<String, Aggregation> aggMap = new HashMap(INI_PARAM_MAP_CAP);
+    private QueryParam queryParam = new QueryParam();
 
     public EsQuery(){}
     public EsQuery(boolean snakeCase){
-        this.snakeCase = snakeCase;
+        this.queryParam.setSnakeCase(snakeCase);
     }
 
     public static EsQuery build(){
@@ -62,7 +38,7 @@ public class EsQuery implements Serializable {
             for(int i=0; i<fields.length; i++){
                 filedSnakeCase(fields[i]);
             }
-            this.selectFields = newFields;
+            this.queryParam.setSelectFields(newFields);
         }
         return this;
     }
@@ -73,7 +49,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery from(String index){
-        this.index = index;
+        this.queryParam.setIndex(index);
         return this;
     }
 
@@ -84,7 +60,23 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery eq(String field, Object value){
-        this.eqMap.put(filedSnakeCase(field), value);
+        this.queryParam.eqMap.put(filedSnakeCase(field), value);
+        return this;
+    }
+
+    /**
+     * 等于(精确匹配)
+     * @param eqMap
+     * @return
+     */
+    public EsQuery eq(Map<String, Object> eqMap){
+        if(eqMap == null || eqMap.isEmpty()){
+            return this;
+        }
+
+        for(Map.Entry<String, Object> entry : eqMap.entrySet()){
+            this.eq(filedSnakeCase(entry.getKey()), entry.getValue());
+        }
         return this;
     }
 
@@ -95,7 +87,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery neq(String field, Object value){
-        this.neqMap.put(filedSnakeCase(field), value);
+        this.queryParam.neqMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -106,7 +98,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gt(String field, Object value){
-        this.gtMap.put(filedSnakeCase(field), value);
+        this.queryParam.gtMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -117,7 +109,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery gte(String field, Object value){
-        this.gteMap.put(filedSnakeCase(field), value);
+        this.queryParam.gteMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -128,7 +120,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lt(String field, Object value){
-        this.ltMap.put(filedSnakeCase(field), value);
+        this.queryParam.ltMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -139,7 +131,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery lte(String field, Object value){
-        this.lteMap.put(filedSnakeCase(field), value);
+        this.queryParam.lteMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -163,7 +155,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery in(String field, Object[] values){
-        this.inMap.put(filedSnakeCase(field), values);
+        this.queryParam.inMap.put(filedSnakeCase(field), values);
         return this;
     }
 
@@ -174,7 +166,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery notIn(String field, Object[] values){
-        this.notInMap.put(filedSnakeCase(field), values);
+        this.queryParam.notInMap.put(filedSnakeCase(field), values);
         return this;
     }
 
@@ -185,7 +177,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery like(String field, Object value){
-        this.likeMap.put(filedSnakeCase(field), value);
+        this.queryParam.likeMap.put(filedSnakeCase(field), value);
         return this;
     }
 
@@ -195,8 +187,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery count(String field){
-        initAggMapIfNeed(filedSnakeCase(field));
-        this.aggMap.get(filedSnakeCase(field)).setCount(true);
+        this.queryParam.setAgg(filedSnakeCase(field), "count");
         return this;
     }
 
@@ -206,8 +197,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery sum(String field){
-        initAggMapIfNeed(filedSnakeCase(field));
-        this.aggMap.get(filedSnakeCase(field)).setSum(true);
+        this.queryParam.setAgg(filedSnakeCase(field), "sum");
         return this;
     }
 
@@ -217,8 +207,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery max(String field){
-        initAggMapIfNeed(filedSnakeCase(field));
-        this.aggMap.get(filedSnakeCase(field)).setMax(true);
+        this.queryParam.setAgg(filedSnakeCase(field), "max");
         return this;
     }
 
@@ -228,8 +217,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery min(String field){
-        initAggMapIfNeed(filedSnakeCase(field));
-        this.aggMap.get(filedSnakeCase(field)).setMin(true);
+        this.queryParam.setAgg(filedSnakeCase(field), "min");
         return this;
     }
 
@@ -239,8 +227,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery avg(String field){
-        initAggMapIfNeed(filedSnakeCase(field));
-        this.aggMap.get(filedSnakeCase(field)).setAvg(true);
+        this.queryParam.setAgg(filedSnakeCase(field), "avg");
         return this;
     }
 
@@ -250,17 +237,27 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery groupBy(String field){
-        this.groupBy = filedSnakeCase(field);
+        this.queryParam.setGroupBy(filedSnakeCase(field));
         return this;
     }
 
     /**
      * 排序
-     * @param field
+     * @param sortColumns 排序的字段，如果有多个字段，使用英文的逗号分割
      * @return
      */
-    public EsQuery orderBy(String field){
-        this.orderBy = filedSnakeCase(field);
+    public EsQuery orderBy(String sortColumns){
+        StringBuffer sbf = new StringBuffer();
+        String[] sortColumnArray = sortColumns.split(",");
+        for(int i=0; i<sortColumnArray.length; i++){
+            String[] sortColumn = sortColumnArray[i].split(" ");
+            if(sortColumn.length > 1){
+                sbf.append(filedSnakeCase(sortColumn[0])).append(" ").append(sortColumn[1]);
+            }else{
+                sbf.append(filedSnakeCase(sortColumn[0]));
+            }
+        }
+        this.queryParam.setOrderBy(sbf.toString());
         return this;
     }
 
@@ -271,8 +268,8 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery page(Integer pageCurrent, Integer pageSize){
-        this.pageCurrent = pageCurrent;
-        this.pageSize = pageSize;
+        this.queryParam.setPageCurrent(pageCurrent);
+        this.queryParam.setPageSize(pageSize);
         return this;
     }
 
@@ -282,7 +279,7 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery size(Integer pageSize){
-        this.pageSize = pageSize;
+        this.queryParam.setPageSize(pageSize);
         return this;
     }
 
@@ -294,10 +291,10 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery scroll(String scrollId, long expireSec, int pageSize){
-        this.scrollMode = true;
-        this.scrollId = scrollId;
-        this.scrollExpireSec = expireSec;
-        this.pageSize = pageSize;
+        this.queryParam.setScrollMode(true);
+        this.queryParam.setScrollId(scrollId);
+        this.queryParam.setScrollExpireSec(expireSec);
+        this.queryParam.setPageSize(pageSize);
         return this;
     }
 
@@ -307,187 +304,324 @@ public class EsQuery implements Serializable {
      * @return
      */
     public EsQuery result(Class clz){
-        this.returnClassName = clz.getName();
+        this.queryParam.setReturnClassName(clz.getName());
         return this;
     }
 
-    private String filedSnakeCase(String field){
-        return snakeCase ? SnakeCaseUtil.toSnakeCase(field, false) : field;
+    public QueryParam getQueryParam() {
+        return this.queryParam;
     }
+
+    public void setQueryParam(QueryParam queryParam) {
+        this.queryParam = queryParam;
+    }
+
+    private String filedSnakeCase(String field){
+        return this.queryParam.getSnakeCase() ? SnakeCaseUtil.toSnakeCase(field, false) : field;
+    }
+
+
+    /**-------------------- 获取查询参数的方法 START ----------------------**/
+    /**
+     * 理论上，为了保障查询参数的正确性，下面的这些方法返回时，都应该重新new一个对象返回的，但考虑到性能问题，所以没有这样做，仅仅是在开发人员中
+     * 进行约定，大家都约定不对返回值做任何修改操作
+     */
 
     public String getIndex() {
-        return index;
+        return this.queryParam.getIndex();
     }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
     public String getGroupBy() {
-        return groupBy;
+        return this.queryParam.getGroupBy();
     }
-
-    public void setGroupBy(String groupBy) {
-        this.groupBy = groupBy;
-    }
-
     public String getOrderBy() {
-        return orderBy;
+        return this.queryParam.getOrderBy();
     }
-
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-    }
-
     public String getReturnClassName() {
-        return returnClassName;
+        return this.queryParam.getReturnClassName();
     }
-
-    public void setReturnClassName(String returnClassName) {
-        this.returnClassName = returnClassName;
-    }
-
     public boolean getSnakeCase() {
-        return snakeCase;
+        return this.queryParam.getSnakeCase();
     }
-
-    public void setSnakeCase(boolean snakeCase) {
-        this.snakeCase = snakeCase;
-    }
-
     public boolean getScrollMode() {
-        return scrollMode;
+        return this.queryParam.getScrollMode();
     }
-
-    public void setScrollMode(boolean scrollMode) {
-        this.scrollMode = scrollMode;
-    }
-
     public String getScrollId() {
-        return scrollId;
+        return this.queryParam.getScrollId();
     }
-
-    public void setScrollId(String scrollId) {
-        this.scrollId = scrollId;
-    }
-
     public long getScrollExpireSec() {
-        return scrollExpireSec;
+        return this.queryParam.getScrollExpireSec();
     }
-
-    public void setScrollExpireSec(long scrollExpireSec) {
-        this.scrollExpireSec = scrollExpireSec;
-    }
-
     public int getPageCurrent() {
-        return pageCurrent;
+        return this.queryParam.getPageCurrent();
     }
-
-    public void setPageCurrent(int pageCurrent) {
-        this.pageCurrent = pageCurrent;
-    }
-
     public int getPageSize() {
-        return pageSize;
+        return this.queryParam.getPageSize();
     }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
-
     public String[] getSelectFields() {
-        return selectFields;
+        return this.queryParam.getSelectFields();
     }
-
-    public void setSelectFields(String[] selectFields) {
-        this.selectFields = selectFields;
-    }
-
     public Map<String, Object> getEqMap() {
-        return eqMap;
+        return this.queryParam.getEqMap();
     }
-
-    public void setEqMap(Map<String, Object> eqMap) {
-        this.eqMap = eqMap;
-    }
-
     public Map<String, Object> getNeqMap() {
-        return neqMap;
+        return this.queryParam.getNeqMap();
     }
-
-    public void setNeqMap(Map<String, Object> neqMap) {
-        this.neqMap = neqMap;
-    }
-
     public Map<String, Object> getGtMap() {
-        return gtMap;
+        return this.queryParam.getGtMap();
     }
-
-    public void setGtMap(Map<String, Object> gtMap) {
-        this.gtMap = gtMap;
-    }
-
     public Map<String, Object> getGteMap() {
-        return gteMap;
+        return this.queryParam.getGteMap();
     }
-
-    public void setGteMap(Map<String, Object> gteMap) {
-        this.gteMap = gteMap;
-    }
-
     public Map<String, Object> getLtMap() {
-        return ltMap;
+        return this.queryParam.getLtMap();
     }
-
-    public void setLtMap(Map<String, Object> ltMap) {
-        this.ltMap = ltMap;
-    }
-
     public Map<String, Object> getLteMap() {
-        return lteMap;
+        return this.queryParam.getLteMap();
     }
-
-    public void setLteMap(Map<String, Object> lteMap) {
-        this.lteMap = lteMap;
-    }
-
     public Map<String, Object> getLikeMap() {
-        return likeMap;
+        return this.queryParam.getLikeMap();
     }
-
-    public void setLikeMap(Map<String, Object> likeMap) {
-        this.likeMap = likeMap;
-    }
-
     public Map<String, Object[]> getInMap() {
-        return inMap;
+        return this.queryParam.getInMap();
     }
-
-    public void setInMap(Map<String, Object[]> inMap) {
-        this.inMap = inMap;
-    }
-
     public Map<String, Object[]> getNotInMap() {
-        return notInMap;
+        return this.queryParam.getNotInMap();
     }
-
-    public void setNotInMap(Map<String, Object[]> notInMap) {
-        this.notInMap = notInMap;
-    }
-
     public Map<String, Aggregation> getAggMap() {
-        return aggMap;
+        return this.queryParam.getAggMap();
     }
+    /**-------------------- 获取查询参数的方法 END ----------------------**/
 
-    public void setAggMap(Map<String, Aggregation> aggMap) {
-        this.aggMap = aggMap;
-    }
 
-    private void initAggMapIfNeed(String field){
-        if(! aggMap.containsKey(field)){
-            synchronized (this){
-                if(! aggMap.containsKey(field)){
-                    aggMap.put(field, new Aggregation(field));
+    /**
+     * 查询参数，设立内部类的目的是为了查询参数不会被随意更改
+     */
+    private class QueryParam implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private static final int INI_PARAM_MAP_CAP = 8;//参数的初始容量
+
+        private String index; //一张表就是一个index
+        private String groupBy; //仅在统计时有用,且仅支持单个字段分组
+        private String orderBy; //排序字段
+        private String returnClassName; //返回结果的类名
+
+        private boolean snakeCase; //是否需要执行驼峰、下划线互转，比如，查询参数为驼峰，ES字段为下划线，查询参数会自动转为下划线，查询结果返回又会把下划线转成驼峰
+        private boolean scrollMode; //是否是滚动查询
+        private String scrollId; //滚动查询时的scrollId
+        private long scrollExpireSec = 30;
+        private int pageCurrent = 1;
+        private int pageSize = 20;
+
+        private String[] selectFields;
+        private Map<String, Object> eqMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> neqMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> gtMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> gteMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> ltMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> lteMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object> likeMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object[]> inMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Object[]> notInMap = new HashMap(INI_PARAM_MAP_CAP);
+        private Map<String, Aggregation> aggMap = new HashMap(INI_PARAM_MAP_CAP);
+
+        public String getIndex() {
+            return index;
+        }
+
+        public void setIndex(String index) {
+            this.index = index;
+        }
+
+        public String getGroupBy() {
+            return groupBy;
+        }
+
+        public void setGroupBy(String groupBy) {
+            this.groupBy = groupBy;
+        }
+
+        public String getOrderBy() {
+            return orderBy;
+        }
+
+        public void setOrderBy(String orderBy) {
+            this.orderBy = orderBy;
+        }
+
+        public String getReturnClassName() {
+            return returnClassName;
+        }
+
+        public void setReturnClassName(String returnClassName) {
+            this.returnClassName = returnClassName;
+        }
+
+        public boolean getSnakeCase() {
+            return snakeCase;
+        }
+
+        public void setSnakeCase(boolean snakeCase) {
+            this.snakeCase = snakeCase;
+        }
+
+        public boolean getScrollMode() {
+            return scrollMode;
+        }
+
+        public void setScrollMode(boolean scrollMode) {
+            this.scrollMode = scrollMode;
+        }
+
+        public String getScrollId() {
+            return scrollId;
+        }
+
+        public void setScrollId(String scrollId) {
+            this.scrollId = scrollId;
+        }
+
+        public long getScrollExpireSec() {
+            return scrollExpireSec;
+        }
+
+        public void setScrollExpireSec(long scrollExpireSec) {
+            this.scrollExpireSec = scrollExpireSec;
+        }
+
+        public int getPageCurrent() {
+            return pageCurrent;
+        }
+
+        public void setPageCurrent(int pageCurrent) {
+            this.pageCurrent = pageCurrent;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public void setPageSize(int pageSize) {
+            this.pageSize = pageSize;
+        }
+
+        public String[] getSelectFields() {
+            return selectFields;
+        }
+
+        public void setSelectFields(String[] selectFields) {
+            this.selectFields = selectFields;
+        }
+
+        public Map<String, Object> getEqMap() {
+            return eqMap;
+        }
+
+        public void setEqMap(Map<String, Object> eqMap) {
+            this.eqMap = eqMap;
+        }
+
+        public Map<String, Object> getNeqMap() {
+            return neqMap;
+        }
+
+        public void setNeqMap(Map<String, Object> neqMap) {
+            this.neqMap = neqMap;
+        }
+
+        public Map<String, Object> getGtMap() {
+            return gtMap;
+        }
+
+        public void setGtMap(Map<String, Object> gtMap) {
+            this.gtMap = gtMap;
+        }
+
+        public Map<String, Object> getGteMap() {
+            return gteMap;
+        }
+
+        public void setGteMap(Map<String, Object> gteMap) {
+            this.gteMap = gteMap;
+        }
+
+        public Map<String, Object> getLtMap() {
+            return ltMap;
+        }
+
+        public void setLtMap(Map<String, Object> ltMap) {
+            this.ltMap = ltMap;
+        }
+
+        public Map<String, Object> getLteMap() {
+            return lteMap;
+        }
+
+        public void setLteMap(Map<String, Object> lteMap) {
+            this.lteMap = lteMap;
+        }
+
+        public Map<String, Object> getLikeMap() {
+            return likeMap;
+        }
+
+        public void setLikeMap(Map<String, Object> likeMap) {
+            this.likeMap = likeMap;
+        }
+
+        public Map<String, Object[]> getInMap() {
+            return inMap;
+        }
+
+        public void setInMap(Map<String, Object[]> inMap) {
+            this.inMap = inMap;
+        }
+
+        public Map<String, Object[]> getNotInMap() {
+            return notInMap;
+        }
+
+        public void setNotInMap(Map<String, Object[]> notInMap) {
+            this.notInMap = notInMap;
+        }
+
+        public Map<String, Aggregation> getAggMap() {
+            return aggMap;
+        }
+
+        public void setAggMap(Map<String, Aggregation> aggMap) {
+            this.aggMap = aggMap;
+        }
+
+        private void setAgg(String field, String type){
+            initAggMapIfNeed(field);
+            switch(type){
+                case "count":
+                    this.aggMap.get(field).setCount(true);
+                    break;
+                case "sum":
+                    this.aggMap.get(field).setSum(true);
+                    break;
+                case "min":
+                    this.aggMap.get(field).setMin(true);
+                    break;
+                case "max":
+                    this.aggMap.get(field).setMax(true);
+                    break;
+                case "avg":
+                    this.aggMap.get(field).setAvg(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void initAggMapIfNeed(String field){
+            if(! this.aggMap.containsKey(field)){
+                synchronized (this){
+                    if(! this.aggMap.containsKey(field)){
+                        this.aggMap.put(field, new Aggregation(field));
+                    }
                 }
             }
         }

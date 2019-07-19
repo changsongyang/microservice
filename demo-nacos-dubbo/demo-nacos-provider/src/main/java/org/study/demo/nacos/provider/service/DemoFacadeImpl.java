@@ -1,6 +1,7 @@
 package org.study.demo.nacos.provider.service;
 
 import org.apache.dubbo.config.annotation.Service;
+import org.study.common.util.dto.EsQuery;
 import org.study.demo.nacos.api.facade.DemoFacade;
 import org.study.demo.nacos.api.vo.HelloVo;
 
@@ -19,5 +20,9 @@ public class DemoFacadeImpl implements DemoFacade {
         vo.setContent("Hello World: " + helloVo.getContent());
         vo.setDescription("这是一个Hello World样例 inputCount="+helloVo.getCount()+",newCount="+count);
         return vo;
+    }
+
+    public EsQuery hello(EsQuery esQuery){
+        return esQuery;
     }
 }

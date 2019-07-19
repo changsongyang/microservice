@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.study.common.util.dto.EsQuery;
 import org.study.demo.nacos.api.facade.DemoFacade;
 import org.study.demo.nacos.api.vo.HelloVo;
 
+import java.util.HashMap;
 import java.util.Random;
 
 @RestController
@@ -29,5 +31,19 @@ public class DemoController {
         helloVo.setCount(new Random().nextInt(20));
         helloVo.setDescription("测试一下");
         return demoFacade.syaHello(helloVo);
+    }
+
+    @RequestMapping(value = "/esQuery", method = RequestMethod.GET)
+    public EsQuery esQuery(String index){
+        EsQuery esQuery = EsQuery.build(true).from(index);
+
+        esQuery
+//                    .eq("userNo", "888100000005252")
+//                .neq("userNo", "888100000005252")
+                .notIn("alterType", "1,2,3".split(","))
+                .page(1, 20)
+                .orderBy("userNo asc")
+                .result(HashMap.class);
+        return demoFacade.hello(esQuery);
     }
 }
