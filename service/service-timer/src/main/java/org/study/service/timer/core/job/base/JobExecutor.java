@@ -34,11 +34,10 @@ public class JobExecutor implements Job {
     public void execute(JobExecutionContext var1) throws JobExecutionException {
         JobKey jobKey = var1.getJobDetail().getKey();
 
-        //因不知Quartz是否能完全暂停住任务，为保险起见，此处再次校验
         if(! instanceStageBiz.isInitFinished()){
             logger.error("当前实例未完成初始化，不可触发任务，将忽略本次任务 jobGroup={} jobName={}", jobKey.getGroup(), jobKey.getName());
             return;
-        }else if(instanceStageBiz.isStandByMode()){
+        }else if(instanceStageBiz.isStandByMode()){ //万一Quartz没能完全暂停住实例，此处再次校验，做最后保障
             logger.error("当前实例挂起中，不可触发任务，将忽略本次任务 jobGroup={} jobName={}", jobKey.getGroup(), jobKey.getName());
             return;
         }
@@ -50,11 +49,11 @@ public class JobExecutor implements Job {
             logger.error("JobExecutor_jobGroup={} jobName={} 获取ScheduleJob时发生异常", jobKey.getGroup(), jobKey.getName(), e);
             return;
         }
-
+        
         if(scheduleJob != null){
             quartzBiz.notifyExecuteScheduleJob(scheduleJob);
         }else{
-            throw new JobExecutionException("JobExecutor_jobGroup="+jobKey.getGroup()+"_jobName="+jobKey.getName()+"对应的定时任务对象(ScheduleJob)不存在");
+            throw new JobExecutionException("jobGroup="+jobKey.getGroup()+" jobName="+jobKey.getName()+"对应的定时任务对象(ScheduleJob)不存在");
         }
     }
 }
