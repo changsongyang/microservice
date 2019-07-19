@@ -11,12 +11,56 @@
 
     <groupId>org.stufy</groupId>
     <artifactId>demo-quartz-timer</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>demo-quartz-timer-api</module>
-        <module>demo-quartz-timer-provider</module>
-        <module>demo-quartz-timer-consumer</module>
-    </modules>
+    <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>facade-timer</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- dubbo START -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-dependencies-zookeeper</artifactId>
+            <type>pom</type>
+        </dependency>
+        <!-- dubbo END -->
+
+        <!-- nacos START -->
+        <dependency><!-- 把nacos作为配置中心时需要引入的依赖 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!-- nacos END -->
+
+        <dependency>
+            <groupId>org.study</groupId>
+            <artifactId>study-spring-boot-starter</artifactId>
+            <version>${projectVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
 </project>
