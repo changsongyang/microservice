@@ -208,6 +208,7 @@ public class ESClient {
     private SearchResponse executeQuery(EsQuery esQuery){
         paramCheck(esQuery, false);
 
+        //如果是滚动查询，则查询后直接返回即可
         if(esQuery.getScrollMode() && StringUtil.isNotEmpty(esQuery.getScrollId())){
             SearchScrollRequest scrollRequest = new SearchScrollRequest(esQuery.getScrollId());
             scrollRequest.scroll(TimeValue.timeValueSeconds(esQuery.getScrollExpireSec()));
@@ -250,8 +251,8 @@ public class ESClient {
         paramCheck(esQuery, true);
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(getQueryBuilder(esQuery));
-        appendAggregation(sourceBuilder, esQuery);
+        appendAggregation(sourceBuilder, esQuery);//设置聚合维度
+        sourceBuilder.query(getQueryBuilder(esQuery));//设置查询过滤条件
 
         SearchRequest searchRequest = new SearchRequest(esQuery.getIndex());
         searchRequest.source(sourceBuilder);

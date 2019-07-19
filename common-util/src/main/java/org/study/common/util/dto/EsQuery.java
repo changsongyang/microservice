@@ -18,6 +18,8 @@ import java.util.Map;
  *      5、如果ES中存储的字段名和查询参数名格式不一致(如ES中是下划线，查询参数是驼峰)，可使用{@link #EsQuery(boolean snakeCase)}这个
  *         构造方法设置为true，那么在查询和返回时会自动进行转换，但会损耗一部分性能
  *      6、如果查询参数中，在ES中并不存在此字段，则在ESClient中拼接查询参数时会自动过滤掉
+ *      7、如果是普通的分页查询，建议不要超过10000条，不然会报错，这是ES为避免深分页问题而特意设置的，如果需要遍历数据，需要使用scroll滚动查询
+ *      8、使用scroll滚动查询时，首次查询时scrollId设置空值即可，查询返回之后，再把scrollId设置到查询参数即可
  *
  */
 public class EsQuery implements Serializable {
@@ -298,17 +300,27 @@ public class EsQuery implements Serializable {
     }
 
     /**
-     * scroll滚动查询
-     * @param scrollId
+     * 设置使用scroll滚动查询，首次查询时调用
      * @param expireSec
      * @param pageSize
      * @return
      */
-    public EsQuery scroll(String scrollId, long expireSec, int pageSize){
+    public EsQuery scroll(long expireSec, int pageSize){
         this.queryParam.setScrollMode(true);
-        this.queryParam.setScrollId(scrollId);
+        this.queryParam.setScrollId(null);
         this.queryParam.setScrollExpireSec(expireSec);
         this.queryParam.setPageSize(pageSize);
+        return this;
+    }
+
+    /**
+     * scroll滚动查询过一次之后，服务端已经返回了scrollId，需要设置进来
+     * @param scrollId
+     * @return
+     */
+    public EsQuery scrollId(String scrollId){
+        this.queryParam.setScrollMode(true);
+        this.queryParam.setScrollId(scrollId);
         return this;
     }
 
