@@ -1,6 +1,5 @@
 package org.study.service.timer.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -18,10 +17,6 @@ import java.util.Properties;
  */
 @SpringBootConfiguration
 public class QuartzConfig {
-    @Autowired
-    DataSource dataSource;
-    @Autowired
-    PlatformTransactionManager transactionManager;
 
     /**
      * spring用来和Quartz交互的对象
@@ -29,7 +24,7 @@ public class QuartzConfig {
      * @return
      */
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(){
+    public SchedulerFactoryBean schedulerFactoryBean(PlatformTransactionManager transactionManager, DataSource dataSource){
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setJobFactory(jobFactory());
         //设置数据源
