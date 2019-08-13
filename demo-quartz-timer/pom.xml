@@ -48,7 +48,7 @@
 
         <!-- nacos START -->
         <dependency><!-- 把nacos作为配置中心时需要引入的依赖 -->
-            <groupId>org.springframework.cloud</groupId>
+            <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
         <!-- nacos END -->

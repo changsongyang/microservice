@@ -22,7 +22,6 @@ public class MD5Util {
     }
 
     /**
-     *
      * @param str
      * @return
      */

@@ -199,7 +199,7 @@ public class RSAUtil {
         Map<String, String> keyMap = genKeyPair();
         Map<String, String> keyMap2 = genKeyPair();
 
-        String data = "都是交流交流发就发给对方感到我认为日u我认465dff34DWS34PO发的发生的34343，。？@！#%￥%~,;'=》》‘；【】@";
+        String data = "都是交流交流发就发给对方感到我认为日u我认465dff34DWS34PO发的发生的34343，。？@！#%￥%~,;'=》》‘；【】@发生的开发商的方式飞机克里斯多夫快回家的思考方式对方老师的讲课费";
 
         String sign = sign(data, keyMap.get(PRIVATE_KEY));//使用私钥签名
 
@@ -208,6 +208,10 @@ public class RSAUtil {
 
         System.out.println("isOk_1="+isOk_1);
         System.out.println("isOk_2="+isOk_2);
+
+        String encrypted = encrypt(data, keyMap.get(PUBLIC_KEY), false);
+        System.out.println("encrypted = " + encrypted);
+        System.out.println("decrypted = " + decrypt(encrypted, keyMap.get(PRIVATE_KEY)));
 
 //        String dataEncrypt = encrypt(data, keyMap.get(PUBLIC_KEY), false);
 //        String dataDecrypt = decrypt(dataEncrypt, keyMap.get(PRIVATE_KEY));//使用正确的私钥解密

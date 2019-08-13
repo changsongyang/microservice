@@ -100,7 +100,7 @@ public class ResponseModifyFilter extends AbstractGlobalFilter {
 
 	public String buildNewResponseBody(ServerWebExchange exchange, String originalBody){
 		RequestParam requestParam = (RequestParam) exchange.getAttributes().get(CACHE_REQUEST_BODY_OBJECT_KEY);
-		ResponseParam responseParam = JsonUtil.toBeanOrderly(originalBody, ResponseParam.class);
+		ResponseParam responseParam = JsonUtil.toBean(originalBody, ResponseParam.class);
 		if(responseParam == null){
 			responseParam = new ResponseParam();
 		}

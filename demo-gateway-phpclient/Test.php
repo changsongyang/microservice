@@ -61,7 +61,7 @@ for($i=1; $i<=1; $i++){
 
     $itemName = str_pad($i, 5, "0", STR_PAD_LEFT);
     $detail->setDetailNo( $detailNo . $itemName);
-    $detail->setName("明细明细明细明细明细明细明细明细abcdefghijklmnopqrstuvwxyz" . $itemName);
+    $detail->setName("都是交流交流发就发给对方感到我认为日u我认465dff34DWS34PO发的发生的34343，。？@！#%￥%~,;'=》》‘；【】@发生的开发商的方式飞机克里斯多夫快回家的思考方式对方老师的讲课费" . $itemName);
     $detail->setCount(1);
     $detail->setAmount($amount);
 
