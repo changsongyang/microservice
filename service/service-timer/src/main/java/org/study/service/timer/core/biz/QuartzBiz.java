@@ -30,7 +30,7 @@ public class QuartzBiz {
     @Autowired
     ScheduleJobDao scheduleJobDao;
     @Autowired
-    JobNotifier mqSender;
+    JobNotifier jobNotifier;
     @Autowired
     JobManager jobManager;
 
@@ -40,7 +40,7 @@ public class QuartzBiz {
             throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不存在");
         }
 
-        return mqSender.sendScheduleJobMessage(scheduleJob);
+        return jobNotifier.notify(scheduleJob);
     }
 
     /**
@@ -235,8 +235,13 @@ public class QuartzBiz {
             if(scheduleJob != null){
                 scheduleJobDao.deleteByPk(scheduleJob.getId());
             }
-            jobManager.deleteJob(jobGroup, jobName);
-            return true;
+            boolean isOk = jobManager.deleteJob(jobGroup, jobName);
+            if(isOk){
+                return true;
+            }else{
+                //抛出异常让事务回滚
+                throw new BizException("删除任务失败");
+            }
         }catch (BizException e){
             throw e;
         }catch (Throwable e){

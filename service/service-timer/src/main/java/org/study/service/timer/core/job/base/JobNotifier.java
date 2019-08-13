@@ -3,6 +3,7 @@ package org.study.service.timer.core.job.base;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQProperties;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.study.common.util.utils.StringUtil;
 import org.study.facade.timer.entity.ScheduleJob;
 import org.study.starter.component.RocketMQSender;
 
+import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
@@ -25,10 +27,22 @@ public class JobNotifier {
 
     @Autowired(required = false)
     private RocketMQSender rocketMQSender;
+
     @Autowired(required = false)
     private JmsTemplate jmsTemplate;
+    @Autowired(required = false)
+    private ActiveMQProperties activeMQProperties;
 
-    public boolean sendScheduleJobMessage(ScheduleJob scheduleJob) throws BizException {
+    @PostConstruct
+    public void init(){
+        if(activeMQProperties != null &&
+                (StringUtil.isEmpty(activeMQProperties.getBrokerUrl()) || activeMQProperties.getBrokerUrl().indexOf("localhost") > 0)){
+            logger.warn("---------------------------------> ActiveMQ使用本地内嵌Broker <---------------------------------");//提示作用
+        }
+    }
+
+
+    public boolean notify(ScheduleJob scheduleJob) throws BizException {
         if(scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ROCKET)){
             return this.sendRocketMQ(scheduleJob);
         }else if(scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ACTIVE)){
