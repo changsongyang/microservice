@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.common.statics.constants.MsgTopicAndTags;
 import org.study.common.statics.enums.TimeUnitEnum;
+import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.statics.pojos.RestResult;
-import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.util.utils.JsonUtil;
 import org.study.facade.timer.entity.ScheduleJob;
 import org.study.facade.timer.service.QuartzAdminService;
@@ -28,53 +28,67 @@ public class TimerController {
     QuartzAdminService quartzAdminService;
 
     @RequestMapping(value = "addSimpleTimer", method = RequestMethod.POST)
-    public RestResult addSimpleTimer(Integer intervalSecond, String jobDescription, String param){
+    public RestResult addSimpleTimer(Integer intervalSecond, String jobDescription, String param, Integer mqType){
         if(intervalSecond == null || intervalSecond <= 0){
             return RestResult.bizSuccess(101, "intervalSecond必须大于0");
         }
         String jobGroup = "simpleTimerGroup";
         String jobName = "simpleTimerJob";
-        ScheduleJob scheduleJob = ScheduleJob.newSimpleTask(
-                jobGroup, jobName, MsgTopicAndTags.TOPIC_QUARTZ_TIMER, MsgTopicAndTags.TAG_TIMER_SIMPLE);
+        String destination = MsgTopicAndTags.TOPIC_QUARTZ_TIMER + ":" + MsgTopicAndTags.TAG_TIMER_SIMPLE;
+        ScheduleJob scheduleJob = ScheduleJob.newSimpleTask(jobGroup, jobName, destination);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setIntervals(intervalSecond);
         scheduleJob.setIntervalUnit(TimeUnitEnum.SECOND.getValue());
         scheduleJob.setJobDescription(jobDescription);
+        scheduleJob.setMqType(mqType);
 
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("param", param);
         scheduleJob.setParamJson(JsonUtil.toString(paramMap));
 
-        ServiceResult serviceResult = quartzService.add(scheduleJob);
-        if(serviceResult.isSuccess()){
-            return RestResult.bizSuccess(100, "添加简单定时任务成功");
-        }else{
-            return RestResult.bizFail(101, serviceResult.getMessage());
+        try{
+            Long id = quartzService.add(scheduleJob);
+            if(id != null){
+                return RestResult.bizSuccess(100, "添加简单定时任务成功");
+            }else{
+                return RestResult.bizFail(101, "添加失败");
+            }
+        }catch(BizException e){
+            return RestResult.bizFail(101, e.getMsg());
+        }catch(Throwable e){
+            return RestResult.bizFail(101, "系统异常 "+e.getMessage());
         }
     }
 
     @RequestMapping(value = "addCronTimer", method = RequestMethod.POST)
-    public RestResult addCronTimer(String cron, String jobDescription, String param){
+    public RestResult addCronTimer(String cron, String jobDescription, String param, Integer mqType){
         if(cron == null || cron.trim().length() <= 0){
             return RestResult.bizSuccess(101, "cron表达式不能为空");
         }
         String jobGroup = "cronTimerGroup";
         String jobName = "cronTimerJob";
-        ScheduleJob scheduleJob = ScheduleJob.newCronTask(
-                jobGroup, jobName, MsgTopicAndTags.TOPIC_QUARTZ_TIMER, MsgTopicAndTags.TAG_TIMER_CRON);
+        String destination = MsgTopicAndTags.TOPIC_QUARTZ_TIMER + ":" + MsgTopicAndTags.TAG_TIMER_SIMPLE;
+        ScheduleJob scheduleJob = ScheduleJob.newCronTask(jobGroup, jobName, destination);
         scheduleJob.setStartTime(new Date());
         scheduleJob.setCronExpression(cron);
         scheduleJob.setJobDescription(jobDescription);
+        scheduleJob.setMqType(mqType);
 
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("param", param);
         scheduleJob.setParamJson(JsonUtil.toString(paramMap));
 
-        ServiceResult serviceResult = quartzService.add(scheduleJob);
-        if(serviceResult.isSuccess()){
-            return RestResult.bizSuccess(100, "添加cron定时任务成功");
-        }else{
-            return RestResult.bizFail(101, serviceResult.getMessage());
+        try{
+            Long id = quartzService.add(scheduleJob);
+            if(id != null){
+                return RestResult.bizSuccess(100, "添加cron定时任务成功");
+            }else{
+                return RestResult.bizFail(101, "添加失败");
+            }
+        }catch(BizException e){
+            return RestResult.bizFail(101, e.getMsg());
+        }catch(Throwable e){
+            return RestResult.bizFail(101, "系统异常 "+e.getMessage());
         }
     }
 
@@ -90,31 +104,49 @@ public class TimerController {
 
     @RequestMapping(value = "deleteTimer", method = RequestMethod.POST)
     public RestResult deleteTimer(String jobGroup, String jobName){
-        ServiceResult serviceResult = quartzService.delete(jobGroup, jobName);
-        if(serviceResult.isSuccess()){
-            return RestResult.bizSuccess(100, "删除成功");
-        }else{
-            return RestResult.bizFail(101, serviceResult.getMessage());
+        try{
+            boolean isSuccess = quartzService.delete(jobGroup, jobName);
+            if(isSuccess){
+                return RestResult.bizSuccess(100, "删除成功");
+            }else{
+                return RestResult.bizFail(101, "删除失败");
+            }
+        }catch(BizException e){
+            return RestResult.bizFail(101, e.getMsg());
+        }catch(Throwable e){
+            return RestResult.bizFail(101, "系统异常 "+e.getMessage());
         }
     }
 
     @RequestMapping(value = "pauseTimer", method = RequestMethod.POST)
     public RestResult pauseTimer(String jobGroup, String jobName){
-        ServiceResult serviceResult = quartzService.pauseJob(jobGroup, jobName);
-        if(serviceResult.isSuccess()){
-            return RestResult.bizSuccess(100, "暂停成功");
-        }else{
-            return RestResult.bizFail(101, serviceResult.getMessage());
+        try{
+            boolean isSuccess = quartzService.pauseJob(jobGroup, jobName);
+            if(isSuccess){
+                return RestResult.bizSuccess(100, "暂停成功");
+            }else{
+                return RestResult.bizFail(101, "暂停失败");
+            }
+        }catch(BizException e){
+            return RestResult.bizFail(101, e.getMsg());
+        }catch(Throwable e){
+            return RestResult.bizFail(101, "系统异常 "+e.getMessage());
         }
     }
 
     @RequestMapping(value = "resumeJob", method = RequestMethod.POST)
     public RestResult resumeJob(String jobGroup, String jobName){
-        ServiceResult serviceResult = quartzService.resumeJob(jobGroup, jobName);
-        if(serviceResult.isSuccess()){
-            return RestResult.bizSuccess(100, "恢复成功");
-        }else{
-            return RestResult.bizFail(101, serviceResult.getMessage());
+        try{
+            boolean isSuccess = quartzService.resumeJob(jobGroup, jobName);
+            if(isSuccess){
+                return RestResult.bizSuccess(100, "恢复成功");
+            }else{
+                return RestResult.bizFail(101, "恢复失败");
+            }
+        }catch(BizException e){
+            return RestResult.bizFail(101, e.getMsg());
+        }catch(Throwable e){
+            return RestResult.bizFail(101, "系统异常 "+e.getMessage());
         }
     }
 
