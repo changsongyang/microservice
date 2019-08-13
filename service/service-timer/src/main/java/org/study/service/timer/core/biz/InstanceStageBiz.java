@@ -57,11 +57,7 @@ public class InstanceStageBiz {
                 throw new BizException("暂停失败！数据库处理失败！");
             }
 
-            ServiceResult<String> result = jobManager.pauseInstance();
-            if(result.isError()){
-                throw new BizException(result.getMessage());
-            }
-
+            jobManager.pauseInstance();
             isRunning = false;
         }
     }
@@ -88,11 +84,7 @@ public class InstanceStageBiz {
                 }
             }
 
-            ServiceResult<String> result = jobManager.resumeInstance();
-            if(result.isError()){
-                throw new BizException(result.getMessage());
-            }
-
+            jobManager.resumeInstance();
             isRunning = true;
         }
     }
