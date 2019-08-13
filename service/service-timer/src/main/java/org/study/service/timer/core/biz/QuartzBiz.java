@@ -319,9 +319,9 @@ public class QuartzBiz {
         }else if(StringUtil.isEmpty(scheduleJob.getJobName())){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务名(jobName)不能为空");
         }else if(StringUtil.isEmpty(scheduleJob.getDestination())){
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务通知目的地不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务通知目的地(destination)不能为空");
         }else if(StringUtil.isEmpty(scheduleJob.getMqType())){
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "消息中间件类型不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "MQ类型(mqType)不能为空");
         }else if(scheduleJob.getStartTime() == null){
             throw new BizException(BizException.PARAM_VALIDATE_ERROR, "开始时间(startTime)不能为空");
         }
@@ -337,11 +337,11 @@ public class QuartzBiz {
                 throw new BizException(BizException.PARAM_VALIDATE_ERROR, "cron表达式(cronExpression)不能为空");
             }
         }else{
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的任务类型: " + scheduleJob.getJobType());
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的任务类型jobType: " + scheduleJob.getJobType());
         }
 
         if(! scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ROCKET) && ! scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ACTIVE)){
-            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的MQ类型: " + scheduleJob.getMqType());
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的MQ类型mqType: " + scheduleJob.getMqType());
         }
     }
 }
