@@ -12,8 +12,8 @@
 		<result column="JOB_GROUP" property="jobGroup" jdbcType="VARCHAR"/>
 		<result column="JOB_NAME" property="jobName" jdbcType="VARCHAR"/>
 		<result column="JOB_TYPE" property="jobType" jdbcType="SMALLINT"/>
-		<result column="TOPIC" property="topic" jdbcType="VARCHAR"/>
-		<result column="TAGS" property="tags" jdbcType="VARCHAR"/>
+		<result column="MQ_TYPE" property="mqType" jdbcType="SMALLINT"/>
+		<result column="DESTINATION" property="destination" jdbcType="VARCHAR"/>
 		<result column="START_TIME" property="startTime" jdbcType="TIMESTAMP"/>
 		<result column="END_TIME" property="endTime" jdbcType="TIMESTAMP"/>
 		<result column="INTERVALS" property="intervals" jdbcType="INTEGER"/>
@@ -36,8 +36,8 @@
 		JOB_GROUP,
 		JOB_NAME,
 		JOB_TYPE,
-		TOPIC,
-		TAGS,
+		MQ_TYPE,
+		DESTINATION,
 		START_TIME,
 		END_TIME,
 		INTERVALS,
@@ -60,8 +60,8 @@
         	JOB_GROUP,
         	JOB_NAME,
         	JOB_TYPE,
-        	TOPIC,
-        	TAGS,
+			MQ_TYPE,
+			DESTINATION,
         	START_TIME,
         	END_TIME,
         	INTERVALS,
@@ -80,8 +80,8 @@
 			#{jobGroup,jdbcType=VARCHAR},
 			#{jobName,jdbcType=VARCHAR},
 			#{jobType,jdbcType=SMALLINT},
-			#{topic,jdbcType=VARCHAR},
-			#{tags,jdbcType=VARCHAR},
+			#{mqType,jdbcType=SMALLINT},
+			#{destination,jdbcType=VARCHAR},
 			#{startTime,jdbcType=TIMESTAMP},
 			#{endTime,jdbcType=TIMESTAMP},
 			#{intervals,jdbcType=INTEGER},
@@ -105,8 +105,8 @@
         	JOB_GROUP,
         	JOB_NAME,
         	JOB_TYPE,
-        	TOPIC,
-        	TAGS,
+			MQ_TYPE,
+			DESTINATION,
         	START_TIME,
         	END_TIME,
         	INTERVALS,
@@ -127,8 +127,8 @@
 			#{item.jobGroup,jdbcType=VARCHAR},
 			#{item.jobName,jdbcType=VARCHAR},
 			#{item.jobType,jdbcType=SMALLINT},
-			#{item.topic,jdbcType=VARCHAR},
-			#{item.tags,jdbcType=VARCHAR},
+			#{item.mqType,jdbcType=SMALLINT},
+			#{item.destination,jdbcType=VARCHAR},
 			#{item.startTime,jdbcType=TIMESTAMP},
 			#{item.endTime,jdbcType=TIMESTAMP},
 			#{item.intervals,jdbcType=INTEGER},
@@ -154,8 +154,8 @@
 			JOB_GROUP = #{jobGroup,jdbcType=VARCHAR},
 			JOB_NAME = #{jobName,jdbcType=VARCHAR},
 			JOB_TYPE = #{jobType,jdbcType=SMALLINT},
-			TOPIC = #{topic,jdbcType=VARCHAR},
-			TAGS = #{tags,jdbcType=VARCHAR},
+			MQ_TYPE = #{mqType,jdbcType=SMALLINT},
+			DESTINATION = #{destination,jdbcType=VARCHAR},
 			START_TIME = #{startTime,jdbcType=TIMESTAMP},
 			END_TIME = #{endTime,jdbcType=TIMESTAMP},
 			INTERVALS = #{intervals,jdbcType=INTEGER},
@@ -189,11 +189,11 @@
 			<if test="jobType != null">
 				JOB_TYPE = #{jobType,jdbcType=SMALLINT},
 			</if>
-			<if test="topic != null">
-				TOPIC = #{topic,jdbcType=VARCHAR},
+			<if test="mqType != null">
+				MQ_TYPE = #{mqType,jdbcType=SMALLINT},
 			</if>
-			<if test="tags != null">
-				TAGS = #{tags,jdbcType=VARCHAR},
+			<if test="destination != null">
+				DESTINATION = #{destination,jdbcType=VARCHAR},
 			</if>
 			<if test="startTime != null">
 				START_TIME = #{startTime,jdbcType=TIMESTAMP},
@@ -323,11 +323,11 @@
 		<if test="jobType != null ">
 			AND JOB_TYPE = #{jobType,jdbcType=SMALLINT}
 		</if>
-		<if test="topic != null and topic !='' ">
-			AND TOPIC = #{topic,jdbcType=VARCHAR}
+		<if test="mqType != null and mqType !='' ">
+			AND MQ_TYPE = #{mqType,jdbcType=SMALLINT}
 		</if>
-		<if test="tags != null and tags !='' ">
-			AND TAGS = #{tags,jdbcType=VARCHAR}
+		<if test="destination != null and destination !='' ">
+			AND DESTINATION = #{destination,jdbcType=VARCHAR}
 		</if>
 		<if test="startTime != null ">
 			AND START_TIME = #{startTime,jdbcType=TIMESTAMP}
