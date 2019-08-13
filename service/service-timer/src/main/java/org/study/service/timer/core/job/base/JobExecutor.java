@@ -53,7 +53,7 @@ public class JobExecutor implements Job {
         }
         
         if(scheduleJob != null){
-            jobNotifier.sendScheduleMessage(scheduleJob);
+            jobNotifier.sendScheduleJobMessage(scheduleJob);
         }else{
             throw new JobExecutionException("jobGroup="+jobKey.getGroup()+" jobName="+jobKey.getName()+"对应的定时任务对象(ScheduleJob)不存在");
         }

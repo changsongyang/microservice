@@ -40,7 +40,7 @@ public class QuartzBiz {
             throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不存在");
         }
 
-        return mqSender.sendScheduleMessage(scheduleJob);
+        return mqSender.sendScheduleJobMessage(scheduleJob);
     }
 
     /**

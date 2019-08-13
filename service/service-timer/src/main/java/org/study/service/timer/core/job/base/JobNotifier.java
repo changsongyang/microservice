@@ -28,7 +28,7 @@ public class JobNotifier {
     @Autowired(required = false)
     private JmsTemplate jmsTemplate;
 
-    public boolean sendScheduleMessage(ScheduleJob scheduleJob) throws BizException {
+    public boolean sendScheduleJobMessage(ScheduleJob scheduleJob) throws BizException {
         if(scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ROCKET)){
             return this.sendRocketMQ(scheduleJob);
         }else if(scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ACTIVE)){
