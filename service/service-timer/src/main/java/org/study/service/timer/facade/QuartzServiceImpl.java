@@ -27,37 +27,37 @@ public class QuartzServiceImpl implements QuartzService {
      * @param jobName
      * @return
      */
-    public ServiceResult sendJobNotify(String jobGroup, String jobName){
+    public boolean sendJobNotify(String jobGroup, String jobName){
         return quartzBiz.sendJobNotify(jobGroup, jobName);
     }
 
     @Override
-    public ServiceResult<Date> add(ScheduleJob scheduleJob){
+    public Long add(ScheduleJob scheduleJob){
         return quartzBiz.add(scheduleJob);
     }
 
     @Override
-    public ServiceResult rescheduleJob(ScheduleJob scheduleJob){
+    public boolean rescheduleJob(ScheduleJob scheduleJob){
         return quartzBiz.rescheduleJob(scheduleJob);
     }
 
     @Override
-    public ServiceResult delete(String jobGroup, String jobName){
+    public boolean delete(String jobGroup, String jobName){
         return quartzBiz.delete(jobGroup, jobName);
     }
 
     @Override
-    public ServiceResult pauseJob(String jobGroup, String jobName){
+    public boolean pauseJob(String jobGroup, String jobName){
         return quartzBiz.pauseJob(jobGroup, jobName);
     }
 
     @Override
-    public ServiceResult resumeJob(String jobGroup, String jobName){
+    public boolean resumeJob(String jobGroup, String jobName){
         return quartzBiz.resumeJob(jobGroup, jobName);
     }
 
     @Override
-    public ServiceResult triggerJob(String jobGroup, String jobName){
+    public boolean triggerJob(String jobGroup, String jobName){
         return quartzBiz.triggerJob(jobGroup, jobName);
     }
 

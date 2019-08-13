@@ -1,19 +1,19 @@
 package org.study.service.timer.core.biz;
 
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
-import org.study.common.statics.pojos.ServiceResult;
-import org.study.common.statics.vo.MessageVo;
-import org.study.common.util.utils.DateUtil;
+import org.study.common.util.utils.JsonUtil;
 import org.study.common.util.utils.StringUtil;
 import org.study.service.timer.core.dao.ScheduleJobDao;
 import org.study.service.timer.core.job.base.JobManager;
-import org.study.starter.component.RocketMQSender;
+import org.study.service.timer.core.job.base.JobNotifier;
 import org.study.facade.timer.entity.ScheduleJob;
 
 import java.util.Date;
@@ -26,25 +26,21 @@ import java.util.Map;
  */
 @Component
 public class QuartzBiz {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     ScheduleJobDao scheduleJobDao;
     @Autowired
-    RocketMQSender rocketMQSender;
+    JobNotifier mqSender;
     @Autowired
     JobManager jobManager;
 
-    public ServiceResult sendJobNotify(String jobGroup, String jobName){
+    public boolean sendJobNotify(String jobGroup, String jobName){
         ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
         if(scheduleJob == null){
-            return ServiceResult.fail("任务不存在");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不存在");
         }
 
-        boolean isOk = notifyExecuteScheduleJob(scheduleJob);
-        if(isOk){
-            return ServiceResult.success("通知成功");
-        }else{
-            return ServiceResult.fail("通知失败");
-        }
+        return mqSender.sendScheduleMessage(scheduleJob);
     }
 
     /**
@@ -53,15 +49,25 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult<Date> add(ScheduleJob scheduleJob){
+    public Long add(ScheduleJob scheduleJob){
+        this.checkJobParam(scheduleJob);
+        this.initScheduleJob(scheduleJob);
+
         try{
-            this.initScheduleJob(scheduleJob);
             scheduleJobDao.insert(scheduleJob);
-            ServiceResult<Date> resultBean = jobManager.addJob(scheduleJob);
+            Date startTime = jobManager.addJob(scheduleJob);
             //还需要再次更新ScheduleJob，因为addJob方法内部会设置scheduleJob的jobStatus、nextExecuteTime等
-            scheduleJobDao.updateIfNotNull(scheduleJob);
-            return resultBean;
+            if(startTime != null){
+                scheduleJobDao.updateIfNotNull(scheduleJob);
+                return scheduleJob.getId();
+            }else{
+                //抛出异常让事务回滚
+                throw new BizException("添加任务失败");
+            }
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
+            logger.error("添加任务时出现异常 ScheduleJob = {} ", JsonUtil.toString(scheduleJob), e);
             throw new BizException("添加任务发生异常", e);
         }
     }
@@ -72,56 +78,67 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult rescheduleJob(ScheduleJob scheduleJob){
+    public boolean rescheduleJob(ScheduleJob scheduleJob){
+        if(scheduleJob == null){
+            throw new BizException("scheduleJob为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getJobGroup())){
+            throw new BizException("jobGroup为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getJobName())){
+            throw new BizException("jobName为空");
+        }
+
+        ScheduleJob scheduleJobTemp = scheduleJobDao.getByName(scheduleJob.getJobGroup(), scheduleJob.getJobName());
+        if(scheduleJobTemp == null){
+            throw new BizException("任务不存在");
+        }
+
+        //设置允许更新的属性值
+        if(scheduleJobTemp.getJobType().intValue() == ScheduleJob.SIMPLE_JOB){
+            if(StringUtil.isNotEmpty(scheduleJob.getIntervals())){
+                scheduleJobTemp.setIntervals(scheduleJob.getIntervals());
+            }
+            if(StringUtil.isNotEmpty(scheduleJob.getIntervalUnit())){
+                scheduleJobTemp.setIntervalUnit(scheduleJob.getIntervalUnit());
+            }
+            if(StringUtil.isNotEmpty(scheduleJob.getRepeatTimes())){
+                scheduleJobTemp.setRepeatTimes(scheduleJob.getRepeatTimes());
+            }
+        }else if(scheduleJobTemp.getJobType().intValue() == ScheduleJob.CRON_JOB){
+            if(StringUtil.isNotEmpty(scheduleJob.getCronExpression())){
+                scheduleJobTemp.setCronExpression(scheduleJob.getCronExpression());
+            }
+        }
+        if(StringUtil.isNotEmpty(scheduleJob.getDestination())){
+            scheduleJobTemp.setDestination(scheduleJob.getDestination());
+        }
+        if(StringUtil.isNotEmpty(scheduleJob.getMqType())){
+            scheduleJobTemp.setMqType(scheduleJob.getMqType());
+        }
+        if(StringUtil.isNotEmpty(scheduleJob.getEndTime())){
+            scheduleJobTemp.setEndTime(scheduleJob.getEndTime());
+        }
+        if(StringUtil.isNotEmpty(scheduleJob.getParamJson())){
+            scheduleJobTemp.setParamJson(scheduleJob.getParamJson());
+        }
+        if(StringUtil.isNotEmpty(scheduleJob.getJobDescription())){
+            scheduleJobTemp.setJobDescription(scheduleJob.getJobDescription());
+        }
+
         try{
-            ScheduleJob scheduleJobTemp = scheduleJobDao.getByName(scheduleJob.getJobGroup(), scheduleJob.getJobName());
-            if(scheduleJobTemp == null){
-                return ServiceResult.fail("任务不存在");
-            }else if(scheduleJobTemp.getJobType().intValue() != ScheduleJob.SIMPLE_JOB
-                    && scheduleJobTemp.getJobType().intValue() != ScheduleJob.CRON_JOB){
-                return ServiceResult.fail("未预期的任务类型");
-            }
-
-            //设置允许更新的属性值
-            if(scheduleJobTemp.getJobType().intValue() == ScheduleJob.SIMPLE_JOB){
-                if(StringUtil.isNotEmpty(scheduleJob.getIntervals())){
-                    scheduleJobTemp.setIntervals(scheduleJob.getIntervals());
-                }
-                if(StringUtil.isNotEmpty(scheduleJob.getIntervalUnit())){
-                    scheduleJobTemp.setIntervalUnit(scheduleJob.getIntervalUnit());
-                }
-                if(StringUtil.isNotEmpty(scheduleJob.getRepeatTimes())){
-                    scheduleJobTemp.setRepeatTimes(scheduleJob.getRepeatTimes());
-                }
-            }else if(scheduleJobTemp.getJobType().intValue() == ScheduleJob.CRON_JOB){
-                if(StringUtil.isNotEmpty(scheduleJob.getCronExpression())){
-                    scheduleJobTemp.setCronExpression(scheduleJob.getCronExpression());
-                }
-            }
-            if(StringUtil.isNotEmpty(scheduleJob.getTopic())){
-                scheduleJobTemp.setTopic(scheduleJob.getTopic());
-            }
-            if(StringUtil.isNotEmpty(scheduleJob.getTags())){
-                scheduleJobTemp.setTags(scheduleJob.getTags());
-            }
-            if(StringUtil.isNotEmpty(scheduleJob.getEndTime())){
-                scheduleJobTemp.setEndTime(scheduleJob.getEndTime());
-            }
-            if(StringUtil.isNotEmpty(scheduleJob.getParamJson())){
-                scheduleJobTemp.setParamJson(scheduleJob.getParamJson());
-            }
-            if(StringUtil.isNotEmpty(scheduleJob.getJobDescription())){
-                scheduleJobTemp.setJobDescription(scheduleJob.getJobDescription());
-            }
-
+            scheduleJobDao.update(scheduleJobTemp);
             //执行更新
-            ServiceResult resultBean = jobManager.rescheduleJob(scheduleJobTemp);
-            if(resultBean.isSuccess()){
-                scheduleJobDao.update(scheduleJobTemp);
+            Date startTime = jobManager.rescheduleJob(scheduleJobTemp);
+            if(startTime != null){
+                return true;
+            }else{
+                //抛出异常让事务回滚
+                throw new BizException("操作失败");
             }
-            return resultBean;
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
-            throw new BizException("重新安排任务发生异常", e);
+            logger.error("重新安排任务时出现异常 ScheduleJob = {} ", JsonUtil.toString(scheduleJob), e);
+            throw new BizException("重新安排任务时发生异常", e);
         }
     }
 
@@ -132,20 +149,22 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult pauseJob(String jobGroup, String jobName){
+    public boolean pauseJob(String jobGroup, String jobName){
+        ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
+        if(scheduleJob == null){
+            throw new BizException("任务不存在");
+        }
+
         try{
-            ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
-            if(scheduleJob == null){
-                return ServiceResult.fail("任务不存在");
-            }
-            ServiceResult resultBean = jobManager.pauseJob(jobGroup, jobName);
-            if(resultBean.isSuccess()){
-                scheduleJob.setJobStatus(Trigger.TriggerState.PAUSED.name());
-                scheduleJobDao.update(scheduleJob);
-            }
-            return resultBean;
+            scheduleJob.setJobStatus(Trigger.TriggerState.PAUSED.name());
+            scheduleJobDao.update(scheduleJob);
+            jobManager.pauseJob(jobGroup, jobName);
+            return true;
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
-            throw new BizException("暂停任务发生异常", e);
+            logger.error("暂停任务时出现异常 jobGroup={} jobName={} ", jobGroup, jobName, e);
+            throw new BizException("暂停任务时发生异常", e);
         }
     }
 
@@ -156,21 +175,26 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult resumeJob(String jobGroup, String jobName){
+    public boolean resumeJob(String jobGroup, String jobName){
+        ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
+        if(scheduleJob == null){
+            throw new BizException("任务不存在");
+        }
+
         try{
-            ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
-            if(scheduleJob == null){
-                return ServiceResult.fail("任务不存在");
+            String status = jobManager.resumeJob(jobGroup, jobName);
+            if(StringUtil.isEmpty(status)){
+                return false;
             }
 
-            ServiceResult<String> resultBean = jobManager.resumeJob(jobGroup, jobName);
-            if(resultBean.isSuccess()){
-                scheduleJob.setJobStatus(resultBean.getData());
-                scheduleJobDao.update(scheduleJob);
-            }
-            return resultBean;
+            scheduleJob.setJobStatus(status);
+            scheduleJobDao.update(scheduleJob);
+            return true;
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
-            throw new BizException("恢复任务发生异常", e);
+            logger.error("恢复任务时出现异常 jobGroup={} jobName={} ", jobGroup, jobName, e);
+            throw new BizException("恢复任务时发生异常", e);
         }
     }
 
@@ -181,16 +205,20 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult triggerJob(String jobGroup, String jobName){
-        try{
-            ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
-            if(scheduleJob == null){
-                return ServiceResult.fail("任务不存在");
-            }
+    public boolean triggerJob(String jobGroup, String jobName){
+        ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
+        if(scheduleJob == null){
+            throw new BizException("任务不存在");
+        }
 
-            return jobManager.triggerJob(jobGroup, jobName);
+        try{
+            jobManager.triggerJob(jobGroup, jobName);
+            return true;
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
-            throw new BizException("触发任务发生异常", e);
+            logger.error("触发任务时出现异常 jobGroup={} jobName={} ", jobGroup, jobName, e);
+            throw new BizException("触发任务时发生异常", e);
         }
     }
 
@@ -201,16 +229,19 @@ public class QuartzBiz {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult delete(String jobGroup, String jobName){
+    public boolean delete(String jobGroup, String jobName){
         try{
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
             if(scheduleJob != null){
                 scheduleJobDao.deleteByPk(scheduleJob.getId());
             }
             jobManager.deleteJob(jobGroup, jobName);
-            return ServiceResult.success();
+            return true;
+        }catch (BizException e){
+            throw e;
         }catch (Throwable e){
-            throw new BizException("删除任务发生异常", e);
+            logger.error("删除任务时出现异常 jobGroup={} jobName={} ", jobGroup, jobName, e);
+            throw new BizException("删除任务时发生异常", e);
         }
     }
 
@@ -222,23 +253,6 @@ public class QuartzBiz {
      */
     public ScheduleJob getJobByName(String jobGroup, String jobName){
         return scheduleJobDao.getByName(jobGroup, jobName);
-    }
-
-    /**
-     * 通知定时任务已触发(通过消息的形式通知)
-     * @param scheduleJob
-     * @return
-     */
-    public boolean notifyExecuteScheduleJob(ScheduleJob scheduleJob){
-        MessageVo msg = new MessageVo();
-        msg.setTopic(scheduleJob.getTopic());
-        msg.setTags(scheduleJob.getTags());
-        msg.setMsgType(0);
-        msg.setTrxNo(scheduleJob.getJobGroup() + "_" + scheduleJob.getJobName() + "_" + DateUtil.formatDateTime(new Date()));
-        msg.setJsonParam(scheduleJob.getParamJson()==null?"":scheduleJob.getParamJson());
-        //发送消息通知
-        rocketMQSender.sendOne(msg);
-        return true;
     }
 
     /**
@@ -292,6 +306,42 @@ public class QuartzBiz {
     private void initScheduleJob(ScheduleJob scheduleJob){
         if(scheduleJob.getExecutedTimes() == null){
             scheduleJob.setExecutedTimes(0L);
+        }
+    }
+
+    private void checkJobParam(ScheduleJob scheduleJob){
+        if(scheduleJob == null){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "scheduleJob不能为空");
+        }else if(scheduleJob.getJobType() == null){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务类型(jobType)不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getJobGroup())){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务的组名(jobGroup)不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getJobName())){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务名(jobName)不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getDestination())){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务通知目的地不能为空");
+        }else if(StringUtil.isEmpty(scheduleJob.getMqType())){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "消息中间件类型不能为空");
+        }else if(scheduleJob.getStartTime() == null){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "开始时间(startTime)不能为空");
+        }
+
+        if(scheduleJob.getJobType().equals(ScheduleJob.SIMPLE_JOB)){
+            if(scheduleJob.getIntervals() == null){
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务间隔(interval)不能为空");
+            }else if(scheduleJob.getIntervalUnit() == null){
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务间隔单位(intervalUnit)不能为空");
+            }
+        }else if(scheduleJob.getJobType().equals(ScheduleJob.CRON_JOB)){
+            if(StringUtil.isEmpty(scheduleJob.getCronExpression())){
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "cron表达式(cronExpression)不能为空");
+            }
+        }else{
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的任务类型: " + scheduleJob.getJobType());
+        }
+
+        if(! scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ROCKET) && ! scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ACTIVE)){
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的MQ类型: " + scheduleJob.getMqType());
         }
     }
 }

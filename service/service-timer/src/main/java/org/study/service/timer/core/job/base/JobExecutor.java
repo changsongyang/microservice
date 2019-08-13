@@ -29,6 +29,8 @@ public class JobExecutor implements Job {
     QuartzBiz quartzBiz;
     @Autowired
     InstanceStageBiz instanceStageBiz;
+    @Autowired
+    JobNotifier jobNotifier;
 
     @Override
     public void execute(JobExecutionContext var1) throws JobExecutionException {
@@ -51,7 +53,7 @@ public class JobExecutor implements Job {
         }
         
         if(scheduleJob != null){
-            quartzBiz.notifyExecuteScheduleJob(scheduleJob);
+            jobNotifier.sendScheduleMessage(scheduleJob);
         }else{
             throw new JobExecutionException("jobGroup="+jobKey.getGroup()+" jobName="+jobKey.getName()+"对应的定时任务对象(ScheduleJob)不存在");
         }

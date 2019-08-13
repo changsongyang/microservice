@@ -22,6 +22,17 @@ public class ScheduleJob implements Serializable {
     public static final int CRON_JOB = 2;
 
     /**
+     * RocketMQ消息中间件
+     */
+    public static final int MQ_TYPE_ROCKET = 1;
+
+    /**
+     * ActiveMQ消息中间件
+     */
+    public static final int MQ_TYPE_ACTIVE = 2;
+
+
+    /**
      * 永远重复任务的重复次数值
      */
     public static final int REPEAT_FOREVER_INTERVAL = -1;
@@ -58,14 +69,16 @@ public class ScheduleJob implements Serializable {
     private Integer jobType;
 
     /**
-     * 消息目的地：主题
+     * 消息种类 1=RocketMQ 2=ActiveMQ
      */
-    private String topic;
+    private Integer mqType;
 
     /**
-     * 消息目的地：子主题
+     * 消息目的地
+     *    1、当 mqType=1 时，此属性值为RocketMQ的topic名，如果需要设置tags，则使用英文的冒号分割，如：topicA:tag1
+     *    2、当 mqType=2 时，此属性值为ActiveMQ的queue队列名
      */
-    private String tags;
+    private String destination;
 
     /**
      * 任务开始时间
@@ -176,20 +189,20 @@ public class ScheduleJob implements Serializable {
         this.jobType = jobType;
     }
 
-    public String getTopic() {
-        return topic;
+    public Integer getMqType() {
+        return mqType;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setMqType(Integer mqType) {
+        this.mqType = mqType;
     }
 
-    public String getTags() {
-        return tags;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public Date getStartTime() {
@@ -299,12 +312,11 @@ public class ScheduleJob implements Serializable {
      * 返回一个Simple任务业务对象
      * @return
      */
-    public static ScheduleJob newSimpleTask(String jobGroup, String jobName, String topic, String tags){
+    public static ScheduleJob newSimpleTask(String jobGroup, String jobName, String destination){
         ScheduleJob job = new ScheduleJob();
         job.setJobGroup(jobGroup);
         job.setJobName(jobName);
-        job.setTopic(topic);
-        job.setTags(tags);
+        job.setDestination(destination);
         job.setJobType(ScheduleJob.SIMPLE_JOB);
         return job;
     }
@@ -313,12 +325,11 @@ public class ScheduleJob implements Serializable {
      * 返回一个Cron任务业务对象
      * @return
      */
-    public static ScheduleJob newCronTask(String jobGroup, String jobName, String topic, String tags){
+    public static ScheduleJob newCronTask(String jobGroup, String jobName, String destination){
         ScheduleJob job = new ScheduleJob();
         job.setJobGroup(jobGroup);
         job.setJobName(jobName);
-        job.setTopic(topic);
-        job.setTags(tags);
+        job.setDestination(destination);
         job.setJobType(ScheduleJob.CRON_JOB);
         return job;
     }

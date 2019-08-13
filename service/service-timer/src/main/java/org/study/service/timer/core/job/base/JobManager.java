@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.study.common.statics.enums.TimeUnitEnum;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.ServiceResult;
-import org.study.common.util.utils.StringUtil;
 import org.study.facade.timer.entity.ScheduleJob;
 
 import java.util.Date;
@@ -34,23 +33,20 @@ public class JobManager {
     SchedulerFactoryBean schedulerFactoryBean;
 
 
-    public ServiceResult<String> pauseInstance(){
+    public void pauseInstance(){
         try{
             schedulerFactoryBean.getScheduler().standby();
-            return ServiceResult.success();
         }catch(Throwable ex){
             logger.error("暂停实例失败", ex);
-            return ServiceResult.fail("暂停实例失败");
+            throw new BizException(ex);
         }
     }
 
-    public ServiceResult<String> resumeInstance(){
+    public void resumeInstance(){
         try{
             schedulerFactoryBean.getScheduler().start();
-            return ServiceResult.success();
         }catch(Throwable ex){
-            logger.error("恢复实例失败", ex);
-            return ServiceResult.fail("实例恢复失败");
+            throw new BizException(ex);
         }
     }
 
@@ -59,14 +55,9 @@ public class JobManager {
      * @param scheduleJob
      * @return
      */
-    public ServiceResult<Date> addJob(ScheduleJob scheduleJob) throws SchedulerException {
-        ServiceResult resp = checkJob(scheduleJob);
-        if(resp.isError()){
-            return resp;
-        }
-
+    public Date addJob(ScheduleJob scheduleJob) throws SchedulerException {
         if(checkJobExist(scheduleJob)){
-            return ServiceResult.fail("jobGroup="+scheduleJob.getJobGroup()+",jobName="+scheduleJob.getJobName()+"的任务已存在！");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "jobGroup="+scheduleJob.getJobGroup()+",jobName="+scheduleJob.getJobName()+"的任务已存在！");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -81,12 +72,12 @@ public class JobManager {
         Date startTime = scheduler.scheduleJob(jobDetail, trigger);
 
         if(startTime == null){
-            return ServiceResult.fail("添加定时计划失败");
+            return null;
         }else{
             Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
             scheduleJob.setJobStatus(triggerState.name());
             scheduleJob.setNextExecuteTime(scheduler.getTrigger(trigger.getKey()).getNextFireTime());
-            return ServiceResult.success(startTime, null);
+            return startTime;
         }
     }
 
@@ -95,12 +86,9 @@ public class JobManager {
      * @param scheduleJob
      * @return
      */
-    public ServiceResult<Date> rescheduleJob(ScheduleJob scheduleJob) throws SchedulerException {
-        ServiceResult resp = checkJob(scheduleJob);
-        if(resp.isError()) return resp;
-
+    public Date rescheduleJob(ScheduleJob scheduleJob) throws SchedulerException {
         if(! checkJobExist(scheduleJob)){
-            return ServiceResult.fail("任务不在定时计划中，无法重新安排");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法重新安排");
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
@@ -110,12 +98,12 @@ public class JobManager {
         //按新的Trigger重新设置job执行
         Date result = scheduler.rescheduleJob(triggerKey, trigger);
         if(result == null){
-            return ServiceResult.fail("任务重安排失败！");
+            return null;
         }else{
             Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
             scheduleJob.setJobStatus(triggerState.name());
             scheduleJob.setNextExecuteTime(result);
-            return ServiceResult.success(result, null);
+            return result;
         }
     }
 
@@ -125,16 +113,15 @@ public class JobManager {
      * @param jobName
      * @return
      */
-    public ServiceResult pauseJob(String jobGroup, String jobName) throws SchedulerException {
+    public void pauseJob(String jobGroup, String jobName) throws SchedulerException, BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            return ServiceResult.fail("任务不在定时计划中，无法暂停");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法暂停");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         scheduler.pauseJob(jobKey);
-        return ServiceResult.success();
     }
 
     /**
@@ -143,17 +130,17 @@ public class JobManager {
      * @param jobName
      * @return
      */
-    public ServiceResult<String> resumeJob(String jobGroup, String jobName) throws SchedulerException {
+    public String resumeJob(String jobGroup, String jobName) throws SchedulerException, BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            return ServiceResult.fail("任务不在定时计划中，无法恢复");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法恢复");
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         scheduler.resumeJob(jobKey);
         Trigger.TriggerState triggerState = scheduler.getTriggerState(triggerKey);
-        return ServiceResult.success(triggerState.name(), "");
+        return triggerState.name();
     }
 
     /**
@@ -162,16 +149,15 @@ public class JobManager {
      * @param jobName
      * @return
      */
-    public ServiceResult<String> triggerJob(String jobGroup, String jobName) throws SchedulerException {
+    public void triggerJob(String jobGroup, String jobName) throws SchedulerException,BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            return ServiceResult.fail("任务不在定时计划中，无法执行");
+            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法执行");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         scheduler.triggerJob(jobKey);
-        return ServiceResult.success();
     }
 
     /**
@@ -180,20 +166,16 @@ public class JobManager {
      * @param jobName
      * @return
      */
-    public ServiceResult deleteJob(String jobGroup, String jobName) throws SchedulerException {
+    public boolean deleteJob(String jobGroup, String jobName) throws SchedulerException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
 
         if(! checkJobExist(scheduleJob)){
-            return ServiceResult.success();
+            return true;
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
-        if(scheduler.deleteJob(jobKey)){
-            return ServiceResult.success();
-        }else{
-            return ServiceResult.fail("删除任务失败");
-        }
+        return scheduler.deleteJob(jobKey);
     }
 
     /**
@@ -225,43 +207,6 @@ public class JobManager {
         }else{
             return false;
         }
-    }
-
-    /**
-     * 检查TimerJob的各属性的参数是否合格
-     * @param scheduleJob
-     * @return
-     */
-    private ServiceResult checkJob(ScheduleJob scheduleJob){
-        if(scheduleJob == null){
-            return ServiceResult.fail("scheduleJob不能为空");
-        }else if(scheduleJob.getJobType() == null){
-            return ServiceResult.fail("任务类型(jobType)不能为空");
-        }else if(StringUtil.isEmpty(scheduleJob.getJobGroup())){
-            return ServiceResult.fail("任务的组名(jobGroup)不能为空");
-        }else if(StringUtil.isEmpty(scheduleJob.getJobName())){
-            return ServiceResult.fail("任务名(jobName)不能为空");
-        }else if(StringUtil.isEmpty(scheduleJob.getTopic())){
-            return ServiceResult.fail("任务通知目的地(topic)不能为空");
-        }else if(StringUtil.isEmpty(scheduleJob.getTags())){
-            return ServiceResult.fail("任务通知目的地(tags)不能为空");
-        }else if(scheduleJob.getStartTime() == null){
-            return ServiceResult.fail("开始时间(startTime)不能为空");
-        }
-
-        if(scheduleJob.getJobType().equals(ScheduleJob.SIMPLE_JOB)){
-            if(scheduleJob.getIntervals() == null){
-                return ServiceResult.fail("任务间隔(interval)不能为空");
-            }else if(scheduleJob.getIntervalUnit() == null){
-                return ServiceResult.fail("任务间隔单位(intervalUnit)不能为空");
-            }
-        }else if(scheduleJob.getJobType().equals(ScheduleJob.CRON_JOB)){
-            if(StringUtil.isEmpty(scheduleJob.getCronExpression())){
-                return ServiceResult.fail("cron表达式(cronExpression)不能为空");
-            }
-        }
-
-        return ServiceResult.success();
     }
 
     private Trigger genTrigger(ScheduleJob scheduleJob){
