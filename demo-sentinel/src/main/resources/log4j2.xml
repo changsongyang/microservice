@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    status : 这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出
+    monitorInterval : Log4j能够自动检测修改配置文件和重新配置本身, 设置间隔秒数。
+-->
+<Configuration status="WARN" monitorInterval="300">
+    <!-- 自定义变量 START-->
+    <Properties>
+        <!-- 配置日志文件输出目录 -->
+        <Property name="LOG_HOME">@logHome@</Property>
+        <!-- 日志文件名 -->
+        <property name="LOG_NAME">@appName@.log</property>
+    </Properties>
+    <!-- 自定义变量 END-->
+
+    <!-- 日志输出器 START-->
+    <Appenders>
+        <!--控制台日志输出器 -->
+        <Console name="consoleAppender" target="SYSTEM_OUT">
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=yellow,INFO=green,DEBUG=bright Cyan,TRACE=bright white}"/>
+        </Console>
+
+        <!-- 应用日志输出器 ，并配置日志压缩格式(应用名.log.年-月-日.gz) -->
+        <RollingRandomAccessFile name="fileAppender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/${LOG_NAME}"
+                                 filePattern="${LOG_HOME}/${LOG_NAME}.%d{yyyy-MM-dd}.log.gz">
+            <!--
+                %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
+                %p : 日志输出格式
+                %c : logger的名称
+                %m : 日志内容，即 logger.info("common")
+                %n : 换行符
+                %C : Java类名
+                %L : 日志输出所在行数
+                %M : 日志输出所在方法名
+                hostName : 本地机器名
+                hostAddress : 本地ip地址
+             -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c{1}[%M %L] %highlight{%msg%xEx%n}{FATAL=bright red,ERROR=red,WARN=bright yellow,INFO=bright green,DEBUG=bright cyan,TRACE=bright white}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <!-- 日志输出器 END-->
+
+
+    <!-- 日志实例 START-->
+    <Loggers>
+        <!-- 根节点日志 -->
+        <Root level="info">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="fileAppender"/>
+        </Root>
+
+        <!-- 第三方日志系统 -->
+        <Logger name="java.sql" additivity="false">
+            <AppenderRef ref="consoleAppender" level="DEBUG" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="org.springframework" additivity="false">
+            <AppenderRef ref="consoleAppender" level="DEBUG" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="org.eclipse.jetty" additivity="false">
+            <AppenderRef ref="consoleAppender" level="DEBUG" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="org.apache" additivity="false">
+            <AppenderRef ref="consoleAppender" level="INFO" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="com.alibaba" additivity="false">
+            <AppenderRef ref="consoleAppender" level="INFO" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+        <Logger name="org.study" additivity="false">
+            <AppenderRef ref="consoleAppender" level="DEBUG" />
+            <AppenderRef ref="fileAppender" level="INFO" />
+        </Logger>
+    </Loggers>
+    <!-- 日志实例 END-->
+</Configuration>
