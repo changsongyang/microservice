@@ -1,6 +1,10 @@
 package org.study.demo.sentinel.service;
 
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+
 public interface TestService {
 
-    public String qps(int index, String desc);
+    public boolean qps(int index) throws BlockException;
+
+    public boolean degrade(int index) throws BlockException;
 }

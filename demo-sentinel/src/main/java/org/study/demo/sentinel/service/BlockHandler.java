@@ -4,8 +4,13 @@ import com.alibaba.csp.sentinel.slots.block.BlockException;
 
 public class BlockHandler {
 
-    public static String qpsBlock(int index, String desc, BlockException e){
-        System.out.println("==>qpsBlock index="+index+",desc = " + desc + "Exception = "+e.getMessage());
-        return "fail";
+    public static boolean qpsBlock(int index, BlockException e){
+        System.out.println("qpsBlock index=" + index + " Rule=" + e.getRule().getClass().getSimpleName() + " resource=" + e.getRule().getResource());
+        return false;
+    }
+
+    public static boolean degradeBlock(int index, BlockException e){
+        System.out.println("degradeBlock index=" + index + " Rule=" + e.getRule().getClass().getSimpleName() + " resource=" + e.getRule().getResource());
+        return false;
     }
 }

@@ -14,12 +14,6 @@
     <artifactId>demo-sentinel</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>org.study</groupId>
-            <artifactId>study-spring-boot-starter</artifactId>
-            <version>${projectVersion}</version>
-        </dependency>
-
         <!-- alibaba sentinel -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -38,6 +32,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 端点监管 endpoint actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 </project>
