@@ -81,5 +81,11 @@
             <optional>true</optional>
         </dependency>
         <!-- java mail -->
+
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>

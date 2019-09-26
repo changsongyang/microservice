@@ -6,7 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.study.demo.sentinel.service.TestService;
+import org.study.starter.component.CircuitBreaker;
+import org.study.starter.component.QpsCounter;
+import org.study.starter.component.QpsLimiter;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,8 +19,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RestController
 @RequestMapping("demo")
 public class DemoController {
+    private static Map<String, Integer> qpsLimitMap = new HashMap<>();
+    private static Map<String, CircuitBreaker.Config> breakerMap = new HashMap<>();
+    static {
+        qpsLimitMap.put("test_qpsLimiter", 5);
+
+        breakerMap.put("test_circuitBreaker", CircuitBreaker.buildConfig(0, 200, 10));
+    }
+
     @Autowired
     private TestService testService;
+    private QpsCounter qpsCounter = new QpsCounter("test_qpsCounter");
+    private QpsLimiter qpsLimiter = new QpsLimiter(qpsLimitMap);
+    private CircuitBreaker breaker = new CircuitBreaker(breakerMap);
 
     @RequestMapping(value = "/qps")
     public boolean qps(int threadCount, String desc){
@@ -42,6 +58,119 @@ public class DemoController {
         FlowDegradeRunner runner = new FlowDegradeRunner(null, threadCount, 100);
         runner.simulateTraffic();
         runner.tick();
+        return true;
+    }
+
+    @RequestMapping(value = "/qpsCount")
+    public boolean qpsCount(int threadCount, int second){
+        for (int i = 1; i <= threadCount; i++) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long now = System.currentTimeMillis();
+                    long end = System.currentTimeMillis() + second * 1000;
+                    boolean isSuccess = false;
+                    while(now <= end){
+//                        try{
+//                            Thread.sleep(2);
+//                        }catch (InterruptedException e){
+//                        }
+
+                        isSuccess = false;
+                        double mod = now % 4;
+                        if(mod <=1){
+                            qpsCounter.incPass();
+                            if(mod == 1){
+                                isSuccess = true;
+                            }
+                        }else if(mod == 2){
+                            qpsCounter.incBlock();
+                        }else if(mod == 3){
+                            qpsCounter.incException();
+                        }
+
+                        if(isSuccess){
+                            qpsCounter.incRtAndSuccess(System.currentTimeMillis() - now);
+                        }
+                        System.out.println(TimeUtil.currentTimeMillis() + " " + qpsCounter.toString());
+                        now = System.currentTimeMillis();
+                    }
+                }
+            });
+            t.setName("simulate-traffic-Task");
+            t.start();
+        }
+
+        return true;
+    }
+
+    @RequestMapping(value = "/qpsLimit")
+    public boolean qpsLimit(int threadCount, int second, String desc) {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (int i = 1; i <= threadCount; i++) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long now = System.currentTimeMillis();
+                    long end = System.currentTimeMillis() + second * 1000;
+
+                    while(now <= end){
+                        String result = qpsLimiter.execute("test_qpsLimiter", (param)->{
+                            int count = counter.incrementAndGet();
+                            System.out.println(TimeUtil.currentTimeMillis() + " count=" + count);
+                            return "ok_" + count;
+                            }, desc);
+
+                        System.out.println(result);
+                        now = System.currentTimeMillis();
+                    }
+                }
+            });
+            t.setName("simulate-traffic-Task");
+            t.start();
+        }
+
+        return true;
+    }
+
+    @RequestMapping(value = "/circuitBreaker")
+    public boolean circuitBreaker(int threadCount, int second, String desc) {
+        QpsCounter qpsCounter = new QpsCounter("circuitBreakerCounter");
+
+        for (int i = 1; i <= threadCount; i++) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long now = System.currentTimeMillis();
+                    long end = System.currentTimeMillis() + second * 1000;
+
+                    while(now <= end){
+                        breaker.execute("test_circuitBreaker", (param)->{
+                            qpsCounter.incPass();
+                            long start = System.currentTimeMillis();
+                            try {
+                                TimeUnit.MILLISECONDS.sleep(3 * 100);//模拟业务处理时间
+                            } catch (InterruptedException e) {
+                                // ignore
+                            }
+
+                            qpsCounter.incRtAndSuccess(System.currentTimeMillis()-start, 1);
+                            return null;
+                        }, desc, (e) -> {
+                            qpsCounter.incBlock();
+                        });
+
+                        now = System.currentTimeMillis();
+
+                        System.out.println(qpsCounter.toString());
+                    }
+                }
+            });
+            t.setName("simulate-traffic-Task");
+            t.start();
+        }
+
         return true;
     }
 
@@ -149,7 +278,7 @@ public class DemoController {
                 System.out.println("time cost: " + cost + " ms");
                 System.out.println("total:" + total.get() + ", pass:" + pass.get()
                         + ", block:" + block.get());
-                System.exit(0);
+//                System.exit(0);
             }
         }
     }
@@ -259,7 +388,7 @@ public class DemoController {
                 System.out.println("time cost: " + cost + " ms");
                 System.out.println("total:" + total.get() + ", pass:" + pass.get()
                         + ", block:" + block.get());
-                System.exit(0);
+//                System.exit(0);
             }
         }
     }
