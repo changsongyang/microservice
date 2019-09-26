@@ -5,6 +5,7 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.study.common.statics.exceptions.QpsException;
 import org.study.demo.sentinel.service.TestService;
 import org.study.starter.component.CircuitBreaker;
 import org.study.starter.component.QpsCounter;
@@ -15,6 +16,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("demo")
@@ -138,6 +141,32 @@ public class DemoController {
     public boolean circuitBreaker(int threadCount, int second, String desc) {
         QpsCounter qpsCounter = new QpsCounter("circuitBreakerCounter");
 
+        //业务逻辑执行器
+        Function<String, Object> bizExecutor = new Function<String, Object>() {
+            @Override
+            public Object apply(String s) {
+                qpsCounter.incPass();
+                long start = System.currentTimeMillis();
+                try {
+                    TimeUnit.MILLISECONDS.sleep(3 * 100);//模拟业务处理时间
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+
+                long rt = System.currentTimeMillis() - start;
+                qpsCounter.incRtAndSuccess(rt, 1);
+                return null;
+            }
+        };
+
+        //异常执行器
+        Consumer<QpsException> errExecutor = new Consumer<QpsException>() {
+            @Override
+            public void accept(QpsException e) {
+                qpsCounter.incBlock();
+            }
+        };
+
         for (int i = 1; i <= threadCount; i++) {
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -146,23 +175,12 @@ public class DemoController {
                     long end = System.currentTimeMillis() + second * 1000;
 
                     while(now <= end){
-                        breaker.execute("test_circuitBreaker", (param)->{
-                            qpsCounter.incPass();
-                            long start = System.currentTimeMillis();
-                            try {
-                                TimeUnit.MILLISECONDS.sleep(3 * 100);//模拟业务处理时间
-                            } catch (InterruptedException e) {
-                                // ignore
-                            }
-
-                            qpsCounter.incRtAndSuccess(System.currentTimeMillis()-start, 1);
-                            return null;
-                        }, desc, (e) -> {
-                            qpsCounter.incBlock();
-                        });
-
-                        now = System.currentTimeMillis();
-
+                        try{
+                            breaker.execute("test_circuitBreaker", bizExecutor, desc, errExecutor);
+                            now = System.currentTimeMillis();
+                        }catch(QpsException e){
+//                            e.printStackTrace();
+                        }
                         System.out.println(qpsCounter.toString());
                     }
                 }
