@@ -1,279 +1,243 @@
 package org.study.starter.component;
 
-import org.redisson.Redisson;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.study.common.util.utils.JsonUtil;
+import com.tpay.common.util.utils.JsonUtil;
+import com.tpay.starter.enums.RedisMode;
+import org.springframework.util.Assert;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.util.Pool;
 
-import javax.annotation.PreDestroy;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-/**
- * 操作redis的客户端
- */
 public class RedisClient {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private String lockNamePrefix = "lock-";
-    private RedissonClient client;
-    private ConcurrentHashMap<String, RLock> unlockWhenShutdownMap = new ConcurrentHashMap<>();
+    private static final int DEFAULT_CACHE_SECONDS = 60 * 1;// 单位秒 设置成一分钟
+    private RedisMode redisMode;
+    private boolean isClusterMode;
+    private JedisCluster jedisCluster;
+    private Pool<Jedis> pool;
 
-    public RedisClient(RedissonClient client){
-        if(client == null){
-            throw new RuntimeException("RedissonClient 不能为null");
+    public RedisClient(RedisMode redisMode, Pool<Jedis> pool, JedisCluster jedisCluster){
+        Assert.notNull(redisMode, "redisMode is null");
+
+        this.redisMode = redisMode;
+        if(RedisMode.CLUSTER.equals(redisMode)){
+            Assert.notNull(jedisCluster, "When redisMode is CLUSTER, jedisCluster can not be null");
+            this.jedisCluster = jedisCluster;
+            this.isClusterMode = true;
+        }else{
+            Assert.notNull(pool, "pool can not be null");
+            this.pool = pool;
+            this.isClusterMode = false;
         }
-        this.client = client;
     }
 
-    public String getLockNamePrefix() {
-        return lockNamePrefix;
-    }
-
-    public void setLockNamePrefix(String lockNamePrefix) {
-        this.lockNamePrefix = lockNamePrefix;
-    }
-
-    @PreDestroy
-    public void destroy(){
-        if(client != null){
+    public String get(String key){
+        if(isClusterMode){
+            return jedisCluster.get(key);
+        }else{
+            Jedis jedis = null;
             try{
-                //waiting for dubbo shutdown
-                Thread.sleep(5000);
-            }catch(Exception e){}
-
-            for(Map.Entry<String, RLock> entry : unlockWhenShutdownMap.entrySet()){
-                logger.info("lockName={} 应用关闭前强制释放锁", entry.getKey());
-                forceUnlock(entry.getValue());
-            }
-            client.shutdown(3, 7, TimeUnit.SECONDS);
-        }
-    }
-
-    public RedissonClient getClient(){
-        return client;
-    }
-
-    /**
-     * 获取分布式锁，有如下注意事项：
-     *     1、请使用当前类中的相关方法来释放锁，而不要直接调用RLock的unlock或者forceUnlock方法来释放锁，因为在{@link #unlockWhenShutdownMap}有缓存，一直不清掉的话可能会造成内存泄露
-     *
-     * @param lockName             锁名称
-     * @param waitMills            获取锁的等待时间
-     * @param expireMills          锁的有效时间
-     * @param unlockWhenShutdown   是否需要在应用关闭时强行释放锁
-     * @return
-     */
-    public RLock tryLock(String lockName, int waitMills, long expireMills, boolean unlockWhenShutdown){
-        Set<String> set = new HashSet<>(1);
-        set.add(lockName);
-        List<RLock> lockList = tryLock(set, waitMills, expireMills, unlockWhenShutdown);
-        if(lockList != null && lockList.size() > 0){
-            return lockList.get(0);
-        }else {
-            return null;
-        }
-    }
-
-    /**
-     * 批量获取锁，要么全部获取成功，要么全部获取失败
-     * @param lockNameList          锁名称
-     * @param waitMills             获取锁的等待时间
-     * @param expireMills           锁的有效时间
-     * @param unlockWhenShutdown    是否需要在应用关闭时强行释放锁
-     * @return
-     */
-    public List<RLock> tryLock(Set<String> lockNameList, int waitMills, long expireMills, boolean unlockWhenShutdown){
-        List<RLock> lockList = new ArrayList<>(lockNameList.size());
-        TimeUnit unit = TimeUnit.MILLISECONDS;
-        //开始时间
-        long startTime = System.currentTimeMillis();
-        //剩余时间
-        long remainTime = waitMills;
-        //获取锁时的真正等待时间
-        long awaitTime = 0;
-
-        for(String lockName : lockNameList){
-            try{
-                lockName = getRealLockName(lockName);
-                RLock lock = getClient().getLock(lockName);
-                remainTime -= System.currentTimeMillis() - startTime;
-                startTime = System.currentTimeMillis();
-                awaitTime = Math.max(remainTime, 0);
-
-                if(awaitTime <= 0){
-                    logger.error("lockName={} lockNameList = {} 获取锁超时", lockName, JsonUtil.toString(lockNameList));
-                    break;
-                }else if(lock.tryLock(awaitTime, expireMills, unit)){
-                    lockList.add(lock);
-                    if(unlockWhenShutdown){
-                        addToShutdownMap(lock);
-                    }
-                }else{
-                    logger.error("lockName={} 获取锁失败", lockName);
-                    break;
+                jedis = pool.getResource();
+                return jedis.get(key);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
                 }
-            }catch(Throwable e){
-                logger.error("lockName={} 获取锁时出现异常", lockName, e);
-                break;
             }
         }
-
-        //如果其中有任何一个账户获取锁失败，则全部锁释放
-        if(lockList.size() != lockNameList.size()){
-            unlock(lockList);
-            //返回空List
-            return new ArrayList<>();
-        }
-        return lockList;
     }
 
-    /**
-     * 释放锁，释放锁的线程和加锁的线程必须是同一个才行，如果需要强行释放锁，请查看 {@link #forceUnlock(RLock)}
-     * @param lockList
-     * @return 如果全部解锁成功，则返回true，否则，返回false
-     */
-    public void unlock(List<RLock> lockList){
-        if(lockList == null || lockList.isEmpty()){
-            return;
-        }
-
-        for(RLock lock : lockList){
+    public <T> T get(String key, Class<T> clz){
+        if(isClusterMode){
+            String value = jedisCluster.get(key);
+            if(value != null){
+                return JsonUtil.toBean(value, clz);
+            }else{
+                return null;
+            }
+        }else{
+            Jedis jedis = null;
             try{
-                unlock(lock);
-            }catch(Throwable t){
-                logger.error("释放锁异常", t);
+                jedis = pool.getResource();
+                String value = jedis.get(key);
+                if(value != null){
+                    return JsonUtil.toBean(value, clz);
+                }else{
+                    return null;
+                }
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
             }
         }
     }
 
-    /**
-     * 释放锁，释放锁的线程和加锁的线程必须是同一个才行，如果需要强行释放锁，请查看 {@link #forceUnlock(RLock)}
-     * @param lock
-     * @return
-     */
-    public void unlock(RLock lock) throws RuntimeException {
-        try{
-            lock.unlock();
-            removeFromShutdownMap(lock.getName());
-        }catch(Throwable t){
-            throw new RuntimeException("lockName = "+lock.getName()+" 释放锁时出现异常", t);
-        }
-    }
-
-    /**
-     * 强行释放锁，不管释放锁的线程是不是跟加锁时的线程一样，都可以释放锁
-     * @param lock
-     * @return
-     */
-    public void forceUnlock(RLock lock){
-        try{
-            removeFromShutdownMap(lock.getName());
-            lock.forceUnlock();
-        }catch(Throwable t){
-            logger.error("lockName = {} 强制释放锁时出现异常", lock.getName(), t);
-        }
-    }
-
-    private String getRealLockName(String lockName){
-        return getLockNamePrefix() + lockName;
-    }
-    private void addToShutdownMap(RLock lock){
-        unlockWhenShutdownMap.putIfAbsent(lock.getName(), lock);
-    }
-    private void removeFromShutdownMap(String lockName){
-        unlockWhenShutdownMap.remove(lockName);
-    }
-
-    public static class Builder{
-        /**
-         * 单机模式
-         * @param urls      地址：如 127.0.0.1:6768
-         * @param password
-         * @return
-         */
-        public static RedisClient singleMode(String urls, String password){
-            Config config = new Config();
-            config.useSingleServer()
-                    .setAddress(addUrlAddressPrefix(urls))
-                    .setPassword(password);
-            RedissonClient client = Redisson.create(config);
-            return new RedisClient(client);
-        }
-
-
-        /**
-         * 集群模式
-         * @param nodeUrlList
-         * @return
-         */
-        public static RedisClient clusterMode(List<String> nodeUrlList, String password){
-            Config config = new Config();
-            String[] nodeUrlArr = addUrlAddressPrefix(nodeUrlList);
-            config.useClusterServers()
-                    .addNodeAddress(nodeUrlArr)
-                    .setPassword(password);
-            return new RedisClient(Redisson.create(config));
-        }
-
-        /**
-         * 主从模式
-         * @param masterUrl
-         * @param masterPass
-         * @param slaveUrls
-         * @return
-         */
-        public static RedisClient masterSlaveMode(String masterUrl, String masterPass, List<String> slaveUrls){
-            Config config = new Config();
-            String[] slaveAddressArr = addUrlAddressPrefix(slaveUrls);
-            config.useMasterSlaveServers()
-                    .setMasterAddress(masterUrl)
-                    .setPassword(masterPass)
-                    .addSlaveAddress(slaveAddressArr);
-            return new RedisClient(Redisson.create(config));
-        }
-
-        /**
-         * 哨兵模式
-         * @param masterName
-         * @param sentinelUrls
-         * @return
-         */
-        public static RedisClient sentinelMode(String masterName, String masterPass, List<String> sentinelUrls){
-            String[] sentinelAddressArr = addUrlAddressPrefix(sentinelUrls);
-            Config config = new Config();
-            config.useSentinelServers()
-                    .setMasterName(masterName)
-                    .setPassword(masterPass)
-                    .addSentinelAddress(sentinelAddressArr);
-            return new RedisClient(Redisson.create(config));
-        }
-
-        /**
-         * 自定义配置
-         * @param config
-         * @return
-         */
-        public static RedisClient newInstance(Config config){
-            return new RedisClient(Redisson.create(config));
-        }
-
-        private static String addUrlAddressPrefix(String address){
-            if(! address.startsWith("redis://" )){
-                address = "redis://" + address;
+    public boolean set(String key, String value){
+        if(isClusterMode){
+            jedisCluster.set(key, value);
+            return true;
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                jedis.set(key, value);
+                return true;
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
             }
-            return address;
+        }
+    }
+
+    public <T> boolean set(String key, T value, int seconds){
+        if (seconds == 0) {// 如果超时时间为0，则设置为默认一分钟
+            seconds = DEFAULT_CACHE_SECONDS;
         }
 
-        private static String[] addUrlAddressPrefix(List<String> addressList){
-            String[] newAddressArr = new String[addressList.size()]; int index= 0;
-            for(String address : addressList){
-                newAddressArr[index++] = addUrlAddressPrefix(address);
+        boolean isNoExpire = seconds <= -1;//-1 表示用不超时
+        if(isClusterMode){
+            if(isNoExpire){
+                jedisCluster.set(key, JsonUtil.toString(value));
+            }else{
+                jedisCluster.setex(key, seconds, JsonUtil.toString(value));
             }
-            return newAddressArr;
+            return true;
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                if(isNoExpire){
+                    jedis.set(key, JsonUtil.toString(value));
+                }else{
+                    jedis.setex(key, seconds, JsonUtil.toString(value));
+                }
+                return true;
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public String hget(String key, String field){
+        if(isClusterMode){
+            return jedisCluster.hget(key, field);
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.hget(key, field);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public boolean hset(String key, String field, String value){
+        if(isClusterMode){
+            return jedisCluster.hset(key, field, value) >= 0;
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.hset(key, field, value) >= 0;
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public Long hincr(String key, String field){
+        if(isClusterMode){
+            return jedisCluster.hincrBy(key, field, 1);
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.hincrBy(key, field, 1);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public Long incr(String key){
+        if(isClusterMode){
+            return jedisCluster.incr(key);
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.incr(key);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public Long incrBy(String key, int increment){
+        if(isClusterMode){
+            return jedisCluster.incrBy(key, increment);
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.incrBy(key, increment);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public <T> T eval(String script, List<String> keys, String... params){
+        if(isClusterMode){
+            return (T) jedisCluster.eval(script, keys, Arrays.asList(params));
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return (T) jedis.eval(script, keys, Arrays.asList(params));
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public Long resetLoopNum(String key, int incrStep, long maxValue){
+        String script = "local currValue = redis.call('incrby', KEYS[1], ARGV[1]); "
+                + "if currValue > tonumber(ARGV[2]) then "
+                + "redis.call('set', KEYS[1], 0); "
+                + "return redis.call('incrby', KEYS[1], ARGV[1]) "
+                + "else "
+                + "return currValue "
+                + "end";
+        Long id = eval(script, Collections.singletonList(key), String.valueOf(incrStep), String.valueOf(maxValue));
+        return id;
+    }
+
+    public void destroy(){
+        if(jedisCluster != null){
+            jedisCluster.close();
+        }
+        if(pool != null){
+            pool.destroy();
         }
     }
 }

@@ -12,31 +12,61 @@ public class IPUtil {
     private static Logger logger = LoggerFactory.getLogger(IPUtil.class);
 
     public static String getFirstLocalIp() {
-        String firstLocalIp = null;
+        InetAddress inetIp = getInetAddress();
+        return inetIp.getHostAddress();
+    }
+
+    public static String getMacAddress(){
+        InetAddress inetIp = getInetAddress();
+        try {
+            StringBuilder sb = new StringBuilder();
+            NetworkInterface ni = NetworkInterface.getByInetAddress(inetIp);
+            byte[] mac = ni.getHardwareAddress();
+            if (mac != null) {
+                for (int i = 0; i < mac.length; i++) {
+                    sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                }
+            }
+
+            return sb.toString();
+        } catch (SocketException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static InetAddress getInetAddress() {
+        InetAddress inetIp = null;
+        boolean isContinue = true;
         try {
             Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
-            while (enumeration.hasMoreElements()) {
+            while (isContinue && enumeration.hasMoreElements()) {
                 NetworkInterface iface = enumeration.nextElement();
-                // filters out 127.0.0.1 and inactive interfaces
-                if (iface.isLoopback() || !iface.isUp()){
+                if (iface.isLoopback() || !iface.isUp()){ //filters out 127.0.0.1 and inactive interfaces
                     continue;
                 }
 
                 Enumeration<InetAddress> inetAddresses = iface.getInetAddresses();
                 while (inetAddresses.hasMoreElements()) {
-                    String ip = inetAddresses.nextElement().getHostAddress();
+                    inetIp = inetAddresses.nextElement();
+                    String ipStr = inetIp.getHostAddress();
                     // 排除 回环IP/ipv6 地址
-                    if (ip.contains(":") || StringUtil.isEmpty(ip)){
+                    if (StringUtil.isEmpty(ipStr) || ipStr.contains(":")){
+                        inetIp = null;
                         continue;
                     }
 
-                    firstLocalIp = ip;
+                    isContinue = false;
                     break;
                 }
             }
-        } catch (SocketException e) {
+        } catch (Exception e) {
             logger.error("获取本地IP时出现异常", e);
         }
-        return firstLocalIp;
+
+        if(inetIp == null){
+            throw new RuntimeException("获取本地IP失败");
+        }
+
+        return inetIp;
     }
 }
