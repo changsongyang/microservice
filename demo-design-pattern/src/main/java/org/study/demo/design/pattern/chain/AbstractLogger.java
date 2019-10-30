@@ -14,11 +14,20 @@ public abstract class AbstractLogger {
         return nextLogger;
     }
 
+    public void close(){
+        destroy();
+        if (nextLogger != null){
+            nextLogger.destroy();
+        }
+    }
+
     private void setNextLogger(AbstractLogger nextLogger) {
         this.nextLogger = nextLogger;
     }
 
     abstract protected void write(String message);
+
+    public abstract void destroy();
 
     public void info(String message){
         logMessage(INFO, "[INFO]", message);
@@ -40,8 +49,6 @@ public abstract class AbstractLogger {
             nextLogger.logMessage(level, prefix, message);//进行下一个责任链元素处理
         }
     }
-
-
 
     public static class Builder {
         private AbstractLogger first;

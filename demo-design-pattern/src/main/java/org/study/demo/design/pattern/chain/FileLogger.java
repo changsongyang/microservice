@@ -35,4 +35,10 @@ public class FileLogger extends AbstractLogger {
 
         }
     }
+
+    public void destroy(){
+        try{
+            outputStream.close();
+        }catch(Exception e){}
+    }
 }

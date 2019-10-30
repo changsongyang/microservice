@@ -25,5 +25,6 @@ public class Client {
         logger.info("第一条日志记录");
         logger.warn("第二条日志记录");
         logger.error("第三条日志记录");
+        logger.close();
     }
 }
