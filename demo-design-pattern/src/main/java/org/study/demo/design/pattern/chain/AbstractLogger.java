@@ -33,12 +33,12 @@ public abstract class AbstractLogger {
         logMessage(INFO, "[INFO]", message);
     }
 
-    public void error(String message){
-        logMessage(ERROR, "[ERROR]", message);
-    }
-
     public void warn(String message){
         logMessage(WARN, "[WARN]", message);
+    }
+
+    public void error(String message){
+        logMessage(ERROR, "[ERROR]", message);
     }
 
     private void logMessage(int level, String prefix, String message){

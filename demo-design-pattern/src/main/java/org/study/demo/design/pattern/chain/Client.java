@@ -11,17 +11,19 @@ package org.study.demo.design.pattern.chain;
 public class Client {
 
     public static void main(String[] args) {
+        //创建三个日志记录器 ---> 对应三个日志文件
         AbstractLogger infoFileLogger = new FileLogger(AbstractLogger.INFO, "E://a.log");
         AbstractLogger errorFileLogger = new FileLogger(AbstractLogger.WARN, "E://b.log");
         AbstractLogger debugFileLogger = new FileLogger(AbstractLogger.ERROR, "E://c.log");
 
-        AbstractLogger.Builder builder = new AbstractLogger.Builder();
-
-        builder.addHandler(infoFileLogger)
+        //通过Builder(建造器模式)把三个日志记录器组成一个链条
+        AbstractLogger logger = new AbstractLogger.Builder()
+                .addHandler(infoFileLogger)
                 .addHandler(errorFileLogger)
-                .addHandler(debugFileLogger);
+                .addHandler(debugFileLogger)
+                .build();
 
-        AbstractLogger logger = builder.build();
+        //打印日志
         logger.info("第一条日志记录");
         logger.warn("第二条日志记录");
         logger.error("第三条日志记录");
