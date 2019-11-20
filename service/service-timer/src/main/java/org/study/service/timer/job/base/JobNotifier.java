@@ -1,4 +1,4 @@
-package org.study.service.timer.core.job.base;
+package org.study.service.timer.job.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

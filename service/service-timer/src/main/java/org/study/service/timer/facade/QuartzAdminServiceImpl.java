@@ -2,7 +2,7 @@ package org.study.service.timer.facade;
 
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.core.biz.InstanceStageBiz;
+import org.study.service.timer.biz.InstanceStageBiz;
 import org.study.facade.timer.service.QuartzAdminService;
 
 @Service(cluster = "broadcast")//需要设置dubbo的协议为'广播模式'

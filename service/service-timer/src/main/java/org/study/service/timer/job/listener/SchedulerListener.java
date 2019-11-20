@@ -1,8 +1,8 @@
-package org.study.service.timer.core.job.listener;
+package org.study.service.timer.job.listener;
 
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.core.biz.InstanceStageBiz;
+import org.study.service.timer.biz.InstanceStageBiz;
 
 public class SchedulerListener implements org.quartz.SchedulerListener {
     @Autowired

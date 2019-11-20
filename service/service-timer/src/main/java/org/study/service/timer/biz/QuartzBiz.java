@@ -1,4 +1,4 @@
-package org.study.service.timer.core.biz;
+package org.study.service.timer.biz;
 
 import org.quartz.Trigger;
 import org.slf4j.Logger;
@@ -11,9 +11,9 @@ import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
 import org.study.common.util.utils.JsonUtil;
 import org.study.common.util.utils.StringUtil;
-import org.study.service.timer.core.dao.ScheduleJobDao;
-import org.study.service.timer.core.job.base.JobManager;
-import org.study.service.timer.core.job.base.JobNotifier;
+import org.study.service.timer.dao.ScheduleJobDao;
+import org.study.service.timer.job.base.JobManager;
+import org.study.service.timer.job.base.JobNotifier;
 import org.study.facade.timer.entity.ScheduleJob;
 
 import java.util.Date;

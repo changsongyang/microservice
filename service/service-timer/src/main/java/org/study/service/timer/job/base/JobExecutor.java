@@ -1,4 +1,4 @@
-package org.study.service.timer.core.job.base;
+package org.study.service.timer.job.base;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -7,8 +7,8 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.core.biz.InstanceStageBiz;
-import org.study.service.timer.core.biz.QuartzBiz;
+import org.study.service.timer.biz.InstanceStageBiz;
+import org.study.service.timer.biz.QuartzBiz;
 import org.study.facade.timer.entity.ScheduleJob;
 
 /**

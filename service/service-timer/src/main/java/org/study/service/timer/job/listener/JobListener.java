@@ -1,4 +1,4 @@
-package org.study.service.timer.core.job.listener;
+package org.study.service.timer.job.listener;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.study.common.util.utils.JsonUtil;
-import org.study.service.timer.core.biz.QuartzBiz;
+import org.study.service.timer.biz.QuartzBiz;
 
 import java.util.HashMap;
 import java.util.Map;

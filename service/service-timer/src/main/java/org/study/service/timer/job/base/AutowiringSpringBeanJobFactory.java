@@ -1,4 +1,4 @@
-package org.study.service.timer.core.job.base;
+package org.study.service.timer.job.base;
 
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.annotation.Autowired;

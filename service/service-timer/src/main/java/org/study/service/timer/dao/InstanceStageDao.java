@@ -1,4 +1,4 @@
-package org.study.service.timer.core.dao;
+package org.study.service.timer.dao;
 
 import org.springframework.stereotype.Repository;
 import org.study.common.service.dao.MyBatisDao;

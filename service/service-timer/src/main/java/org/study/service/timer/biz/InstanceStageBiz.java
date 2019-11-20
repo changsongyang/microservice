@@ -1,4 +1,4 @@
-package org.study.service.timer.core.biz;
+package org.study.service.timer.biz;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.study.common.statics.exceptions.BizException;
-import org.study.common.statics.pojos.ServiceResult;
 import org.study.common.util.utils.IPUtil;
-import org.study.service.timer.core.dao.InstanceStageDao;
-import org.study.service.timer.core.job.base.JobManager;
+import org.study.service.timer.dao.InstanceStageDao;
+import org.study.service.timer.job.base.JobManager;
 import org.study.facade.timer.entity.InstanceStage;
 
 import java.util.Date;
