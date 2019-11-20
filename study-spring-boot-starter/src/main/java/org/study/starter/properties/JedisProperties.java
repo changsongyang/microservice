@@ -1,4 +1,4 @@
-package com.xpay.starter.comp.properties;
+package org.study.starter.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

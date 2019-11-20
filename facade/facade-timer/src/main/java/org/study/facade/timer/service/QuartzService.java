@@ -3,10 +3,8 @@ package org.study.facade.timer.service;
 import org.study.common.statics.exceptions.BizException;
 import org.study.common.statics.pojos.PageParam;
 import org.study.common.statics.pojos.PageResult;
-import org.study.common.statics.pojos.ServiceResult;
 import org.study.facade.timer.entity.ScheduleJob;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +12,9 @@ import java.util.Map;
  * @author chenyf on 2017/8/20.
  */
 public interface QuartzService {
+
     /**
-     * 直接通知，当实例处于暂停中的时候使用
+     * 直接触发任务的消息通知，主要在实例处于挂起状态，但又需要对个别任务进行测试时使用
      * @param jobGroup
      * @param jobName
      * @return
@@ -61,7 +60,7 @@ public interface QuartzService {
     public boolean resumeJob(String jobGroup, String jobName) throws BizException;
 
     /**
-     * 立即触发任务
+     * 立即触发任务，若实例处于挂起状态，则操作无效
      * @param jobGroup
      * @param jobName
      * @return

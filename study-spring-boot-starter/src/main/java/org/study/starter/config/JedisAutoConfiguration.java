@@ -1,8 +1,5 @@
-package com.xpay.starter.comp.config;
+package org.study.starter.config;
 
-import com.xpay.starter.comp.component.RedisClient;
-import com.xpay.starter.comp.enums.RedisMode;
-import com.xpay.starter.comp.properties.JedisProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +8,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
+import org.study.starter.component.RedisClient;
+import org.study.starter.enums.RedisMode;
+import org.study.starter.properties.JedisProperties;
 import redis.clients.jedis.*;
 
 import java.util.HashSet;

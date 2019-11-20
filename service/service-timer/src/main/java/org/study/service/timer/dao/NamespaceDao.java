@@ -1,8 +1,8 @@
-package com.xpay.service.timer.dao;
+package org.study.service.timer.dao;
 
-import com.xpay.common.service.dao.MyBatisDao;
-import com.xpay.facade.timer.entity.Namespace;
 import org.springframework.stereotype.Repository;
+import org.study.common.service.dao.MyBatisDao;
+import org.study.facade.timer.entity.Namespace;
 
 import java.util.HashMap;
 import java.util.Map;

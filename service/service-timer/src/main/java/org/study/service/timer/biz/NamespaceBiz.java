@@ -1,15 +1,15 @@
-package com.xpay.service.timer.biz;
+package org.study.service.timer.biz;
 
-import com.xpay.common.statics.exceptions.BizException;
-import com.xpay.common.util.utils.StringUtil;
-import com.xpay.facade.timer.entity.Namespace;
-import com.xpay.facade.timer.enums.TimerStatus;
-import com.xpay.service.timer.config.TimerConfig;
-import com.xpay.service.timer.dao.NamespaceDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.study.common.statics.exceptions.BizException;
+import org.study.common.util.utils.StringUtil;
+import org.study.facade.timer.entity.Namespace;
+import org.study.facade.timer.enums.TimerStatus;
+import org.study.service.timer.config.TimerConfig;
+import org.study.service.timer.dao.NamespaceDao;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -30,7 +30,7 @@ public class NamespaceBiz {
     public synchronized void initialize(){
         //1.初始化命名空间的记录
         String name = timerConfig.getNamespace();
-        Namespace namespace = namespaceDao.getById(name);
+        Namespace namespace = namespaceDao.getByPk(name);
         if(namespace == null){
             namespace = new Namespace();
             namespace.setNamespace(name);
@@ -55,7 +55,7 @@ public class NamespaceBiz {
             public void run() {
                 try{
                     String name = timerConfig.getNamespace();
-                    Namespace namespace = namespaceDao.getById(name);
+                    Namespace namespace = namespaceDao.getByPk(name);
                     if(namespace.getStatus() == TimerStatus.STAND_BY.getValue()){
                         instanceBiz.pause(name);
                     }else if(namespace.getStatus() == TimerStatus.RUNNING.getValue()){

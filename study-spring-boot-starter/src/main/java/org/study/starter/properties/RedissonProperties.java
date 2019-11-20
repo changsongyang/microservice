@@ -1,21 +1,21 @@
 package org.study.starter.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.study.starter.enums.RedisClusterMode;
+import org.study.starter.enums.RedisMode;
 
 @ConfigurationProperties(prefix = "redis")
 public class RedissonProperties {
 
-    private RedisClusterMode clusterMode;
+    private RedisMode clusterMode;
     private String urls;
     private String masterName;
     private String password;
 
-    public RedisClusterMode getClusterMode() {
+    public RedisMode getClusterMode() {
         return clusterMode;
     }
 
-    public void setClusterMode(RedisClusterMode clusterMode) {
+    public void setClusterMode(RedisMode clusterMode) {
         this.clusterMode = clusterMode;
     }
 

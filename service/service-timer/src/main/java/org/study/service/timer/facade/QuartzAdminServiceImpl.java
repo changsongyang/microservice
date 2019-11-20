@@ -1,14 +1,14 @@
-package com.xpay.service.timer.facade;
+package org.study.service.timer.facade;
 
-import com.xpay.common.statics.result.PageParam;
-import com.xpay.common.statics.result.PageResult;
-import com.xpay.facade.timer.entity.Instance;
-import com.xpay.facade.timer.entity.Namespace;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.xpay.facade.timer.service.QuartzAdminService;
-import com.xpay.service.timer.biz.NamespaceBiz;
-import com.xpay.service.timer.biz.InstanceBiz;
+import org.study.common.statics.pojos.PageParam;
+import org.study.common.statics.pojos.PageResult;
+import org.study.facade.timer.entity.Instance;
+import org.study.facade.timer.entity.Namespace;
+import org.study.facade.timer.service.QuartzAdminService;
+import org.study.service.timer.biz.InstanceBiz;
+import org.study.service.timer.biz.NamespaceBiz;
 
 import java.util.List;
 import java.util.Map;

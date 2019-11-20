@@ -1,21 +1,21 @@
-package com.xpay.service.timer.biz;
+package org.study.service.timer.biz;
 
-import com.xpay.common.statics.exceptions.BizException;
-import com.xpay.common.statics.result.PageParam;
-import com.xpay.common.statics.result.PageResult;
-import com.xpay.common.util.utils.IPUtil;
-import com.xpay.common.util.utils.StringUtil;
-import com.xpay.facade.timer.entity.Namespace;
-import com.xpay.facade.timer.enums.TimerStatus;
-import com.xpay.service.timer.dao.InstanceDao;
-import com.xpay.service.timer.dao.NamespaceDao;
-import com.xpay.service.timer.job.base.JobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.xpay.facade.timer.entity.Instance;
 import org.springframework.transaction.annotation.Transactional;
+import org.study.common.statics.exceptions.BizException;
+import org.study.common.statics.pojos.PageParam;
+import org.study.common.statics.pojos.PageResult;
+import org.study.common.util.utils.IPUtil;
+import org.study.common.util.utils.StringUtil;
+import org.study.facade.timer.entity.Instance;
+import org.study.facade.timer.entity.Namespace;
+import org.study.facade.timer.enums.TimerStatus;
+import org.study.service.timer.dao.InstanceDao;
+import org.study.service.timer.dao.NamespaceDao;
+import org.study.service.timer.job.base.JobManager;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class InstanceBiz {
     @Autowired
     JobManager jobManager;
     @Autowired
-    InstanceDao InstanceDao;
+    InstanceDao instanceDao;
     @Autowired
     NamespaceDao namespaceDao;
 
@@ -47,14 +47,14 @@ public class InstanceBiz {
      */
     public synchronized void initialize(String namespace, int status){
         String instanceId = getInstanceId();
-        Instance instance = InstanceDao.getByInstanceId(instanceId);
+        Instance instance = instanceDao.getByInstanceId(instanceId);
         if(instance == null){
             instance = new Instance();
             instance.setInstanceId(instanceId);
             instance.setNamespace(namespace);
             instance.setStatus(status);
             instance.setUpdateTime(instance.getCreateTime());
-            int count = InstanceDao.insert(instance);
+            int count = instanceDao.insert(instance);
             if(count <= 0){
                 throw new BizException("instanceId = " + instanceId + " 当前实例初始化失败");
             }
@@ -85,7 +85,7 @@ public class InstanceBiz {
             throw new BizException("namespace不能为空");
         }
 
-        List<Instance> instanceList = InstanceDao.listByNamespace(namespace);
+        List<Instance> instanceList = instanceDao.listByNamespace(namespace);
         boolean isPausing = true;
         for(Instance stage : instanceList){
             if(stage.getStatus() != TimerStatus.STAND_BY.getValue()){
@@ -104,7 +104,7 @@ public class InstanceBiz {
             throw new BizException("namespace不能为空");
         }
 
-        List<Instance> instanceList = InstanceDao.listByNamespace(namespace);
+        List<Instance> instanceList = instanceDao.listByNamespace(namespace);
         boolean isRunning = true;
         for(Instance stage : instanceList){
             if(stage.getStatus() != TimerStatus.RUNNING.getValue()){
@@ -126,7 +126,7 @@ public class InstanceBiz {
             return true;
         }
 
-        boolean isOk = InstanceDao.updateInstanceStatus(TimerStatus.STAND_BY.getValue(), getInstanceId(), namespace);
+        boolean isOk = instanceDao.updateInstanceStatus(TimerStatus.STAND_BY.getValue(), getInstanceId(), namespace);
         if(isOk){
              if(! jobManager.isStandByMode()){
                  jobManager.pauseInstance();
@@ -148,7 +148,7 @@ public class InstanceBiz {
             return true;
         }
 
-        boolean isOk = InstanceDao.updateInstanceStatus(TimerStatus.RUNNING.getValue(), getInstanceId(), namespace);
+        boolean isOk = instanceDao.updateInstanceStatus(TimerStatus.RUNNING.getValue(), getInstanceId(), namespace);
         if(isOk){
             if(jobManager.isStandByMode()){
                 jobManager.resumeInstance();
@@ -160,10 +160,10 @@ public class InstanceBiz {
     }
 
     public PageResult<List<Instance>> listInstancePage(Map<String, Object> paramMap, PageParam pageParam){
-        PageResult<List<Instance>> pageResult = InstanceDao.listPage(paramMap, pageParam);
+        PageResult<List<Instance>> pageResult = instanceDao.listPage(paramMap, pageParam);
         if(pageResult.getData() != null && pageResult.getData().size() > 0){
             //一般情况下namespace也就只有几个
-            PageResult<Map<String, Namespace>> result = namespaceDao.mapByIdPage(null, PageParam.newInstance(1, 200));
+            PageResult<Map<String, Namespace>> result = namespaceDao.mapByPkPage(null, PageParam.newInstance(1, 200));
             Map<String, Namespace> namespaceMap = result.getData();
             for(Instance instance : pageResult.getData()){
                 if(namespaceMap != null && namespaceMap.containsKey(instance.getNamespace())){

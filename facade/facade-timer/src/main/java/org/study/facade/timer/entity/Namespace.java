@@ -1,6 +1,6 @@
-package com.xpay.facade.timer.entity;
+package org.study.facade.timer.entity;
 
-import com.xpay.common.statics.annotations.PK;
+import org.study.common.statics.annotations.PK;
 
 import java.io.Serializable;
 import java.util.Date;

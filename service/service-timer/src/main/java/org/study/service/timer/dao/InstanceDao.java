@@ -1,10 +1,10 @@
-package com.xpay.service.timer.dao;
+package org.study.service.timer.dao;
 
-import com.xpay.common.statics.exceptions.BizException;
-import com.xpay.common.util.utils.StringUtil;
-import com.xpay.facade.timer.entity.Instance;
 import org.springframework.stereotype.Repository;
-import com.xpay.common.service.dao.MyBatisDao;
+import org.study.common.service.dao.MyBatisDao;
+import org.study.common.statics.exceptions.BizException;
+import org.study.common.util.utils.StringUtil;
+import org.study.facade.timer.entity.Instance;
 
 import java.util.HashMap;
 import java.util.List;

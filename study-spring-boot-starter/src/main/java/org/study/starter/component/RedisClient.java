@@ -1,7 +1,7 @@
 package org.study.starter.component;
 
-import com.tpay.common.util.utils.JsonUtil;
-import com.tpay.starter.enums.RedisMode;
+import org.study.common.util.utils.JsonUtil;
+import org.study.starter.enums.RedisMode;
 import org.springframework.util.Assert;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
@@ -10,10 +10,11 @@ import redis.clients.jedis.util.Pool;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class RedisClient {
     private static final int DEFAULT_CACHE_SECONDS = 60 * 1;// 单位秒 设置成一分钟
-    private RedisMode redisMode;
+    private RedisMode redisMode;//预留
     private boolean isClusterMode;
     private JedisCluster jedisCluster;
     private Pool<Jedis> pool;
@@ -22,7 +23,7 @@ public class RedisClient {
         Assert.notNull(redisMode, "redisMode is null");
 
         this.redisMode = redisMode;
-        if(RedisMode.CLUSTER.equals(redisMode)){
+        if(RedisMode.CLUSTER.equals(this.redisMode)){
             Assert.notNull(jedisCluster, "When redisMode is CLUSTER, jedisCluster can not be null");
             this.jedisCluster = jedisCluster;
             this.isClusterMode = true;
@@ -155,6 +156,41 @@ public class RedisClient {
             }
         }
     }
+
+
+    public Set<String> hkeys(String key){
+        if(isClusterMode){
+            return jedisCluster.hkeys(key);
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.hkeys(key);
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+    public boolean del(String key) {
+        if(isClusterMode){
+            return jedisCluster.hdel(key) >= 0;
+        }else{
+            Jedis jedis = null;
+            try{
+                jedis = pool.getResource();
+                return jedis.del(key) >= 0;
+            } finally {
+                if(jedis != null){
+                    jedis.close();
+                }
+            }
+        }
+    }
+
+
 
     public Long hincr(String key, String field){
         if(isClusterMode){

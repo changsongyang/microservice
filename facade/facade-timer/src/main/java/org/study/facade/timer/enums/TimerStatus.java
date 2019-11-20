@@ -1,4 +1,4 @@
-package com.xpay.facade.timer.enums;
+package org.study.facade.timer.enums;
 
 public enum TimerStatus {
     RUNNING(1, "运行中"),

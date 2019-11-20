@@ -1,10 +1,9 @@
-package com.xpay.starter.comp.properties;
+package org.study.starter.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

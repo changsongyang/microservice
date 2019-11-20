@@ -1,4 +1,4 @@
-package com.xpay.starter.comp.enums;
+package org.study.starter.enums;
 
 public enum RedisMode {
     STANDALONE,

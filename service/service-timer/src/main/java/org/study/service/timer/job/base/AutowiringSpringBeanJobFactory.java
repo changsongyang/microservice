@@ -1,4 +1,4 @@
-package com.xpay.service.timer.job.base;
+package org.study.service.timer.job.base;
 
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;

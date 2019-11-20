@@ -1,8 +1,8 @@
-package com.xpay.service.timer.job.listener;
+package org.study.service.timer.job.listener;
 
-import com.xpay.service.timer.biz.NamespaceBiz;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.study.service.timer.biz.NamespaceBiz;
 
 public class SchedulerListener implements org.quartz.SchedulerListener {
     @Autowired

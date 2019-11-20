@@ -1,7 +1,5 @@
-package com.xpay.starter.comp.config;
+package org.study.starter.config;
 
-import com.xpay.starter.comp.component.EmailSender;
-import com.xpay.starter.comp.properties.MailProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.study.starter.component.EmailSender;
+import org.study.starter.properties.MailProperties;
 
 import java.util.HashMap;
 import java.util.Map;

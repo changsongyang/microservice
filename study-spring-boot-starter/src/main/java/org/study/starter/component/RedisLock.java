@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 操作redis的客户端
+ * redis分布式锁
  */
 public class RedisLock {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

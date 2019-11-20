@@ -1,4 +1,4 @@
-package com.xpay.service.timer.config;
+package org.study.service.timer.config;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

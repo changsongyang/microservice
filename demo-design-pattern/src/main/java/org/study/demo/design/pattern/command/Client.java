@@ -15,7 +15,6 @@ public class Client {
         //准备好智能音响
         AIAudio aiAudio = new AIAudio();
 
-
         System.out.println("------打开电灯");
         LightOnCommand lightOnCommand = new LightOnCommand(light);//发出打开电灯的命令
         aiAudio.addCommand(lightOnCommand);

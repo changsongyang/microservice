@@ -1,4 +1,4 @@
-package com.xpay.service.timer.job.base;
+package org.study.service.timer.job.base;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -7,9 +7,9 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.xpay.service.timer.biz.InstanceBiz;
-import com.xpay.service.timer.biz.QuartzBiz;
-import com.xpay.facade.timer.entity.ScheduleJob;
+import org.study.facade.timer.entity.ScheduleJob;
+import org.study.service.timer.biz.InstanceBiz;
+import org.study.service.timer.biz.QuartzBiz;
 
 /**
  * Quartz的任务执行类：

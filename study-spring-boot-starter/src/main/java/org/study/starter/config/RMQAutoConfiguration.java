@@ -16,7 +16,7 @@ public class RMQAutoConfiguration {
 
     @ConditionalOnBean(RocketMQTemplate.class)
     @Bean
-    public RocketMQSender rmqSender(RocketMQTemplate rocketMQTemplate){
+    public RocketMQSender rocketMQSender(RocketMQTemplate rocketMQTemplate){
         return new RocketMQSender(rocketMQTemplate);
     }
 

@@ -23,6 +23,7 @@
             <version>${projectVersion}</version>
         </dependency>
 
+        <!-- SpringBoot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -35,6 +36,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
             <optional>true</optional>
         </dependency>
@@ -43,17 +49,51 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- SpringBoot -->
 
+        <!-- sentinel -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- sentinel -->
+
+        <!-- RocketMQ -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- RocketMQ -->
+
+        <!-- ActiveMQ -->
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.messaginghub</groupId>
+            <artifactId>pooled-jms</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- ActiveMQ -->
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- redis -->
+
+        <!-- zookeeper -->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>
@@ -64,28 +104,22 @@
             <artifactId>curator-recipes</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!-- java mail -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <!-- java mail -->
+        <!-- zookeeper -->
 
+        <!-- elasticsearch -->
         <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-core</artifactId>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- elasticsearch -->
+
+        <!-- java mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- java mail -->
     </dependencies>
 </project>

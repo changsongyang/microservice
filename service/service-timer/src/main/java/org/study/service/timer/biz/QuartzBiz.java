@@ -1,20 +1,20 @@
-package com.xpay.service.timer.biz;
+package org.study.service.timer.biz;
 
-import com.xpay.common.statics.exceptions.BizException;
-import com.xpay.common.statics.result.PageParam;
-import com.xpay.common.statics.result.PageResult;
-import com.xpay.common.util.utils.JsonUtil;
-import com.xpay.common.util.utils.StringUtil;
-import com.xpay.service.timer.dao.ScheduleJobDao;
-import com.xpay.service.timer.job.base.JobManager;
-import com.xpay.service.timer.job.base.JobNotifier;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import com.xpay.facade.timer.entity.ScheduleJob;
+import org.study.common.statics.exceptions.BizException;
+import org.study.common.statics.pojos.PageParam;
+import org.study.common.statics.pojos.PageResult;
+import org.study.common.util.utils.JsonUtil;
+import org.study.common.util.utils.StringUtil;
+import org.study.facade.timer.entity.ScheduleJob;
+import org.study.service.timer.dao.ScheduleJobDao;
+import org.study.service.timer.job.base.JobManager;
+import org.study.service.timer.job.base.JobNotifier;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class QuartzBiz {
     public boolean sendJobNotify(String jobGroup, String jobName) {
         ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
         if (scheduleJob == null) {
-            throw new BizException(BizException.BIZ_INVALIDATE, "任务不存在");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务不存在");
         }
 
         boolean isOk = jobNotifier.notify(scheduleJob);
@@ -249,7 +249,7 @@ public class QuartzBiz {
         try {
             ScheduleJob scheduleJob = scheduleJobDao.getByName(jobGroup, jobName);
             if (scheduleJob != null) {
-                scheduleJobDao.deleteById(scheduleJob.getId());
+                scheduleJobDao.deleteByPk(scheduleJob.getId());
             }
             boolean isOk = jobManager.deleteJob(jobGroup, jobName);
             if (isOk) {
@@ -337,37 +337,37 @@ public class QuartzBiz {
 
     private void checkJobParam(ScheduleJob scheduleJob) {
         if (scheduleJob == null) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "scheduleJob不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "scheduleJob不能为空");
         } else if (scheduleJob.getJobType() == null) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "任务类型(jobType)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务类型(jobType)不能为空");
         } else if (StringUtil.isEmpty(scheduleJob.getJobGroup())) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "任务的组名(jobGroup)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务的组名(jobGroup)不能为空");
         } else if (StringUtil.isEmpty(scheduleJob.getJobName())) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "任务名(jobName)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务名(jobName)不能为空");
         } else if (StringUtil.isEmpty(scheduleJob.getDestination())) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "任务通知目的地(destination)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务通知目的地(destination)不能为空");
         } else if (scheduleJob.getMqType() == null) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "MQ类型(mqType)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "MQ类型(mqType)不能为空");
         } else if (scheduleJob.getStartTime() == null) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "开始时间(startTime)不能为空");
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "开始时间(startTime)不能为空");
         }
 
         if (scheduleJob.getJobType().equals(ScheduleJob.SIMPLE_JOB)) {
             if (scheduleJob.getIntervals() == null) {
-                throw new BizException(BizException.PARAM_INVALIDATE, "任务间隔(interval)不能为空");
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务间隔(interval)不能为空");
             } else if (scheduleJob.getIntervalUnit() == null) {
-                throw new BizException(BizException.PARAM_INVALIDATE, "任务间隔单位(intervalUnit)不能为空");
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "任务间隔单位(intervalUnit)不能为空");
             }
         } else if (scheduleJob.getJobType().equals(ScheduleJob.CRON_JOB)) {
             if (StringUtil.isEmpty(scheduleJob.getCronExpression())) {
-                throw new BizException(BizException.PARAM_INVALIDATE, "cron表达式(cronExpression)不能为空");
+                throw new BizException(BizException.PARAM_VALIDATE_ERROR, "cron表达式(cronExpression)不能为空");
             }
         } else {
-            throw new BizException(BizException.PARAM_INVALIDATE, "未支持的任务类型jobType: " + scheduleJob.getJobType());
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的任务类型jobType: " + scheduleJob.getJobType());
         }
 
         if (!scheduleJob.getMqType().equals(ScheduleJob.MQ_TYPE_ROCKET)) {
-            throw new BizException(BizException.PARAM_INVALIDATE, "未支持的MQ类型mqType: " + scheduleJob.getMqType());
+            throw new BizException(BizException.PARAM_VALIDATE_ERROR, "未支持的MQ类型mqType: " + scheduleJob.getMqType());
         }
     }
 }

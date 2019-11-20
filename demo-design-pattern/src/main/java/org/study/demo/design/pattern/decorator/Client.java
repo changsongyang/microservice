@@ -1,5 +1,7 @@
 package org.study.demo.design.pattern.decorator;
 
+import java.io.*;
+
 /**
  * 客户端
  *
@@ -10,11 +12,16 @@ public class Client {
     public static void main(String[] args) {
         PersonComponent personComponent = new PersonComponent();//经过初步打扮的你
 
-        Decorator sweaterDecorator = new SweaterDecorator(personComponent);//加了毛衣之后的你
+        Decorator sweaterDecorator = new HatDecorator(new SweaterDecorator(new PersonComponent()));//加了毛衣之后的你
 
         Decorator hatDecorator = new HatDecorator(sweaterDecorator);//加了帽子之后的你
         hatDecorator.decorate();
 
-        //可以非常灵活的 增加、卸载 链节点
+        //可以非常灵活的 增加、卸载
+
+
+//        ObjectInputStream
+//        SequenceInputStream
+//        StringBufferInputStream
     }
 }

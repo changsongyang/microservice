@@ -1,38 +1,69 @@
 package org.study.facade.timer.service;
 
 import org.study.common.statics.exceptions.BizException;
+import org.study.common.statics.pojos.PageParam;
+import org.study.common.statics.pojos.PageResult;
+import org.study.facade.timer.entity.Instance;
+import org.study.facade.timer.entity.Namespace;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Quartz实例管理接口，需要消费端启动 cluster="broadcast" 来配合使用
+ * Quartz实例管理接口
  */
 public interface QuartzAdminService {
+
     /**
-     * 暂停当前实例，如果暂停失败，则抛出异常
+     * 暂停某个命名空间下的所有实例(异步)
      *
      * 注意：
-     *     1、此方法会挂起当前实例的所有任务，但应用并不会关闭
-     *     2、当前实例的挂起状态只维护在当前内存中，如果应用重启，挂起设置会失效
-     *     3、如果当前应用采用集群方式部署了多台机器，若dubbo消费端想要挂起所有实例，需要dubbo的服务提供方设置 @Service(cluster = "broadcast") 广播模式，
-     *        广播模式 + 消费端重试 的情况下在绝大部分情况下都能够完成所有运行实例的挂起，但若遇到个别应用比较极端的情况(如：网络波动较大)，广播模式
-     *        也不能100%的保证能挂起所有实例，这个需要评估对业务的影响
-     *     4、鉴于第3点中提到的没有100%保证能挂起所有实例的情况，因为本应用足够轻便，单实例部署已足够，若为了故障容忍，部署2台亦可
+     *     1、此方法会挂起当前命名空间下所有实例的所有任务，但应用并不会关闭，可调用 {@link #resumeAllInstanceAsync(String)} 恢复
+     *     2、此方法内部是通过定时轮训数据库的形式来更新实例状态的，因此可能存在一定的延时性(默认5秒)，可调用 {@link #isAllInstancePausing(String)} 检测是否已全部暂停
+     * @param namespace
+     * @return  成功返回true，失败则返回false
+     * @throws BizException
+     */
+    public boolean pauseAllInstanceAsync(String namespace) throws BizException;
+
+    /**
+     * 恢复某个命名空间下被暂停的所有实例(异步)
+     *
+     * 注意：
+     *     1、此方法内部是通过定时轮训数据库的形式来更新实例状态的，因此可能存在一定的延时性(默认5秒)，可调用 {@link #isAllInstanceRunning(String)} 检测是否已全部恢复
+     * @param namespace
+     * @return  成功返回true，失败则返回false
+     * @throws BizException
+     */
+    public boolean resumeAllInstanceAsync(String namespace) throws BizException;
+
+    /**
+     * 断命名空间下的所有实例是否都处于暂停状态
+     * @param namespace
+     * @return  已全部暂停则返回true，否则返回false
+     * @throws BizException
+     */
+    public boolean isAllInstancePausing(String namespace) throws BizException;
+
+    /**
+     * 判断命名空间下的所有实例是否都处于运行状态
+     * @param namespace
+     * @return  已全部处于运行中则返回true，否则返回false
+     * @throws BizException
+     */
+    public boolean isAllInstanceRunning(String namespace) throws BizException;
+
+    /**
+     * 分页查询实例列表
+     * @param pageParam
+     * @param paramMap
      * @return
      */
-    public void pauseInstance();
+    public PageResult<List<Instance>> listInstancePage(Map<String, Object> paramMap, PageParam pageParam);
 
     /**
-     * 恢复当前实例，如果恢复失败，则抛出异常
+     * 取得所有命名空间
      * @return
      */
-    public void resumeInstance();
-
-    /**
-     * 断言实例是暂停中，如果当前实例为非暂停中，则会抛出异常
-     */
-    public void assertPausing() throws BizException;
-
-    /**
-     * 断言实例是运行中，如果当前实例为暂停中，则会抛出异常
-     */
-    public void assertRunning() throws BizException;
+    public List<Namespace> listAllNamespace();
 }
