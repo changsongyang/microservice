@@ -1,13 +1,13 @@
-package org.study.service.timer.config;
+package com.xpay.service.timer.config;
 
+import com.xpay.service.timer.job.listener.SchedulerListener;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.study.service.timer.job.base.AutowiringSpringBeanJobFactory;
-import org.study.service.timer.job.listener.JobListener;
-import org.study.service.timer.job.listener.SchedulerListener;
-import org.study.service.timer.job.listener.TriggerListener;
+import com.xpay.service.timer.job.base.AutowiringSpringBeanJobFactory;
+import com.xpay.service.timer.job.listener.JobListener;
+import com.xpay.service.timer.job.listener.TriggerListener;
 
 import javax.sql.DataSource;
 import java.util.Properties;

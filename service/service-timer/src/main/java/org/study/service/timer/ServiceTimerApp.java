@@ -1,4 +1,4 @@
-package org.study.service.timer;
+package com.xpay.service.timer;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

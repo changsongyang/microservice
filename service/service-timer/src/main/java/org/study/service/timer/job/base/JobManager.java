@@ -1,15 +1,14 @@
-package org.study.service.timer.job.base;
+package com.xpay.service.timer.job.base;
 
+import com.xpay.common.statics.enums.TimeUnitEnum;
+import com.xpay.common.statics.exceptions.BizException;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Component;
-import org.study.common.statics.enums.TimeUnitEnum;
-import org.study.common.statics.exceptions.BizException;
-import org.study.common.statics.pojos.ServiceResult;
-import org.study.facade.timer.entity.ScheduleJob;
+import com.xpay.facade.timer.entity.ScheduleJob;
 
 import java.util.Date;
 import java.util.List;
@@ -42,6 +41,15 @@ public class JobManager {
         }
     }
 
+    public boolean isStandByMode() {
+        try{
+            return schedulerFactoryBean.getScheduler().isInStandbyMode();
+        }catch(Exception ex){
+            logger.error("判断实例是否处于挂起状态时出现异常", ex);
+            throw new BizException(ex);
+        }
+    }
+
     public void resumeInstance(){
         try{
             schedulerFactoryBean.getScheduler().start();
@@ -57,7 +65,7 @@ public class JobManager {
      */
     public Date addJob(ScheduleJob scheduleJob) throws SchedulerException {
         if(checkJobExist(scheduleJob)){
-            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "jobGroup="+scheduleJob.getJobGroup()+",jobName="+scheduleJob.getJobName()+"的任务已存在！");
+            throw new BizException(BizException.BIZ_INVALIDATE, "jobGroup="+scheduleJob.getJobGroup()+",jobName="+scheduleJob.getJobName()+"的任务已存在！");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -88,7 +96,7 @@ public class JobManager {
      */
     public Date rescheduleJob(ScheduleJob scheduleJob) throws SchedulerException {
         if(! checkJobExist(scheduleJob)){
-            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法重新安排");
+            throw new BizException(BizException.BIZ_INVALIDATE, "任务不在定时计划中，无法重新安排");
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
@@ -116,7 +124,7 @@ public class JobManager {
     public void pauseJob(String jobGroup, String jobName) throws SchedulerException, BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法暂停");
+            throw new BizException(BizException.BIZ_INVALIDATE, "任务不在定时计划中，无法暂停");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -133,7 +141,7 @@ public class JobManager {
     public String resumeJob(String jobGroup, String jobName) throws SchedulerException, BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法恢复");
+            throw new BizException(BizException.BIZ_INVALIDATE, "任务不在定时计划中，无法恢复");
         }
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
         TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
@@ -152,7 +160,7 @@ public class JobManager {
     public void triggerJob(String jobGroup, String jobName) throws SchedulerException,BizException {
         ScheduleJob scheduleJob = new ScheduleJob(jobGroup, jobName);
         if(! checkJobExist(scheduleJob)){
-            throw new BizException(BizException.BIZ_VALIDATE_ERROR, "任务不在定时计划中，无法执行");
+            throw new BizException(BizException.BIZ_INVALIDATE, "任务不在定时计划中，无法执行");
         }
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -182,8 +190,8 @@ public class JobManager {
      * 获得当前正在执行的任务
      * @return
      */
-    public ServiceResult<List<ScheduleJob>> listRunningJob(){
-        return ServiceResult.success();
+    public List<ScheduleJob> listRunningJob(){
+        return null;
     }
 
     /**

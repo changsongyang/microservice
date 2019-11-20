@@ -1,46 +1,76 @@
-package org.study.service.timer.facade;
+package com.xpay.service.timer.facade;
 
+import com.xpay.common.statics.result.PageParam;
+import com.xpay.common.statics.result.PageResult;
+import com.xpay.facade.timer.entity.Instance;
+import com.xpay.facade.timer.entity.Namespace;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.biz.InstanceStageBiz;
-import org.study.facade.timer.service.QuartzAdminService;
+import com.xpay.facade.timer.service.QuartzAdminService;
+import com.xpay.service.timer.biz.NamespaceBiz;
+import com.xpay.service.timer.biz.InstanceBiz;
 
-@Service(cluster = "broadcast")//需要设置dubbo的协议为'广播模式'
+import java.util.List;
+import java.util.Map;
+
+@Service
 public class QuartzAdminServiceImpl implements QuartzAdminService {
     @Autowired
-    InstanceStageBiz instanceStageBiz;
+    NamespaceBiz namespaceBiz;
+    @Autowired
+    InstanceBiz instanceStageBiz;
 
     /**
-     * 暂停当前实例，如果暂停失败，则抛出异常
+     * 暂停某个命名空间下的所有实例
      * @return
      */
     @Override
-    public void pauseInstance(){
-        instanceStageBiz.pauseInstance();
+    public boolean pauseAllInstanceAsync(String namespace){
+        return namespaceBiz.pauseNamespaceAsync(namespace);
     }
 
     /**
-     * 恢复当前实例，如果恢复失败，则抛出异常
+     * 恢复某个命名空间下被暂停的所有实例
      * @return
      */
     @Override
-    public void resumeInstance(){
-        instanceStageBiz.resumeInstance();
+    public boolean resumeAllInstanceAsync(String namespace){
+        return namespaceBiz.resumeNamespaceAsync(namespace);
     }
 
     /**
-     * 断言实例是暂停中，如果当前实例为非暂停中，则会抛出异常
+     * 取得所有命名空间
+     * @return
      */
     @Override
-    public void assertPausing(){
-        instanceStageBiz.assertPausing();
+    public List<Namespace> listAllNamespace(){
+        return namespaceBiz.listAllNamespace();
     }
 
     /**
-     * 断言实例是运行中，如果当前实例为暂停中，则会抛出异常
+     * 判断命名空间下的所有实例是否都处于暂停状态
      */
     @Override
-    public void assertRunning(){
-        instanceStageBiz.assertRunning();
+    public boolean isAllInstancePausing(String namespace){
+        return instanceStageBiz.isAllInstancePausing(namespace);
+    }
+
+    /**
+     * 判断命名空间下的所有实例是否都处于运行状态
+     */
+    @Override
+    public boolean isAllInstanceRunning(String namespace){
+        return instanceStageBiz.isAllInstanceRunning(namespace);
+    }
+
+    /**
+     * 分页查询实例列表
+     * @param pageParam
+     * @param paramMap
+     * @return
+     */
+    @Override
+    public PageResult<List<Instance>> listInstancePage(Map<String, Object> paramMap, PageParam pageParam){
+        return instanceStageBiz.listInstancePage(paramMap, pageParam);
     }
 }

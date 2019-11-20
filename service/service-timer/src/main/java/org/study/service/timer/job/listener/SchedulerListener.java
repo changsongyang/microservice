@@ -1,12 +1,12 @@
-package org.study.service.timer.job.listener;
+package com.xpay.service.timer.job.listener;
 
+import com.xpay.service.timer.biz.NamespaceBiz;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.biz.InstanceStageBiz;
 
 public class SchedulerListener implements org.quartz.SchedulerListener {
     @Autowired
-    InstanceStageBiz instanceStageBiz;
+    NamespaceBiz namespaceBiz;
 
     @Override
     public void jobScheduled(Trigger trigger) {
@@ -88,7 +88,7 @@ public class SchedulerListener implements org.quartz.SchedulerListener {
      */
     @Override
     public void schedulerStarted() {
-        instanceStageBiz.initialize();
+        namespaceBiz.initialize();
     }
 
     @Override

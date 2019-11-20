@@ -1,12 +1,12 @@
-package org.study.service.timer.job.listener;
+package com.xpay.service.timer.job.listener;
 
+import com.xpay.common.util.utils.JsonUtil;
 import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.common.util.utils.JsonUtil;
-import org.study.service.timer.biz.QuartzBiz;
+import com.xpay.service.timer.biz.QuartzBiz;
 
 import java.util.Date;
 import java.util.HashMap;

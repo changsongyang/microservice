@@ -1,32 +1,24 @@
-package org.study.facade.timer.entity;
+package com.xpay.facade.timer.entity;
 
-import org.study.common.statics.annotations.PK;
+import com.xpay.common.statics.annotations.PK;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class InstanceStage implements Serializable {
+public class Instance implements Serializable {
     private static final long serialVersionUID = 43493635241245483L;
-
-    public final static int RUNNING_STAGE = 1;
-    public final static int STAND_BY_STAGE = 2;
-
     @PK
-    private Long id;
-    private Date createTime = new Date();
-
     private String instanceId;
+    private Date createTime = new Date();
+    private String namespace;
     private Integer status;
     private String remark = "";
     private Date updateTime;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    /**
+     * 命名空间的状态，属于业务冗余字段
+     */
+    private Integer namespaceStatus;
 
     public Date getCreateTime() {
         return createTime;
@@ -42,6 +34,14 @@ public class InstanceStage implements Serializable {
 
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     public Integer getStatus() {
@@ -66,5 +66,13 @@ public class InstanceStage implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getNamespaceStatus() {
+        return namespaceStatus;
+    }
+
+    public void setNamespaceStatus(Integer namespaceStatus) {
+        this.namespaceStatus = namespaceStatus;
     }
 }

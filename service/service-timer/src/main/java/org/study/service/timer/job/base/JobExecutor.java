@@ -1,4 +1,4 @@
-package org.study.service.timer.job.base;
+package com.xpay.service.timer.job.base;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -7,9 +7,9 @@ import org.quartz.JobKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.study.service.timer.biz.InstanceStageBiz;
-import org.study.service.timer.biz.QuartzBiz;
-import org.study.facade.timer.entity.ScheduleJob;
+import com.xpay.service.timer.biz.InstanceBiz;
+import com.xpay.service.timer.biz.QuartzBiz;
+import com.xpay.facade.timer.entity.ScheduleJob;
 
 /**
  * Quartz的任务执行类：
@@ -28,7 +28,7 @@ public class JobExecutor implements Job {
     @Autowired
     QuartzBiz quartzBiz;
     @Autowired
-    InstanceStageBiz instanceStageBiz;
+    InstanceBiz instanceStageBiz;
     @Autowired
     JobNotifier jobNotifier;
 
@@ -38,9 +38,6 @@ public class JobExecutor implements Job {
 
         if(! instanceStageBiz.isInitFinished()){
             logger.error("当前实例未完成初始化，不可触发任务，将忽略本次任务 jobGroup={} jobName={}", jobKey.getGroup(), jobKey.getName());
-            return;
-        }else if(instanceStageBiz.isStandByMode()){ //万一Quartz没能完全暂停住实例，此处再次校验，做最后保障
-            logger.error("当前实例挂起中，不可触发任务，将忽略本次任务 jobGroup={} jobName={}", jobKey.getGroup(), jobKey.getName());
             return;
         }
 
