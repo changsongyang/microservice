@@ -25,13 +25,13 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
-    public String getOne(String index) {
+    public HashMap getOne(String index) {
         try{
             EsQuery esQuery = EsQuery.build().from(index);
 
             esQuery.eq("ID", 22168781);
 
-            String result = esClient.getOne(esQuery);
+            HashMap result = esClient.getOne(esQuery);
 
             return result;
         }catch(Exception e){
@@ -42,14 +42,14 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/listBy", method = RequestMethod.GET)
-    public List<String> listBy(String index, Integer pagSize) {
+    public List<HashMap> listBy(String index, Integer pagSize) {
         try{
             EsQuery esQuery = EsQuery.build().from(index);
 
             esQuery.eq("USER_NO", "888100000005252")
             .size(pagSize);
 
-            List<String> result = esClient.listBy(esQuery);
+            List<HashMap> result = esClient.listBy(esQuery);
 
             return result;
         }catch(Exception e){
@@ -60,7 +60,7 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
-    public PageResult<List<String>> listPage(String index, Integer pageCurrent) {
+    public PageResult<List<HashMap>> listPage(String index, Integer pageCurrent) {
         try{
             EsQuery esQuery = EsQuery.build(true).from(index);
 
@@ -69,9 +69,9 @@ public class DemoController {
                     .neq("userNo", "888100000005252")
                     .notIn("alterType", "1,2,3".split(","))
                     .page(pageCurrent, 20)
-                    .result(HashMap.class);
+                    .resultClass(HashMap.class);
 
-            PageResult<List<String>> result = esClient.listPage(esQuery);
+            PageResult<List<HashMap>> result = esClient.listPage(esQuery);
 
             return result;
         }catch(Exception e){
@@ -82,13 +82,13 @@ public class DemoController {
 
     @ResponseBody
     @RequestMapping(value = "/scrollPage", method = RequestMethod.GET)
-    public PageResult<List<String>> scrollPage(String index, String scrollId, Integer pagSize) {
+    public PageResult<List<HashMap>> scrollPage(String index, String scrollId, Integer pagSize) {
         try{
             EsQuery esQuery = EsQuery.build(true).from(index);
 
-            esQuery.eq("userNo", "888100000005252").scroll(scrollId, 60, pagSize);
+            esQuery.eq("userNo", "888100000005252").scroll( 60, pagSize).scrollId(scrollId);
 
-            PageResult<List<String>> result = esClient.listPage(esQuery);
+            PageResult<List<HashMap>> result = esClient.listPage(esQuery);
 
             return result;
         }catch(Exception e){

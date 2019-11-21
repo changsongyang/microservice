@@ -79,13 +79,17 @@ public class ESClient {
         if(response.getHits().getTotalHits().value > 0){
             if(esQuery.getSnakeCase()){
                 Map<String, Object> resultMap = snakeCaseKey(response.getHits().getHits()[0].getSourceAsMap());
-                if(isString(clz)){
+                if(isHashMap(clz)){
+                    return (T) resultMap;
+                }else if(isString(clz)){
                     return (T)JsonUtil.toString(resultMap);
                 }else{
                     return JsonUtil.toBean(JsonUtil.toString(resultMap), clz);
                 }
             }else{
-                if(isString(clz)){
+                if(isHashMap(clz)){
+                    return (T) response.getHits().getHits()[0].getSourceAsMap();
+                }else if(isString(clz)){
                     return (T) response.getHits().getHits()[0].getSourceAsString();
                 }else{
                     return JsonUtil.toBean(response.getHits().getHits()[0].getSourceAsString(), clz);
@@ -179,6 +183,7 @@ public class ESClient {
      */
     public  <T> List<T> getEntityList(SearchResponse response, Class<T> clz, boolean snakeCase){
         List<T> entityList = new ArrayList<>();
+        boolean isHashMap = isHashMap(clz);
         boolean isString = isString(clz);
         if(response.getHits().getHits().length <= 0){
             return entityList;
@@ -188,13 +193,17 @@ public class ESClient {
         for(int i=0; i<hits.length; i++){
             if(snakeCase){
                 Map<String, Object> resultMap = snakeCaseKey(hits[i].getSourceAsMap());
-                if(isString){
+                if(isHashMap){
+                    entityList.add((T) resultMap);
+                }else if(isString){
                     entityList.add((T)JsonUtil.toString(resultMap));
                 }else{
                     entityList.add(JsonUtil.toBean(JsonUtil.toString(resultMap), clz));
                 }
             }else{
-                if(isString){
+                if(isHashMap){
+                    entityList.add((T) hits[i].getSourceAsMap());
+                }else if(isString){
                     entityList.add((T)hits[i].getSourceAsString());
                 }else{
                     entityList.add(JsonUtil.toBean(hits[i].getSourceAsString(), clz));
@@ -408,19 +417,19 @@ public class ESClient {
                 ValuesSourceAggregationBuilder aggBuilder;
                 switch(name){
                     case "count":
-                        aggBuilder = AggregationBuilders.count(fillFieldName(aggField, "count")).field(aggField);
+                        aggBuilder = AggregationBuilders.count(fillFieldName(aggField, name)).field(aggField);
                         break;
                     case "sum":
-                        aggBuilder = AggregationBuilders.sum(fillFieldName(aggField, "sum")).field(aggField);
+                        aggBuilder = AggregationBuilders.sum(fillFieldName(aggField, name)).field(aggField);
                         break;
                     case "min":
-                        aggBuilder = AggregationBuilders.min(fillFieldName(aggField, "min")).field(aggField);
+                        aggBuilder = AggregationBuilders.min(fillFieldName(aggField, name)).field(aggField);
                         break;
                     case "max":
-                        aggBuilder = AggregationBuilders.max(fillFieldName(aggField,"max")).field(aggField);
+                        aggBuilder = AggregationBuilders.max(fillFieldName(aggField, name)).field(aggField);
                         break;
                     case "avg":
-                        aggBuilder = AggregationBuilders.avg(fillFieldName(aggField,"avg" )).field(aggField);
+                        aggBuilder = AggregationBuilders.avg(fillFieldName(aggField, name)).field(aggField);
                         break;
                     default:
                         throw new BizException("EsQuery.Aggregation 未预期的属性名称：" + name);
@@ -496,7 +505,7 @@ public class ESClient {
      */
     private Class getReturnClass(EsQuery esQuery){
         if(StringUtil.isEmpty(esQuery.getReturnClassName())){
-            return String.class;
+            return HashMap.class;
         }else{
             try{
                 return ClassUtil.getClass(esQuery.getReturnClassName());
@@ -551,6 +560,10 @@ public class ESClient {
 
     private boolean isNotBlank(Map map){
         return map != null && ! map.isEmpty();
+    }
+
+    private boolean isHashMap(Class clz){
+        return HashMap.class.getName().equals(clz.getName());
     }
 
     private boolean isString(Class clz){

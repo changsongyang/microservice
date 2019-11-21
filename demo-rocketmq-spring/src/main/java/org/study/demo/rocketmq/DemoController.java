@@ -138,8 +138,7 @@ public class DemoController {
 
     @RequestMapping(value = "/sendBatch")
     public boolean sendBatch(String topic, String trxNo) {
-        String tags = "batchTag";
-
+        String tags = "batchTags";
         List<OrderVo> voList = new ArrayList<>();
         for(int i=1; i<=3; i++){
             OrderVo vo = new OrderVo();
@@ -152,7 +151,24 @@ public class DemoController {
             vo.setIsFinish(true);
             voList.add(vo);
         }
-        rmqSender.sendBatch(topic, voList);
+        rmqSender.sendBatch(voList);
+        return true;
+    }
+
+    @RequestMapping(value = "/sendBatch2")
+    public boolean sendBatch2(String topic, String tags, String trxNo) {
+        List<OrderVo> voList = new ArrayList<>();
+        for(int i=1; i<=3; i++){
+            OrderVo vo = new OrderVo();
+            vo.setTopic(topic);
+            vo.setMsgType(10002);
+            vo.setTrxNo(trxNo + i);
+
+            vo.setAmount(BigDecimal.valueOf(10.01 * i).setScale(2, BigDecimal.ROUND_DOWN));
+            vo.setIsFinish(true);
+            voList.add(vo);
+        }
+        rmqSender.sendBatch(topic + ":" + tags, voList);
         return true;
     }
 
