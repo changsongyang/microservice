@@ -45,6 +45,7 @@ import java.util.*;
  */
 public class ESClient {
     public static final int MAX_GROUP_SIZE = 1000;//最大分组数量
+    private static final String INNER_GROUP_VALUE = null;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private RestHighLevelClient restEsClient;
     private Cache<String, Map<String, String>> cache;
@@ -151,10 +152,10 @@ public class ESClient {
     public EsAggResult aggregation(EsQuery esQuery){
         SearchResponse response = executeAggregation(esQuery);
 
-        EsAggResult aggResult = new EsAggResult();
+        AggResultTemp aggResultTemp = new AggResultTemp();
         if(response.getHits().getTotalHits().value > 0){
             if (isEmpty(esQuery.getGroupBy())){
-                fillEsAggResult(aggResult, null, response.getAggregations().iterator(), esQuery.getSnakeCase());
+                fillEsAggResult(aggResultTemp, INNER_GROUP_VALUE, response.getAggregations().iterator(), esQuery.getSnakeCase());
             }else{
                 Iterator<Aggregation> iterator = response.getAggregations().iterator();
                 while (iterator.hasNext()){
@@ -168,12 +169,12 @@ public class ESClient {
                     for(Terms.Bucket bucket : terms.getBuckets()){
                         String groupValue = ((Terms.Bucket) bucket).getKeyAsString();
                         Aggregations bucketAgg = ((Terms.Bucket) bucket).getAggregations();
-                        fillEsAggResult(aggResult, groupValue, bucketAgg.iterator(), esQuery.getSnakeCase());
+                        fillEsAggResult(aggResultTemp, groupValue, bucketAgg.iterator(), esQuery.getSnakeCase());
                     }
                 }
             }
         }
-        return aggResult;
+        return aggResultTemp.toEsAggResult();
     }
 
     /**
@@ -448,7 +449,7 @@ public class ESClient {
         }
     }
 
-    private void fillEsAggResult(EsAggResult aggResult, String groupValue, Iterator<Aggregation> iterator, boolean snakeCase){
+    private void fillEsAggResult(AggResultTemp aggResult, String groupValue, Iterator<Aggregation> iterator, boolean snakeCase){
         while(iterator.hasNext()) {
             Aggregation aggEs = iterator.next();
             String fieldName = splitFieldName(aggEs.getName());
@@ -457,23 +458,17 @@ public class ESClient {
             }
 
             org.study.common.util.dto.Aggregation agg;
-            if(groupValue == null){
-                agg = aggResult.getAggMap().get(fieldName);
-                if (agg == null) {
-                    agg = new org.study.common.util.dto.Aggregation();
-                    aggResult.getAggMap().put(fieldName, agg);
-                }
-            }else{
-                Map<String, org.study.common.util.dto.Aggregation> aggMap = aggResult.getAggGroupMap().get(fieldName);
-                if(aggMap == null){
-                    agg = new org.study.common.util.dto.Aggregation();
-                    aggMap = new HashMap<>();
-                    aggMap.put(groupValue, agg);
-                    aggResult.getAggGroupMap().put(fieldName, aggMap);
-                }else if((agg = aggMap.get(groupValue)) == null){
-                    agg = new org.study.common.util.dto.Aggregation();
-                    aggMap.put(groupValue, agg);
-                }
+            Map<String, org.study.common.util.dto.Aggregation> aggMap = aggResult.getAggMap().get(fieldName);
+            if(aggMap == null){
+                agg = new org.study.common.util.dto.Aggregation();
+                agg.setGroupValue(groupValue);
+                aggMap = new HashMap<>();
+                aggMap.put(groupValue, agg);
+                aggResult.getAggMap().put(fieldName, aggMap);
+            }else if((agg = aggMap.get(groupValue)) == null){
+                agg = new org.study.common.util.dto.Aggregation();
+                agg.setGroupValue(groupValue);
+                aggMap.put(groupValue, agg);
             }
 
             switch(aggEs.getType()){
@@ -645,6 +640,40 @@ public class ESClient {
             this.getRestEsClient().close();
         }catch(Throwable e){
 
+        }
+    }
+
+    /**
+     * 统计结果的临时存放值
+     */
+    private class AggResultTemp{
+        Map<String, Map<String, org.study.common.util.dto.Aggregation>> aggMap = new HashMap<>();
+
+        public Map<String, Map<String, org.study.common.util.dto.Aggregation>> getAggMap() {
+            return aggMap;
+        }
+
+        public void setAggMap(Map<String, Map<String, org.study.common.util.dto.Aggregation>> aggMap) {
+            this.aggMap = aggMap;
+        }
+
+        public EsAggResult toEsAggResult(){
+            EsAggResult result = new EsAggResult();
+            for(Map.Entry<String, Map<String, org.study.common.util.dto.Aggregation>> entry : aggMap.entrySet()){
+                String key = entry.getKey();
+                Map<String, org.study.common.util.dto.Aggregation> valueMap = entry.getValue();
+
+                if(valueMap.size() == 1 && valueMap.containsKey(INNER_GROUP_VALUE)){
+                    result.getAggMap().put(key, valueMap.get(INNER_GROUP_VALUE));
+                }else{
+                    List<org.study.common.util.dto.Aggregation> aggList = new ArrayList<>();
+                    for(Map.Entry<String, org.study.common.util.dto.Aggregation> aggEntry : valueMap.entrySet()){
+                        aggList.add(aggEntry.getValue());
+                    }
+                    result.getAggListMap().put(key, aggList);
+                }
+            }
+            return result;
         }
     }
 }

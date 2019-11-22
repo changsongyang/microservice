@@ -9,11 +9,20 @@ import java.math.BigDecimal;
 public class Aggregation implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private String groupValue;//分组值，统计条件中有使用group by时才有值
     private Long count;
     private BigDecimal min;
     private BigDecimal max;
     private BigDecimal sum;
     private BigDecimal avg;
+
+    public String getGroupValue() {
+        return groupValue;
+    }
+
+    public void setGroupValue(String groupValue) {
+        this.groupValue = groupValue;
+    }
 
     public Long getCount() {
         return count;

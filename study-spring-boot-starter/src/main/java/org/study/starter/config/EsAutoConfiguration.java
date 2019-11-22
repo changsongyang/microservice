@@ -6,7 +6,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchAutoConfiguration;
+import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.study.starter.component.ESClient;
@@ -14,7 +14,7 @@ import org.study.starter.component.ESClient;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@AutoConfigureAfter(ElasticsearchAutoConfiguration.class)
+@AutoConfigureAfter(RestClientAutoConfiguration.class)
 @ConditionalOnClass(RestHighLevelClient.class)
 @Configuration
 public class EsAutoConfiguration {
