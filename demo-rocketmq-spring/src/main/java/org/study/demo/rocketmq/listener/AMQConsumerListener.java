@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.Message;
 import java.util.concurrent.atomic.AtomicLong;
 
-//@Component
+@Component
 public class AMQConsumerListener {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     AtomicLong messageCount = new AtomicLong(1);
@@ -35,5 +35,35 @@ public class AMQConsumerListener {
         long timeCost = (System.currentTimeMillis() - start)/1000;
 
         logger.info("接收到MQ消息 timeCost={} messageCount={} textMessage = {} ", timeCost, messageCount.incrementAndGet(), textMessage);
+    }
+
+    @JmsListener(destination = "Consumer.A.VirtualTopic.Orders", subscription = "receiveVTopicA", concurrency = "1-5")
+    public void receiveVTopicA(Message message){
+        ActiveMQTextMessage activeMQTextMessage = (ActiveMQTextMessage) message;
+        String textMessage;
+        try {
+            textMessage = activeMQTextMessage.getText();
+        } catch (Exception ex) {
+            throw new RuntimeException("消息转换时发生异常！", ex);
+        }
+
+        logger.info("接收到MQ消息 textMessage = {} ", textMessage);
+    }
+
+    @JmsListener(destination = "Consumer.B.VirtualTopic.Orders", subscription = "receiveVTopicB", concurrency = "1-5")
+    public void receiveVTopicB(Message message){
+        ActiveMQTextMessage activeMQTextMessage = (ActiveMQTextMessage) message;
+        String textMessage;
+        try {
+            textMessage = activeMQTextMessage.getText();
+        } catch (Exception ex) {
+            throw new RuntimeException("消息转换时发生异常！", ex);
+        }
+        logger.info("接收到MQ消息 textMessage = {} ", textMessage);
+
+        //DEBUG
+        if(true){
+            throw new RuntimeException("测试消息消费ACK机制");
+        }
     }
 }

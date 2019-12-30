@@ -151,14 +151,14 @@ public class TimerController {
     }
 
     @RequestMapping(value = "pauseInstance", method = RequestMethod.POST)
-    public RestResult pauseInstance(){
-        quartzAdminService.pauseInstance();
+    public RestResult pauseInstance(String namespace){
+        quartzAdminService.pauseAllInstanceAsync(namespace);
         return RestResult.bizSuccess(100, "实例暂停成功");
     }
 
     @RequestMapping(value = "resumeInstance", method = RequestMethod.POST)
-    public RestResult resumeInstance(){
-        quartzAdminService.resumeInstance();
+    public RestResult resumeInstance(String namespace){
+        quartzAdminService.resumeAllInstanceAsync(namespace);
         return RestResult.bizSuccess(100, "实例恢复成功");
     }
 }

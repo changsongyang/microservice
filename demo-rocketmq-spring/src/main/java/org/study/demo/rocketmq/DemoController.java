@@ -1,5 +1,6 @@
 package org.study.demo.rocketmq;
 
+import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -54,6 +55,26 @@ public class DemoController {
         long timeCost = ((System.currentTimeMillis()-start))/1000;
         System.out.println("发送结束 sendAmq timeCost="+timeCost);
         return true;
+    }
+
+    @RequestMapping(value = "/sendAmqVTopic")
+    public String sendAmqVTopic(String topic, String trxNo){
+        String tags = "oneTag";
+        OrderVo vo = new OrderVo();
+        vo.setTopic(topic);
+        vo.setTags(tags);
+        vo.setMsgType(10001);
+        vo.setTrxNo(trxNo);
+        vo.setAmount(BigDecimal.valueOf(20.36));
+        vo.setIsFinish(true);
+
+        long start = System.currentTimeMillis();
+        for(int i=0; i<messageCount; i++){
+            jmsTemplate.convertAndSend(new ActiveMQTopic("VirtualTopic.Orders"), JsonUtil.toString(vo));
+        }
+        long timeCost = ((System.currentTimeMillis()-start))/1000;
+        System.out.println("发送结束 sendAmq timeCost="+timeCost);
+        return "ok";
     }
 
     @RequestMapping(value = "/sendMuch")

@@ -27,4 +27,11 @@ public class RMQConsumeListener {
         public void onMessage(MessageVo message) {
             logger.info("接收到cron消息 MessageVo = {}", JsonUtil.toString(message));        }
     }
+
+    @Component
+    @RocketMQMessageListener(topic = MsgTopicAndTags.TOPIC_QUARTZ_TIMER, selectorExpression = "*", consumeThreadMax = 1, consumerGroup = "cronTimer_consume_2")
+    public class cornTimerConsumer2 implements RocketMQListener<MessageVo> {
+        public void onMessage(MessageVo message) {
+            logger.info("接收到2消息 MessageVo = {}", JsonUtil.toString(message));        }
+    }
 }
