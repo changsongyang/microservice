@@ -32,7 +32,7 @@
         <rocketmq-spring-boot.version>2.0.4</rocketmq-spring-boot.version>
         <redisson.version>3.10.7</redisson.version>
         <redisson-starter.version>3.11.2</redisson-starter.version>
-        <quartz.version>2.3.1</quartz.version>
+        <quartz.version>2.3.2</quartz.version>
         <curator.version>4.2.0</curator.version>
 
         <!-- dubbo 相关 -->
